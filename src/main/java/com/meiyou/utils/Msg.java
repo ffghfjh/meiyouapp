@@ -41,7 +41,6 @@ public class Msg {
 		result.setCode(200);
 		result.setMsg("失败");
 		return result;
-		
 	}
 
 	public static Msg noLogin(){

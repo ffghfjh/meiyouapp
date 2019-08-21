@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @description:
+ * @description: 推拿会所控制器
  * @author: Mr.Z
  * @create: 2019-08-21 14:34
  **/

@@ -36,4 +36,12 @@ public interface ShopService {
      * @return
      */
     Shop selectBySid(Integer id);
+
+    /**
+     * 根据经纬度查找附近的景点商家
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    List<Shop> selectShop(float longitude, float latitude);
 }

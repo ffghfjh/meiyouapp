@@ -32,21 +32,13 @@ public class UserController {
      * @param req
      * @return
      */
-    @RequestMapping(value = "phoneLogin",method = RequestMethod.GET)
-    public Msg phoneLogin(@RequestParam("手机号") String phone,@RequestParam("密码") String password, HttpServletRequest req){
+    @RequestMapping(value = "phoneLogin",method = RequestMethod.POST)
+    public Msg phoneLogin(String phone,String password, HttpServletRequest req){
         if(phone==null||password==null){
             return Msg.nullParam();
         }else{
-
             Msg msg = userService.phoneLogin(phone,password);
-            if(msg.getCode()==100){
-                RedisTemplate<String,String> redis = new RedisTemplate<>();
-                String token = UUID.randomUUID().toString();//token生成
-                redis.boundValueOps(String.valueOf(msg.getExtend().get("uid"))).set(token);
-
-            }
+            return msg;
         }
-       return null;
     }
-
 }

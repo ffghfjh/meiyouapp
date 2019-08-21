@@ -2,8 +2,14 @@ package com.meiyou.service;
 
 import com.meiyou.pojo.Activity;
 import com.meiyou.utils.Msg;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -16,7 +22,8 @@ import java.util.List;
 public interface ActivityService {
 
     //发布动态
-    int postActivity(Activity activity);
+    int postActivity(MultipartFile file, Activity activity, ModelMap map
+            , HttpServletRequest request, HttpServletResponse response) throws IOException;
 
     //删除动态
     int removeActivity(int aid);

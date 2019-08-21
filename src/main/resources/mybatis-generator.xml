@@ -54,5 +54,7 @@
         <table tableName="tour" domainObjectName="Tour"></table>
         <table tableName="tour_ask" domainObjectName="TourAsk"></table>
         <table tableName="user" domainObjectName="User"></table>
+        <table tableName="club_star" domainObjectName="ClubStar"></table>
+        <table tableName="shop_star" domainObjectName="ShopStar"></table>
     </context>
 </generatorConfiguration>

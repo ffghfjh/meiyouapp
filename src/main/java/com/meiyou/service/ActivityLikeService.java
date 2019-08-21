@@ -12,7 +12,7 @@ import com.meiyou.pojo.ActivityLike;
 public interface ActivityLikeService {
 
     //点赞
-    int addLike(int aid, int uid);
+    int like(int aid, int uid);
 
     //取消点赞
     int removeLike(int aid, int uid);

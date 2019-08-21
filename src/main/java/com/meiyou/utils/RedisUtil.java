@@ -80,8 +80,7 @@ public class RedisUtil {
      public static Long addReo(Coordinate coordinate, String table) {
          Jedis jedis = null;  
          try {  
-             jedis = jedisPool.getResource();  
-            
+             jedis = jedisPool.getResource();
              //第一个参数可以理解为表名  
              return jedis.geoadd(table,coordinate.getLongitude(),coordinate.getLatitude(),coordinate.getKey());  
          } catch (Exception e) {  
@@ -154,6 +153,7 @@ public class RedisUtil {
                   jedis.close();
 
           }
+
           return false;
       }
 

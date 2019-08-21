@@ -1,6 +1,9 @@
 package com.meiyou.utils;
 
 import com.meiyou.model.TokenModel;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import javax.annotation.Resource;
 
 /**
  * @author     ：dengshilin
@@ -10,6 +13,9 @@ import com.meiyou.model.TokenModel;
  * @version: 1
  */
 public interface TokenManager {
+
+
+
 
     /**
      * 创建一个token关联上指定用户

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="DB2Tables"    targetRuntime="MyBatis3">
+        <!--<commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>-->
+        <!--数据库链接地址账号密码-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://rm-bp1msl568beq541b6ro.mysql.rds.aliyuncs.com:3306/meiyouapp?useUnicode=true"
+                        userId="root"
+                        password="SHIlin24664266" >
+        </jdbcConnection>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="com.meiyou.pojo" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.meiyou.mapper"
+                             targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 列出要生成代码的所有表，这里配置的是不生成Example文件 -->
+        <!-- 这个地方呢 也是你需要自动修改的地方  第一个参数是你数据库的表名  第二个参数就是想要生成实体类的名称  -->
+        <table tableName="activity" domainObjectName="Activity"></table>
+        <table tableName="activity_like" domainObjectName="ActivityLike"></table>
+        <table tableName="admin" domainObjectName="Admin"></table>
+        <table tableName="appoint_ask" domainObjectName="AppointAsk"></table>
+        <table tableName="appointment" domainObjectName="Appointment"></table>
+        <table tableName="authorization" domainObjectName="Authorization"></table>
+        <table tableName="cash" domainObjectName="Cash"></table>
+        <table tableName="club" domainObjectName="Club"></table>
+        <table tableName="club_buy" domainObjectName="ClubBuy"></table>
+        <table tableName="comment" domainObjectName="Comment"></table>
+        <table tableName="read" domainObjectName="Read"></table>
+        <table tableName="recharge" domainObjectName="Recharge"></table>
+        <table tableName="red_packet" domainObjectName="RedPacket"></table>
+        <table tableName="root_message" domainObjectName="RootMessage"></table>
+        <table tableName="share" domainObjectName="Share"></table>
+        <table tableName="shop" domainObjectName="Shop"></table>
+        <table tableName="shop_buy" domainObjectName="ShopBuy"></table>
+        <table tableName="tour" domainObjectName="Tour"></table>
+        <table tableName="tour_ask" domainObjectName="TourAsk"></table>
+        <table tableName="user" domainObjectName="User"></table>
+    </context>
+</generatorConfiguration>

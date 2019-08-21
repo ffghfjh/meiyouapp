@@ -1,5 +1,6 @@
 package com.meiyou.service;
 
+import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.Club;
 
 import java.util.List;
@@ -36,4 +37,12 @@ public interface ClubService {
      * @return
      */
     Club selectByCid(Integer id);
+
+    /**
+     * 根据经纬度查询附近的会所
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    List<Club> selectClub(float longitude, float latitude);
 }

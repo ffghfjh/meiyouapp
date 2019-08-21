@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * @description:
+ * @description: 景点商家(同城导游)业务层实现类
  * @author: Mr.Z
  * @create: 2019-08-21 17:38
  **/
 @Service
-public class ShopServiceImpl implements ShopService {
+public class ShopServiceImpl implements ShopService{
+
     @Override
     public void addShop(Shop shop) {
 
@@ -30,6 +31,11 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public Shop selectBySid(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<Shop> selectShop(float longitude, float latitude) {
         return null;
     }
 }

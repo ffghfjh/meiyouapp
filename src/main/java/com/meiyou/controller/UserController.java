@@ -1,24 +1,19 @@
 package com.meiyou.controller;
 
-import com.meiyou.mapper.AuthorizationMapper;
-import com.meiyou.mapper.UserMapper;
-import com.meiyou.pojo.AuthorizationExample;
-import com.meiyou.service.GeoService;
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.RedisServer;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
 
 @RestController
 @Api("用户控制器")
@@ -31,8 +26,7 @@ public class UserController {
     SendCodeApiService sendCodeApiService;
     @Autowired
     RedisTemplate<String,String> redis;
-    @Autowired
-    GeoService geoServices;
+
     /**
      * 用户手机号登录
      * @param phone 手机号
@@ -67,16 +61,5 @@ public class UserController {
             return sendCodeApiService.sendRebackPwd(phone);
         }
         return Msg.fail();
-    }
-
-
-    @RequestMapping(value="addUserGeo",method = RequestMethod.POST)
-    public Msg addUserGeo(){
-        geoServices.addUserGeo(114.1,22.2,"1");
-        geoServices.addUserGeo(114.7,22.1,"3");
-        geoServices.addUserGeo(114.2,22.2,"4");
-        geoServices.getUserGeo(114.1,22.2);
-
-        return Msg.success();
     }
 }

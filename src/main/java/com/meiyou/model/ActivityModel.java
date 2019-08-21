@@ -24,4 +24,15 @@ public class ActivityModel {
     //距离
     private String distance;
 
+    //发布时间
+    private String postTime;
+
+    //点赞数
+    private int likeNum;
+
+    //评论数
+     private int commentNum;
+
+
+
 }

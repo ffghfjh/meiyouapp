@@ -33,6 +33,9 @@ public interface ActivityService {
     //通过用户id查询他的所有动态
     List<Activity> listActivityByUid(int uid);
 
+    //获取所有动态
+    List<Activity> listActivity();
+
     //通过经纬度获取所有动态
     List<Activity> listActivityBy(float longitude, float latitude);
 

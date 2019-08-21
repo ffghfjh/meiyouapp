@@ -93,4 +93,10 @@ public interface ActivityMapper {
      * @mbggenerated Wed Aug 21 14:28:33 CST 2019
      */
     int updateByPrimaryKey(Activity record);
+
+    /**
+     * hzy
+     * 查询所有动态
+     */
+    List<Activity> ListActivityByExample(ActivityExample example);
 }

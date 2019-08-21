@@ -1,7 +1,10 @@
 package com.meiyou.service.impl;
 
+import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.pojo.Activity;
+import com.meiyou.pojo.ActivityExample;
 import com.meiyou.service.ActivityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,10 @@ import java.util.List;
  */
 @Service
 public class ActivityServiceImpl implements ActivityService {
+
+    @Autowired
+    ActivityMapper activityMapper;
+
     @Override
     public int postActivity(Activity activity) {
         return 0;
@@ -42,6 +49,15 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public List<Activity> listActivityByUid(int uid) {
+        return null;
+    }
+
+    @Override
+    public List<Activity> listActivity() {
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+
+
         return null;
     }
 

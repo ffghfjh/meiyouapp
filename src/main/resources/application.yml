@@ -1,0 +1,4 @@
+spring:
+  kafka:
+    ssl:
+      key-store-location:

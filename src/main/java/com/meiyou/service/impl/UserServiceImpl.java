@@ -8,6 +8,7 @@ import com.meiyou.pojo.User;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import io.netty.util.Constant;
 import io.netty.util.internal.logging.Log4JLoggerFactory;
 import io.swagger.models.auth.In;
@@ -15,11 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -28,8 +26,6 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     @Autowired
     AuthorizationMapper authMapper;
-    @Resource
-    RedisTemplate<String,String> stringRedisTemplate;
 
 
     @Override
@@ -58,7 +54,9 @@ public class UserServiceImpl implements UserService {
             msg.add("nickName",user.getNickname());
             msg.add("header",user.getHeader());
             String token = UUID.randomUUID().toString();//UUID生成token
-            setToken(user.getId(),token);//写入鉴权信息
+            if(!RedisUtil.setToken(String.valueOf(user.getId()),token)){
+                System.out.println("写入token失败");
+            }
             msg.add("token",token);
             return msg;
         }else if(authorizations == null ||authorizations.size() == 0 ){
@@ -72,8 +70,5 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    //生成token写入redis
-    private void setToken(int uid,String token){
-        stringRedisTemplate.boundValueOps(String.valueOf(uid)).set(token,Constants.TOKEN_EXPIRES_HOUR,TimeUnit.HOURS);//token写入redsi
-    }
+
 }

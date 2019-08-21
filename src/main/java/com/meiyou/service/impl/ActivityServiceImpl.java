@@ -1,4 +1,11 @@
 package com.meiyou.service.impl;
+
+import com.meiyou.pojo.Activity;
+import com.meiyou.service.ActivityService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 /**
  * @author     ：huangzhaoyang
  * @date       ：Created in 2019/8/21 14:19
@@ -6,5 +13,40 @@ package com.meiyou.service.impl;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-public class ActivityServiceImpl {
+@Service
+public class ActivityServiceImpl implements ActivityService {
+    @Override
+    public int postActivity(Activity activity) {
+        return 0;
+    }
+
+    @Override
+    public int removeActivity(int aid) {
+        return 0;
+    }
+
+    @Override
+    public int removeAllActivityByUid() {
+        return 0;
+    }
+
+    @Override
+    public int updateActivity(Activity activity) {
+        return 0;
+    }
+
+    @Override
+    public Activity getActivityByAid(int aid) {
+        return null;
+    }
+
+    @Override
+    public List<Activity> listActivityByUid(int uid) {
+        return null;
+    }
+
+    @Override
+    public List<Activity> listActivityBy(float longitude, float latitude) {
+        return null;
+    }
 }

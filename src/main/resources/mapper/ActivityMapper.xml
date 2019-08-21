@@ -18,6 +18,28 @@
     <result column="commont_num" jdbcType="INTEGER" property="commontNum" />
     <result column="bool_close" jdbcType="BIT" property="boolClose" />
   </resultMap>
+
+<!--  hzy
+  添加点赞实体和阅读实体
+-->
+  <resultMap id="ActWithLikeWithReadBaseResultMap" type="com.meiyou.pojo.Activity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="publish_id" jdbcType="INTEGER" property="publishId" />
+    <result column="imgs_url" jdbcType="VARCHAR" property="imgsUrl" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="read_num" jdbcType="INTEGER" property="readNum" />
+    <result column="like_num" jdbcType="INTEGER" property="likeNum" />
+    <result column="commont_num" jdbcType="INTEGER" property="commontNum" />
+    <result column="bool_close" jdbcType="TINYINT" property="boolClose" />
+    <collection property="likeList" ofType="com.meiyou.pojo.ActivityLike">
+
+    </collection>
+
+
+  </resultMap>
+
   <sql id="Example_Where_Clause">
     <!--
       WARNING - @mbggenerated

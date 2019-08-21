@@ -15,8 +15,8 @@ import java.util.List;
  */
 public interface ActivityService {
 
-    //添加动态
-    int addActivity(Activity activity);
+    //发布动态
+    int postActivity(Activity activity);
 
     //删除动态
     int removeActivity(int aid);

@@ -1,7 +1,11 @@
 package com.meiyou.controller;
 
+import com.meiyou.mapper.AuthorizationMapper;
+import com.meiyou.mapper.UserMapper;
+import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Api("用户控制器")
 public class UserController {
+
+
 
 
     /**
@@ -26,6 +32,7 @@ public class UserController {
         if(phone==null||password==null){
             return Msg.nullParam();
         }else{
+
             return null;
         }
 

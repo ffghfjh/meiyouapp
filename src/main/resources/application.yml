@@ -17,6 +17,8 @@ spring:
         max-idle: 10 # 连接池中的最大空闲连接
         min-idle: 0 # 连接池中的最小空闲连接
     timeout: 1000 # 连接超时时间（毫秒）
+  cache:
+    cache-names: MeiyouCache
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.meiyou.pojo

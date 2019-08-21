@@ -18,6 +18,8 @@ public class Msg {
 	public static int NOLOGIN = 300;  //没有登录
 	public static int NULLPARAM = 400;//参数报空
 
+
+
 	//状态码
 	private int code;
 	//提示信息

@@ -14,4 +14,6 @@ public class Constants {
     public static String ACCESSKEYID = "LTAILzv9HnGuCEPg";  //阿里云
     public static String ACCESSKEYSERECT = "9I8BN2KnkebQOS1O89utWPKtfPcRrl"; //阿里云
 
+
+
 }

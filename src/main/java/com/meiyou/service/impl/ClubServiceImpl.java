@@ -4,6 +4,7 @@ import com.meiyou.mapper.ClubMapper;
 import com.meiyou.pojo.Club;
 import com.meiyou.service.ClubService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -29,7 +30,6 @@ public class ClubServiceImpl implements ClubService {
 
     @Override
     public void deleteClub(Integer id) {
-
     }
 
     @Override
@@ -39,6 +39,12 @@ public class ClubServiceImpl implements ClubService {
 
     @Override
     public Club selectByCid(Integer id) {
+        return null;
+    }
+
+    @Override
+    @Cacheable(cacheNames = "Club")
+    public List<Club> selectClub(float longitude, float latitude) {
         return null;
     }
 }

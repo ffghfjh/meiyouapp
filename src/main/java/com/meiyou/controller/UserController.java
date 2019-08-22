@@ -2,8 +2,7 @@ package com.meiyou.controller;
 
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.service.UserService;
-import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @Api(value = "用户控制器",tags = "用户接口层")
@@ -62,7 +62,7 @@ public class UserController {
     @RequestMapping(value = "phoneRegist",method = RequestMethod.POST)
     @ApiOperation(value = "手机号注册",notes = "1001 手机号被注册 1003 头像上传失败  1000验证码错误")
     public Msg phoneRegist(String code, String phone, String password, String nickname, String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req){
-        if(phone==null||password==null){
+        if(phone==null||password==null||phone.equals("")||password.equals("")){
             return Msg.nullParam();
         }else{
             Msg msg = userService.userRegist(code,phone,password,nickname,birthday,sex,signature,img,req);
@@ -89,9 +89,26 @@ public class UserController {
     }
 
     @RequestMapping(value = "alipayLogin",method = RequestMethod.POST)
-    @ApiOperation(value="支付宝登录")
+    @ApiOperation(value="支付宝登录",notes = "1000 需要绑定手机 接收参数  aliId aliToken 绑定手机要用。")
     public Msg alipayLogin(String auth_code){
 
-        return null;
+        return userService.alipayLogin(auth_code);
+    }
+
+
+    /**
+     * 获取签名信息和加签信息
+     */
+    @RequestMapping(value = "getauthInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "获取签名信息和加签信息")
+    public String getauthInfo(HttpServletRequest req) {
+
+        String uccount = ShareCodeUtil.getRamdomCount();
+        Map<String, String> authInfoMap = OrderInfoUtil2_0.buildAuthInfoMap(Constants.PID, Constants.APP_ID, uccount,
+                true);
+        String info = OrderInfoUtil2_0.buildOrderParam(authInfoMap);
+        String sign = OrderInfoUtil2_0.getSign(authInfoMap, Constants.APP_PRIVATE_KEY, true);
+        String authInfo = info + "&" + sign;
+        return authInfo;
     }
 }

@@ -10,6 +10,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.params.GeoRadiusParam;
+import redis.clients.jedis.params.SetParams;
 
 public class RedisUtil {
     
@@ -159,12 +160,14 @@ public class RedisUtil {
     }
 
     /**
-     * 设置token
+     * 设置值
      * @param uid
      * @param token
      * @return
      */
-      public static boolean setToken(String uid,String token){
+      public static boolean setToken(String uid,String token,int time){
+          SetParams setParams = new SetParams();
+          setParams.ex(time);
           Jedis jedis = null;
           try {
               jedis = jedisPool.getResource();
@@ -201,4 +204,21 @@ public class RedisUtil {
          }
          return false;
      }
+
+    public static boolean authCode(String phone,String code){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String tokenRedis = jedis.get(phone);
+            if(tokenRedis.equals(code)){
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+        return false;
+    }
 }

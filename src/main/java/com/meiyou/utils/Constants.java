@@ -23,8 +23,8 @@ public class Constants {
     public static long SDKAPPID = 1400207520;// 腾讯云SDKAPPID
     public static String IDENTIFIER = "administrator";// 腾讯云IM管理员账号
 
-    public static long TOKEN_EXPIRES_HOUR = 4000; // token过期时间
-    public static long REDIS_CODE_OUT_TIME = 1000;//验证码redis过期时间
+    public static int TOKEN_EXPIRES_SECOND = 72000; // token过期时间 单位/秒
+    public static int REDIS_CODE_OUT_TIME = 1000;//验证码redis过期时间 单位/秒
     public static String GEO_USER_KEY = "user";
     public static String GEO_ACTIVITY = "activity";
     public static String ACCESSKEYID = "LTAILzv9HnGuCEPg";  //阿里云

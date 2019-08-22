@@ -4,16 +4,21 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
+import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
+import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AliPayInfo;
 import com.meiyou.pojo.Authorization;
 import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.User;
+import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.ShareCodeUtil;
 import io.netty.util.Constant;
 import io.netty.util.internal.logging.Log4JLoggerFactory;
 import io.swagger.models.auth.In;
@@ -21,8 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,6 +38,8 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     @Autowired
     AuthorizationMapper authMapper;
+    @Autowired
+    TencentImService imService;
 
 
     // 支付宝调用接口之前的初始化
@@ -39,6 +48,7 @@ public class UserServiceImpl implements UserService {
             Constants.SIGN_TYPE);
 
     @Override
+    @Transactional
     public Msg alipayLogin(String auth_code) {
 
         Msg msg;
@@ -54,28 +64,114 @@ public class UserServiceImpl implements UserService {
                 AuthorizationExample example = new AuthorizationExample();
                 AuthorizationExample.Criteria criteria = example.createCriteria();
                 criteria.andIdentityTypeEqualTo(2);//验证方式为支付宝
-                criteria.andIdentifierEqualTo(alipayUserId);
-
-                //是否存在该支付宝用户
+                criteria.andIdentifierEqualTo(alipayUserId);//唯一支付宝id
                 List<Authorization> authorizations = authMapper.selectByExample(example);
+                //是否存在该支付宝用户
                 if(authorizations.size()>0){
                     Authorization authorization = authorizations.get(0);
+                    User user = userMapper.selectByPrimaryKey(authorization.getUserId());//获取用户
+                    //验证绑定手机
                     if(authorization.getBoolVerified()){
-
+                        msg  = Msg.success();
+                        msg.add("uid",user.getId());
+                        msg.add("account",user.getAccount());
+                        msg.add("nickName",user.getNickname());
+                        msg.add("header",user.getHeader());
+                        msg.add("aliId",authorization.getIdentifier());//阿里ID
+                        msg.add("token",authorization.getCredential());//授权凭证
+                        return msg;
                     }else {
-                      msg = Msg.fail();
-                      msg.setCode(1000);
+                       String account = user.getAccount();
+                       msg = Msg.fail();
+                       msg.setCode(1000);
+                       msg.setMsg("未绑定手机");
+                       String aliToken = UUID.randomUUID().toString();
+                       RedisUtil.setAliLoginToken(alipayUserId,aliToken);
+                       msg.add("aliId",alipayUserId);
+                       msg.add("aliToken",aliToken);
+                       return msg;
                     }
                 }
+                //不存在用户支付宝信息获取
                 else{
+                    String access_token = response.getAccessToken();// 访问令牌,通过该令牌调用需要用户信息授权的接口，如alipay.user.info.share
+                    System.out.println("授权令牌：" + access_token);
+                    AlipayUserInfoShareRequest infoShareRequest = new AlipayUserInfoShareRequest();
+                    AlipayUserInfoShareResponse infoShareResponse = alipayClient.execute(infoShareRequest, access_token);
+                    if (infoShareResponse.isSuccess()) {
+                        Map<String, Object> map = new HashMap<>();
+                        AliPayInfo alipayinfo = new AliPayInfo();
+                        alipayinfo.setUserId(infoShareResponse.getUserId()); // 支付宝id
+                        alipayinfo.setAvatar(infoShareResponse.getAvatar()); // 支付宝头像URL
+                        alipayinfo.setGender(infoShareResponse.getGender()); // 支付宝性别
+                        System.out.println("手机号" + infoShareResponse.getPhone());//
+                        alipayinfo.setIs_certied(infoShareResponse.getIsCertified()); // 支付宝是否实名
+                        alipayinfo.setNick_name(infoShareResponse.getNickName()); // 支付宝昵称
 
+
+                        User user = new User();
+                        String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                        user.setAccount(userAccount);
+                        user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
+                        user.setBindAlipay(false);//未绑定支付宝
+                        user.setBirthday(Constants.USER_BIRTHDAY);//设置默认出生年月
+                        user.setBoolClose(true);
+                        user.setHeader(alipayinfo.getAvatar());//设置头像
+                        user.setNickname(alipayinfo.getNick_name());//设置昵称
+                        Date date = new Date();
+                        user.setCreateTime(date);
+                        user.setUpdateTime(date);
+                        user.setMoney(0f);
+                        user.setSignature(Constants.SIGNATURE);//设置默认签名
+                        if(alipayinfo.getGender().equals("F")){
+                            user.setSex(false);//女
+                        }else {
+                            user.setSex(true);//男
+                        }
+                        user.setShareCode(ShareCodeUtil.toSerialCode(new Random().nextInt()));//设置邀请码
+                        if(userMapper.insert(user)==1){
+                            int uid = user.getId();//获取插入的用户
+                            Authorization authorization = new Authorization();
+                            authorization.setBoolVerified(false);//设置为激活状态
+                            authorization.setCreateTime(date);
+                            authorization.setUpdateTime(date);
+                            authorization.setIdentityType(2);//设置支付宝方式
+                            authorization.setCredential(access_token);//授权凭证
+                            authorization.setUserId(uid);//设置用户id
+                            if(authMapper.insert(authorization)==1){
+                                if(imService.registTencent(user)){
+                                    msg = Msg.success();
+                                    msg.setCode(1000);//10001需要绑定手机
+                                    msg.add("uid",user.getId());
+                                    msg.add("account",user.getAccount());
+                                    msg.add("nickName",user.getNickname());
+                                    msg.add("header",user.getHeader());
+                                    msg.add("aliId",authorization.getIdentifier());//阿里ID
+                                    msg.add("token",authorization.getCredential());//授权凭证
+                                    return msg;
+                                }else {
+                                    msg = Msg.fail();
+                                    msg.setMsg("腾讯云账号注册失败");
+                                    return msg;
+                                }
+                            }
+
+                            msg = Msg.fail();
+                            return msg;
+                        }
+                    } else {
+                        System.out.println("支付宝令牌授权失败");
+                        System.out.println("错误码" + infoShareResponse.getCode());
+                        System.out.println("明细错误码" + infoShareResponse.getSubCode());
+                        System.out.println("调用失败!" + infoShareResponse.getMsg());
+                    }
                 }
             }
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return Msg.fail();
     }
 
     @Override
@@ -113,6 +209,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Msg userRegist(String code, String phone, String password, String sharecode, String nickname, int old, String sex, String qianming, MultipartFile img) {
+
+        return null;
+    }
 
 
 }

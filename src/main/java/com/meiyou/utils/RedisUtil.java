@@ -135,6 +135,29 @@ public class RedisUtil {
         }
     }
 
+
+    /**
+     * 支付宝登录token设置、未绑定手机验证
+     * @param aliUserId
+     * @param token
+     * @return
+     */
+    public static boolean setAliLoginToken(String aliUserId,String token){
+        Jedis jedis = null;
+
+        try {
+            jedis = jedisPool.getResource();
+            jedis.set(aliUserId,token);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+        return false;
+    }
+
     /**
      * 设置token
      * @param uid
@@ -152,9 +175,7 @@ public class RedisUtil {
           } finally {
               if (null != jedis)
                   jedis.close();
-
           }
-
           return false;
       }
 

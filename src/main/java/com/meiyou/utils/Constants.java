@@ -7,6 +7,22 @@ package com.meiyou.utils;
  * @create: 2019-08-21 14:55
  **/
 public class Constants {
+    public static String USER_BAC_DEFAULT = "http://www.meiyou8.cn/meiyou/uimg/imgs/default.jpg";//默认用户资料背景
+    public static String USER_BIRTHDAY = "1996-11-12";//默认用户出生年月
+    public static String SIGNATURE = "该用户很懒，什么都没有";//用户默认签名
+
+
+    /**
+     * 腾讯云
+     */
+    public static String PRIKEY = "-----BEGIN PRIVATE KEY-----\r\n" +
+            "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgUBrb65xkExEVD3gU\r\n" +
+            "GEKsZ/Rr7InCiJKHqzkrXYsHMtOhRANCAASPWA7Nuen1mfTPeman3JRN/pdYUiPS\r\n" +
+            "O0r0S9+UOtXKwTgUaq2Zc1MTm4xYRX4n4Ntor9tZHd9q0oVsFzYj3DCB\r\n" +
+            "-----END PRIVATE KEY-----\r\n";
+    public static long SDKAPPID = 1400207520;// 腾讯云SDKAPPID
+    public static String IDENTIFIER = "administrator";// 腾讯云IM管理员账号
+
     public static long TOKEN_EXPIRES_HOUR = 4000; // token过期时间
     public static long REDIS_CODE_OUT_TIME = 1000;//验证码redis过期时间
     public static String GEO_USER_KEY = "user";

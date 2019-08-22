@@ -40,9 +40,8 @@ public class ActivityController {
     @ApiOperation(value = "发布动态", notes = "发布动态", httpMethod = "POST")
     @RequestMapping(value = "/postActivity", method = RequestMethod.POST)
     @ResponseBody
-    public Msg postActivity(MultipartFile file, Activity activity, ModelMap map
-            , HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int i = activityService.postActivity(file, activity, map, request, response);
+    public Msg postActivity(int uid, MultipartFile file ,String  content, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int i = activityService.postActivity(uid, file, content, request, response);
         if (i == 1) {
             return Msg.success();
         }
@@ -55,7 +54,7 @@ public class ActivityController {
      * 获取所有动态及其用户
      * @return
      */
-    @ApiOperation(value = "获取所有动态", notes = "获取所有动态", httpMethod = "POST")
+    @ApiOperation(value = "管理员获取所有用户动态", notes = "管理员获取所有用户动态", httpMethod = "POST")
     @RequestMapping("/listActivity")
     @ResponseBody
     public List<Activity> listActivity() {

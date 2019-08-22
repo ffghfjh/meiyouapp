@@ -12,6 +12,7 @@ import com.aliyuncs.profile.IClientProfile;
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +29,7 @@ import java.util.Random;
 public class SendCodeApiServiceImpl implements SendCodeApiService {
 
 
-    @Resource
-    RedisTemplate<String,String> redisTemplate;
+
 
     //短信签名
     String qianming = "美游";
@@ -75,7 +75,7 @@ public class SendCodeApiServiceImpl implements SendCodeApiService {
                 if(sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
                     Msg msg = Msg.success();
                     msg.setMsg(sendSmsResponse.getMessage());
-                    redisTemplate.boundValueOps(phone).set(verifyCode,Constants.REDIS_CODE_OUT_TIME);//保存验证码信息到Redis
+                    RedisUtil.setToken(phone,verifyCode,Constants.REDIS_CODE_OUT_TIME);
                     return msg;
                 }else if(sendSmsResponse.getCode().equals("isv.DAY_LIMIT_CONTROL")){
                     Msg msg = Msg.fail();
@@ -130,7 +130,7 @@ public class SendCodeApiServiceImpl implements SendCodeApiService {
                 if(sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
                     Msg msg = Msg.success();
                     msg.setMsg(sendSmsResponse.getMessage());
-                    redisTemplate.boundValueOps(phone).set(verifyCode,Constants.REDIS_CODE_OUT_TIME);//保存验证码信息到Redis
+                    RedisUtil.setToken(phone,verifyCode,Constants.REDIS_CODE_OUT_TIME);
                     return msg;
                 }else if(sendSmsResponse.getCode().equals("isv.DAY_LIMIT_CONTROL")){
                     Msg msg = Msg.fail();
@@ -153,17 +153,4 @@ public class SendCodeApiServiceImpl implements SendCodeApiService {
         }
         return Msg.fail();
     }
-
-    @Override
-    public Msg checkCode(String code, String phone) {
-
-        String redisCode =  redisTemplate.boundValueOps(phone).get();
-        if(code.equals(redisCode)){
-            return Msg.success();
-        }else {
-            return Msg.fail();
-        }
-    }
-
-
 }

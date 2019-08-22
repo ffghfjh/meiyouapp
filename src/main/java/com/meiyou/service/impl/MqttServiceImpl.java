@@ -1,10 +1,22 @@
 package com.meiyou.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.meiyou.mapper.RootMessageMapper;
+import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.MqttMessageModel;
+import com.meiyou.pojo.AuthorizationExample;
+import com.meiyou.pojo.RootMessageExample;
+import com.meiyou.pojo.User;
+import com.meiyou.pojo.UserExample;
 import com.meiyou.service.MqttService;
 import com.meiyou.utils.ConnectionOptionWrapper;
 import com.meiyou.utils.Constants;
+import com.meiyou.utils.MqttConstants;
+import com.meiyou.utils.MqttMessageFactory;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
@@ -23,6 +35,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class MqttServiceImpl implements MqttService {
 
+    @Autowired
+    UserMapper userMapper;
+    @Autowired
+    RootMessageMapper rootMessageMapper;
 
     /**
      * MQ4IOT 实例 ID，购买后控制台获取
@@ -50,13 +66,14 @@ public class MqttServiceImpl implements MqttService {
      * 如果使用了没有申请或者没有被授权的 topic 会导致鉴权失败，服务端会断开客户端连接。
      */
     final String parentTopic = "rtc";
+    final String childTopic = "videoChat";
     /**
      * MQ4IOT支持子级 topic，用来做自定义的过滤，此处为示意，可以填写任何字符串，具体参考https://help.aliyun.com/document_detail/42420.html?spm=a2c4g.11186623.6.544.1ea529cfAO5zV3
      * 需要注意的是，完整的 topic 长度不得超过128个字符。
      */
+    final String topic = parentTopic+"/"+childTopic;//需要订阅的话题
 
-
-
+    MqttClient mqttClient;
 
 
 
@@ -69,7 +86,7 @@ public class MqttServiceImpl implements MqttService {
                 /**
                  * QoS参数代表传输质量，可选0，1，2，根据实际需求合理设置，具体参考 https://help.aliyun.com/document_detail/42420.html?spm=a2c4g.11186623.6.544.1ea529cfAO5zV3
                  */
-                final int qosLevel = 0;
+                final int qosLevel = 2;
                 final ConnectionOptionWrapper connectionOptionWrapper = new ConnectionOptionWrapper(instanceId, accessKey, secretKey, clientId);
                 final MemoryPersistence memoryPersistence = new MemoryPersistence();
 
@@ -78,7 +95,7 @@ public class MqttServiceImpl implements MqttService {
                  * 客户端使用的协议和端口必须匹配，具体参考文档 https://help.aliyun.com/document_detail/44866.html?spm=a2c4g.11186623.6.552.25302386RcuYFB
                  * 如果是 SSL 加密则设置ssl://endpoint:8883
                  */
-                final MqttClient mqttClient = new MqttClient("tcp://" + endPoint + ":1883", clientId, memoryPersistence);
+                mqttClient = new MqttClient("tcp://" + endPoint + ":1883", clientId, memoryPersistence);
                 /**
                 *  客户端设置好发送超时时间，防止无限阻塞
                 */
@@ -97,8 +114,20 @@ public class MqttServiceImpl implements MqttService {
 
                     @Override
                     public void messageArrived(String topic, MqttMessage message) throws Exception {
-
                         System.out.println("收到mqtt消息");
+                        String msg = message.getPayload().toString();
+                        MqttMessageModel mqttMessage = JSON.parseObject(msg,MqttMessageModel.class);
+                        System.out.println(mqttMessage.getReceiver());
+                        if(mqttMessage.getMsgType()== MqttConstants.CALL){
+                            String sender = mqttMessage.getSender();//发送者
+                            if(authSenderMoey(sender)){
+
+                            }else{
+
+                            }
+                        }
+
+
                     }
 
                     @Override
@@ -107,9 +136,24 @@ public class MqttServiceImpl implements MqttService {
                     }
 
                     public void connectComplete(boolean reconnect, String serverURI) {
+                        /**
+                         * 客户端连接成功后就需要尽快订阅需要的 topic
+                         */
                         System.out.println("mqtt服务连接成功");
+                        executorService.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                final String topicFilter[] = {topic};
+                                final int[] qos = {qosLevel};
+                                try {
+                                    mqttClient.subscribe(topicFilter, qos);
+                                    System.out.println("订阅话题成功");
+                                } catch (MqttException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
-
                 });
                 //连接mqtt服务
                 mqttClient.connect(connectionOptionWrapper.getMqttConnectOptions());
@@ -123,5 +167,46 @@ public class MqttServiceImpl implements MqttService {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 查询发送者余额
+     * @param sender
+     * @return
+     */
+    public boolean authSenderMoey(String sender){
+
+        RootMessageExample example = new RootMessageExample();
+        RootMessageExample.Criteria criteriaRoot = example.createCriteria();
+        criteriaRoot.andNameEqualTo("video_money");
+        float videoMoney = Float.parseFloat(rootMessageMapper.selectByExample(example).get(0).getValue());
+
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andAccountEqualTo(sender);
+        User user = userMapper.selectByExample(userExample).get(0);
+        if(videoMoney>user.getMoney()){
+            return false;  //余额不足
+        }else{
+            return true;
+        }
+    }
+
+
+    private void sendMessage(int chatType,int msgType,String sender,String reiver,String topic){
+        MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver);
+        JSONObject object = factory.getJsonObject();
+        final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mqttClient.publish(topic,toClientMessage);
+                } catch (MqttException e) {
+                    System.out.println("发送消息异常");
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

@@ -74,18 +74,18 @@ public class UserServiceImpl implements UserService {
                         msg.add("account",user.getAccount());
                         msg.add("nickName",user.getNickname());
                         msg.add("header",user.getHeader());
-                        msg.add("aliId",authorization.getIdentifier());//阿里ID
-                        msg.add("token",authorization.getCredential());//授权凭证
+                        String token = UUID.randomUUID().toString();
+                        //保存token
+                        RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);
+                        msg.add("token",token);
                         return msg;
                     }else {
                        String account = user.getAccount();
                        msg = Msg.fail();
                        msg.setCode(1000);
                        msg.setMsg("未绑定手机");
-                       String aliToken = UUID.randomUUID().toString();
-                       RedisUtil.setAliLoginToken(alipayUserId,aliToken);
                        msg.add("aliId",alipayUserId);
-                       msg.add("aliToken",aliToken);
+                       msg.add("aliToken",authorization.getCredential());//阿里token
                        return msg;
                     }
                 }
@@ -125,12 +125,13 @@ public class UserServiceImpl implements UserService {
                         }else {
                             user.setSex(true);//男
                         }
-                        user.setShareCode(ShareCodeUtil.toSerialCode(new Random().nextInt()));//设置邀请码
+                        user.setShareCode(ShareCodeUtil.toSerialCode(2));//设置邀请码
                         if(userMapper.insert(user)==1){
                             int uid = user.getId();//获取插入的用户
                             Authorization authorization = new Authorization();
                             authorization.setBoolVerified(false);//设置为激活状态
                             authorization.setCreateTime(date);
+                            authorization.setIdentifier(alipayUserId);
                             authorization.setUpdateTime(date);
                             authorization.setIdentityType(2);//设置支付宝方式
                             authorization.setCredential(access_token);//授权凭证
@@ -145,6 +146,8 @@ public class UserServiceImpl implements UserService {
                                     msg.add("header",user.getHeader());
                                     msg.add("aliId",authorization.getIdentifier());//阿里ID
                                     msg.add("token",authorization.getCredential());//授权凭证
+                                    msg.add("aliId",alipayUserId);
+                                    msg.add("aliToken",authorization.getCredential());
                                     return msg;
                                 }else {
                                     msg = Msg.fail();
@@ -152,7 +155,6 @@ public class UserServiceImpl implements UserService {
                                     return msg;
                                 }
                             }
-
                             msg = Msg.fail();
                             return msg;
                         }
@@ -191,7 +193,7 @@ public class UserServiceImpl implements UserService {
             msg.add("nickName",user.getNickname());
             msg.add("header",user.getHeader());
             String token = UUID.randomUUID().toString();//UUID生成token
-            if(!RedisUtil.setToken(String.valueOf(user.getId()),token)){
+            if(!RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND)){
                 System.out.println("写入token失败");
             }
             msg.add("token",token);
@@ -212,9 +214,8 @@ public class UserServiceImpl implements UserService {
                           String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req) {
         Msg msg;
         //校验验证码
-        String codeRedis = (String) redisTemplate.boundValueOps(phone).get();
-        if(codeRedis.equals(code)){
 
+        if(RedisUtil.authCode(phone,code)){
             //检测手机号
             AuthorizationExample example = new AuthorizationExample();
             AuthorizationExample.Criteria criteria = example.createCriteria();
@@ -227,12 +228,15 @@ public class UserServiceImpl implements UserService {
                 return msg;
             }else{
                 User user = new User();
-                String shareCode = ShareCodeUtil.toSerialCode(new Random().nextInt());//邀请码生成
+                String account = UUID.randomUUID().toString();//用户账号
+                String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
                 user.setShareCode(shareCode);//邀请码
+                user.setAccount(account);
                 user.setSex(sex);
+                user.setNickname(nickname);
+                Date date = new Date();
                 user.setSignature(signature);
                 user.setMoney(0f);
-                Date date = new Date();
                 user.setCreateTime(date);
                 user.setUpdateTime(date);
                 user.setBindAlipay(false);

@@ -25,7 +25,7 @@ public class FileUploadUtil {
      */
     public static Msg uploadUtil(MultipartFile uploadFile,String fileDir, HttpServletRequest request) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
-        String realPath = request.getSession().getServletContext().getRealPath("/upload/" + fileDir);
+        String realPath = request.getSession().getServletContext().getRealPath("/static/upload/" + fileDir);
         String format = sdf.format(new Date());
         File folder = new File(realPath + format);
         //是否目录
@@ -39,7 +39,7 @@ public class FileUploadUtil {
         try {
             //用于图片上传时，把内存中图片写入磁盘
             uploadFile.transferTo(new File(folder, newName));
-            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/"+fileDir+"/" + format + newName;
+            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/static/upload/" +fileDir+"/" + format + newName;
             Msg msg = Msg.success();
             msg.add("path",filePath);
             return msg;
@@ -47,6 +47,6 @@ public class FileUploadUtil {
             e.printStackTrace();
         }
 
-       return Msg.fail();
+        return Msg.fail();
     }
 }

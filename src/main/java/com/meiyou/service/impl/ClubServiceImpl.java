@@ -1,17 +1,26 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubMapper;
+import com.meiyou.mapper.RootMessageMapper;
+import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.Club;
+import com.meiyou.pojo.ClubExample;
+import com.meiyou.pojo.RootMessageExample;
+import com.meiyou.pojo.User;
 import com.meiyou.service.ClubService;
+import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
- * @description: 会所业务层接口实现类
+ * @description: 按摩会所业务层接口实现类
  * @author: Mr.Z
  * @create: 2019-08-21 14:31
  **/
@@ -21,29 +30,145 @@ public class ClubServiceImpl implements ClubService {
     @Autowired
     ClubMapper clubMapper;
 
+    @Autowired
+    UserMapper userMapper;
+
+    @Autowired
+    RootMessageMapper rootMessageMapper;
+
+    /**
+     * 发布按摩会所
+     * @param club
+     * @param time 置顶天数
+     * @param password 支付密码
+     * @return
+     */
     @Override
-    public void addClub(Club club,Integer time) {
+    @Transactional
+    public Msg addClub(Club club,String token, Integer time, String password) {
+        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
         Date now = new Date();
         club.setCreateTime(now);
         club.setUpdateTime(now);
         //添加过期时间
         Long millisecond = now.getTime()+24*60*60*1000*time;
         club.setOutTime(new Date(millisecond));
-        clubMapper.insert(club);
+        club.setState(0);
+
+        //获取用户密码和余额
+        String payWord = userMapper.selectByPrimaryKey(club.getPublishId()).getPayWord();
+        Float money = userMapper.selectByPrimaryKey(club.getPublishId()).getMoney();
+
+        //从系统数据表获取置顶费用
+        RootMessageExample rootMessageExample = new RootMessageExample();
+        rootMessageExample.createCriteria().andNameEqualTo("top_money");
+        String top_money = rootMessageMapper.selectByExample(rootMessageExample).get(0).getValue();
+
+        if(payWord.equals("")){
+            msg.setMsg("请设置支付密码!");
+            msg.setCode(1000);
+            return msg;
+        }else if(!payWord.equals(password)){
+            msg.setMsg("支付密码错误!");
+            msg.setCode(1001);
+            return msg;
+            //用户金额与发布金额进行比较
+        }else if(money < Float.valueOf(top_money)*time){
+            msg.setMsg("发布失败,账户余额不足!");
+            msg.setCode(1002);
+            return msg;
+        }else {
+            clubMapper.insert(club);
+
+            //执行扣钱操作
+            User user = new User();
+            money = money - Float.valueOf(top_money)*time;
+            user.setMoney(money);
+            user.setId(club.getPublishId());
+            user.setUpdateTime(new Date());
+            userMapper.updateByPrimaryKeySelective(user);
+            return Msg.success();
+        }
     }
 
+    /**
+     * 取消发布 只更改状态
+     * @param uid
+     * @param cid
+     * @return
+     */
     @Override
-    public void deleteClub(Integer id) {
+    public Msg updateClub(Integer uid, Integer cid) {
+        Integer state = clubMapper.selectByPrimaryKey(cid).getState();
+        if(state != 0){
+            return Msg.fail();
+        }
+        //更改状态为已失效
+        Club club = new Club();
+        club.setPublishId(uid);
+        club.setId(cid);
+        club.setState(2);
+        club.setUpdateTime(new Date());
+        int rows = clubMapper.updateByPrimaryKeySelective(club);
+        if(rows != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
     }
 
+    /**
+     * 查找指定用户发布的有效按摩会所
+     * @param uid
+     * @return
+     */
     @Override
-    public List<Club> selectByUid(Integer id) {
-        return null;
+    public Msg selectByUid(Integer uid) {
+        Msg msg = new Msg();
+        //查找发布出去的有效按摩会所
+        ClubExample clubExample = new ClubExample();
+        clubExample.createCriteria().andPublishIdEqualTo(uid).andStateBetween(0,1);
+        List<Club> result = clubMapper.selectByExample(clubExample);
+        if(result.size() == 0){
+            msg.setMsg("没有找到对应的Club");
+            msg.setCode(404);
+            return msg;
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("club",result);
+
+        msg.setExtend(map);
+        msg.setCode(100);
+        msg.setMsg("成功");
+        return msg;
     }
 
+    /**
+     * 查看指定的按摩会所
+     * @param cid
+     * @return
+     */
     @Override
-    public Club selectByCid(Integer id) {
-        return null;
+    public Msg selectByCid(Integer cid) {
+        Msg msg = new Msg();
+        Club result = clubMapper.selectByPrimaryKey(cid);
+        if(result == null){
+            msg.setMsg("没有找到对应的Club");
+            msg.setCode(404);
+            return msg;
+        }
+        if(result.getState() == 2){
+            return Msg.fail();
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("club",result);
+
+        msg.setExtend(map);
+        msg.setCode(100);
+        msg.setMsg("成功");
+        return msg;
     }
 
     @Override

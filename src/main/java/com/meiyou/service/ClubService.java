@@ -1,7 +1,7 @@
 package com.meiyou.service;
 
-import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.Club;
+import com.meiyou.utils.Msg;
 
 import java.util.List;
 
@@ -15,28 +15,32 @@ public interface ClubService {
     /**
      * 添加会所
      * @param club
+     * @param time 置顶天数
+     * @param password 支付密码
      */
-    void addClub(Club club,Integer time);
+    Msg addClub(Club club,String token, Integer time, String password);
 
     /**
      * 通过会所id删除指定的会所
-     * @param id
+     * @param uid
+     * @param cid
+     * @return
      */
-    void deleteClub(Integer id);
+    Msg updateClub(Integer uid,Integer cid);
 
     /**
      * 通过用户id查找全部发布的会所
      * @param id
      * @return
      */
-    List<Club> selectByUid(Integer id);
+    Msg selectByUid(Integer uid);
 
     /**
      * 通过会所id查找会所信息
-     * @param id
+     * @param cid
      * @return
      */
-    Club selectByCid(Integer id);
+    Msg selectByCid(Integer cid);
 
     /**
      * 根据经纬度查询附近的会所

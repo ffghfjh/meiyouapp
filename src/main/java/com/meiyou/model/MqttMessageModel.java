@@ -1,0 +1,54 @@
+package com.meiyou.model;
+
+/**
+ * @program: meiyou
+ * @description:
+ * @author: dengshilin
+ * @create: 2019-08-22 15:49
+ **/
+public class MqttMessageModel {
+
+    /**
+     * chatType : 1
+     * msgType : 2
+     * sender : fdsf
+     * receiver : faf
+     */
+
+    private int chatType;
+    private int msgType;
+    private String sender;
+    private String receiver;
+
+    public int getChatType() {
+        return chatType;
+    }
+
+    public void setChatType(int chatType) {
+        this.chatType = chatType;
+    }
+
+    public int getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(int msgType) {
+        this.msgType = msgType;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+}

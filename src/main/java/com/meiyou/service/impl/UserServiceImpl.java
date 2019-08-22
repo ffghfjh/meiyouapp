@@ -16,6 +16,7 @@ import com.meiyou.pojo.User;
 import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
+import com.tls.tls_sigature.tls_sigature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -287,6 +288,23 @@ public class UserServiceImpl implements UserService {
             return msg;
         }
         return Msg.fail();
+    }
+
+    @Override
+    public Msg getSig(int uid,String token) {
+        Msg msg;
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            String account = userMapper.selectByPrimaryKey(uid).getAccount();
+            String usersig = tls_sigature.genSig(Constants.SDKAPPID, account, Constants.PRIKEY).urlSig;
+            msg = Msg.success();
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("userSig",usersig);
+            msg.setExtend(map);
+            return msg;
+        }else{
+            return Msg.noLogin();
+        }
+
     }
 
 

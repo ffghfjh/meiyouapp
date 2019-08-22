@@ -12,5 +12,6 @@ public interface UserService {
     public Msg phoneLogin(String phone,String password);
     //用户注册
     public Msg userRegist(String code, String phone, String password,  String nickname, String birthday, boolean sex, String qianming, MultipartFile img, HttpServletRequest req);
-
+   //获取腾讯云IM鉴权Sig
+    public Msg getSig(int uid,String token);
 }

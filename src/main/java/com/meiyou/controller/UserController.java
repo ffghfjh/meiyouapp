@@ -35,7 +35,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "phoneLogin",method = RequestMethod.POST)
-    @ApiOperation(value = "手机号登录")
+    @ApiOperation(value = "手机号登录",notes = "请把返回的用户id和token和用户account保存")
     public Msg phoneLogin(String phone,String password, HttpServletRequest req){
         if(phone==null||password==null){
             return Msg.nullParam();
@@ -52,7 +52,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "sendCode",method = RequestMethod.POST)
-    @ApiOperation(value = "发送验证码")
+    @ApiOperation(value = "发送验证码",notes = "type为发送类型 1 用户注册 2 找回密码")
     public Msg sendCode(String phone,int type){
         if(type==1){
             Msg msg = sendCodeApiService.sendRegistCode(phone);
@@ -61,5 +61,12 @@ public class UserController {
             return sendCodeApiService.sendRebackPwd(phone);
         }
         return Msg.fail();
+    }
+
+    @RequestMapping(value = "alipayLogin",method = RequestMethod.POST)
+    @ApiOperation(value="支付宝登录")
+    public Msg alipayLogin(String auth_code){
+
+        return null;
     }
 }

@@ -35,16 +35,15 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityMapper activityMapper;
 
     @Override
-    public int postActivity(MultipartFile file, Activity activity, ModelMap map
-            , HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public int postActivity(int uid, MultipartFile file, String content
+            , HttpServletRequest request, HttpServletResponse responsee) throws IOException {
         //获得磁盘文件
         DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
         //设置 缓存的大小，当上传文件的容量超过该缓存时，直接暂存起来
         diskFileItemFactory.setSizeThreshold(10*1024*1024);
         ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
         //图片上传成功后，将图片的地址写到数据库
-        String filePath = request.getServletContext().getRealPath("/ActivityPic");//“/”表示WebRoot//保存图片的路径
+        String filePath = request.getServletContext().getRealPath("/resources/ActivityPic");//“/”表示WebRoot//保存图片的路径
         //获取原始图片的拓展名
         String originalFilename = file.getOriginalFilename();
         //新的文件名字
@@ -53,9 +52,12 @@ public class ActivityServiceImpl implements ActivityService {
         File targetFile = new File(filePath, newFileName);
         //把本地文件上传到封装上传文件位置的全路径
         file.transferTo(targetFile);
-        activity.setImgsUrl(newFileName);
+        Activity activity = new Activity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
+        activity.setPublishId(uid);
+        activity.setImgsUrl(newFileName);
+        activity.setContent(content);
         activity.setReadNum(0);
         activity.setLikeNum(0);
         activity.setCommontNum(0);

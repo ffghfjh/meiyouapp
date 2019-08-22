@@ -17,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: meiyouapp
@@ -82,15 +79,27 @@ public class AppointmentController {
         return appointmentService.insert(appointment,password,token);
     }
 
+    /**
+    * @Description: 查询所有我发布的约会
+    * @Author: JK
+    * @Date: 2019/8/22
+    */
+    @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "POST")
     @PostMapping(value = "/selectAppointmentList")
     public Map<String, Object> selectAppointmentList(){
         List<Appointment> appointments = appointmentService.selectAppointmentList();
         Map<String, Object> map = new HashMap<>();
         if (appointments != null) {
-            map.put("appointments",appointments);
+            ArrayList<Appointment> lists = new ArrayList<>();
+            for (Appointment appointment : appointments) {
+                lists.add(appointment);
+            }
+            map.put("lists",lists);
             Msg success = Msg.success();
             map.put("success",success);
         }
+
+
         return map;
     }
 
@@ -99,6 +108,7 @@ public class AppointmentController {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @ApiOperation(value = "取消发布约会订单", notes = "取消发布约会订单", httpMethod = "POST")
     @PostMapping(value = "/deletePublish")
     public Msg deletePublish(Integer uid,Integer id){
         int i = appointmentService.deletePublish(uid, id);
@@ -114,6 +124,7 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/22
      */
+    @ApiOperation(value = "从多个约会订单中选择一个进行报名", notes = "从多个约会订单中选择一个进行报名", httpMethod = "POST")
     @PostMapping(value = "/startEnrollment")
     public Msg startEnrollment(Integer uid,Integer id){
         int i = appointmentService.startEnrollment(uid,id);
@@ -129,6 +140,7 @@ public class AppointmentController {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @ApiOperation(value = "查询所有报名某个约会的人员信息，并选择一个进行确认", notes = "查询所有报名某个约会的人员信息，并选择一个进行确认", httpMethod = "POST")
     @PostMapping(value = "/selectAppointAskList")
     public Map<String,Object> selectAppointAskList(Integer appointId){
         Map<String, Object> map = new HashMap<>();
@@ -146,6 +158,7 @@ public class AppointmentController {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @ApiOperation(value = "从所有报名某个约会的人员信息中选择一个进行确认", notes = "从所有报名某个约会的人员信息中选择一个进行确认", httpMethod = "POST")
     @PostMapping(value = "/confirmUserId")
     public Msg confirmUserId(Integer askerId, Integer appointId) {
         int i = appointmentService.confirmUserId(askerId, appointId);

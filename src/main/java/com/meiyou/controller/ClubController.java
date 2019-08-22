@@ -6,10 +6,7 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description: 推拿会所控制器
@@ -25,15 +22,18 @@ public class ClubController {
     ClubService clubService;
 
     @PostMapping("/add")
-    @ApiOperation(value = "发布",notes = "发布会所推拿会所")
-    public Msg addClub(@RequestParam("imgs_url") String imgsUrl,
+    @ApiOperation(value = "发布推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
+    public Msg addClub(@RequestParam("publish_id") Integer publishId,
+                       @RequestParam("imgs_url") String imgsUrl,
                        @RequestParam("project_name") String projectName,
                        @RequestParam("project_desc") String projectDesc,
                        @RequestParam("project_address") String projectAddress,
                        @RequestParam("project_price") Integer projectPrice,
                        @RequestParam("market_price") Integer marketPrice,
-                       @RequestParam("time") Integer time){
+                       @RequestParam("time") Integer time,
+                       @RequestParam("password") String password){
         Club club = new Club();
+        club.setPublishId(publishId);
         club.setImgsUrl(imgsUrl);
         club.setProjectName(projectName);
         club.setProjectDesc(projectDesc);
@@ -41,11 +41,26 @@ public class ClubController {
         club.setProjectAddress(projectAddress);
         club.setProjectPrice(projectPrice);
         club.setMarketPrice(marketPrice);
-        clubService.addClub(club,time);
 
-        Msg msg = new Msg();
-        msg.setCode(100);
-        msg.setMsg("成功？");
-        return msg;
+        return clubService.addClub(club,time,password);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation(value = "取消推拿会所",notes = "取消")
+    public Msg deleteClub(@RequestParam("uid") Integer uid,
+                          @RequestParam("cid") Integer cid){
+        return clubService.deleteClub(uid, cid);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation(value = "通过用户id查找指定用户id的全部推拿会所",notes = "查找")
+    public Msg getClubByUid(Integer uid){
+        return clubService.selectByUid(uid);
+    }
+
+    @GetMapping("/find")
+    @ApiOperation(value = "通过会所id查找对应的会所",notes = "查找")
+    public Msg findClubByCid(Integer cid){
+        return clubService.selectByCid(cid);
     }
 }

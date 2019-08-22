@@ -89,7 +89,7 @@ public class AppointmentController {
     public Map<String, Object> selectAppointmentList(){
         List<Appointment> appointments = appointmentService.selectAppointmentList();
         Map<String, Object> map = new HashMap<>();
-        if (appointments != null) {
+        if (appointments != null && appointments.size() != 0) {
             ArrayList<Appointment> lists = new ArrayList<>();
             for (Appointment appointment : appointments) {
                 lists.add(appointment);

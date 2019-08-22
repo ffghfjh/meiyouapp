@@ -14,7 +14,7 @@ import java.util.UUID;
  * @author: dengshilin
  * @create: 2019-08-22 11:00
  **/
-public class FiltUploadUtil {
+public class FileUploadUtil {
 
     /**
      * 上传文件工具类

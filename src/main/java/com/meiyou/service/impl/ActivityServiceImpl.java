@@ -1,9 +1,13 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.service.ActivityService;
+import com.meiyou.utils.FileUploadUtil;
+import com.meiyou.utils.Msg;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +39,32 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public int postActivity(int uid, String content, MultipartFile[] files
             , HttpServletRequest request, HttpServletResponse response){
-
+        Activity activity = new Activity();
+        activity.setCreateTime(new Date());
+        activity.setUpdateTime(new Date());
+        activity.setPublishId(uid);
+        //使用Hutool进行json操作
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
+            }
+        }
+        if (array.size() == 0) {
+            return 0;
+        }
+        activity.setImgsUrl(array.toString());//以json数组的形式存图片
+        activity.setContent(content);
+        activity.setReadNum(0);
+        activity.setLikeNum(0);
+        activity.setCommontNum(0);
+        activity.setBoolClose(false);
+        int i = activityMapper.insertSelective(activity);
+        if (i == 1) {
+            return 1;
+        }
+        return 0;
     }
 
     @Override

@@ -39,7 +39,7 @@ public class FileUploadUtil {
         try {
             //用于图片上传时，把内存中图片写入磁盘
             uploadFile.transferTo(new File(folder, newName));
-            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/"+fileDir + format + newName;
+            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/"+fileDir+"/" + format + newName;
             Msg msg = Msg.success();
             msg.add("path",filePath);
             return msg;

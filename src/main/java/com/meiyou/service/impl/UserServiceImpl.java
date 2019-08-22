@@ -15,20 +15,15 @@ import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.User;
 import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
-import com.meiyou.utils.Constants;
-import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
-import com.meiyou.utils.ShareCodeUtil;
-import io.netty.util.Constant;
-import io.netty.util.internal.logging.Log4JLoggerFactory;
-import io.swagger.models.auth.In;
+import com.meiyou.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
@@ -40,6 +35,8 @@ public class UserServiceImpl implements UserService {
     AuthorizationMapper authMapper;
     @Autowired
     TencentImService imService;
+    @Resource
+    RedisTemplate redisTemplate;
 
 
     // 支付宝调用接口之前的初始化
@@ -209,10 +206,83 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public Msg userRegist(String code, String phone, String password, String sharecode, String nickname, int old, String sex, String qianming, MultipartFile img) {
 
-        return null;
+    @Override
+    public Msg userRegist(String code, String phone, String password,  String nickname,
+                          String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req) {
+        Msg msg;
+        //校验验证码
+        String codeRedis = (String) redisTemplate.boundValueOps(phone).get();
+        if(codeRedis.equals(code)){
+
+            //检测手机号
+            AuthorizationExample example = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria = example.createCriteria();
+            criteria.andIdentityTypeEqualTo(1);//手机号
+            criteria.andIdentifierEqualTo(phone);
+            if(authMapper.selectByExample(example).size()>0){
+                msg = Msg.fail();
+                msg.setCode(1001);//手机号被注册
+                msg.setMsg("手机号已注册");
+                return msg;
+            }else{
+                User user = new User();
+                String shareCode = ShareCodeUtil.toSerialCode(new Random().nextInt());//邀请码生成
+                user.setShareCode(shareCode);//邀请码
+                user.setSex(sex);
+                user.setSignature(signature);
+                user.setMoney(0f);
+                Date date = new Date();
+                user.setCreateTime(date);
+                user.setUpdateTime(date);
+                user.setBindAlipay(false);
+                user.setBirthday(birthday);
+                user.setBoolClose(false);
+                user.setBgPicture(Constants.USER_BAC_DEFAULT);
+
+                //文件上传判断
+                Msg fileMsg = FileUploadUtil.uploadUtil(img,"headers",req);
+                if(fileMsg.getCode()==100){
+                    user.setHeader((String) fileMsg.getExtend().get("path"));
+                    if(userMapper.insert(user)==1){
+                        int uid = user.getId();
+                        Authorization authorization = new Authorization();
+                        authorization.setUserId(uid);
+                        authorization.setIdentityType(1);
+                        authorization.setCredential(password);
+                        authorization.setBoolVerified(true);
+                        authorization.setUpdateTime(date);
+                        authorization.setCreateTime(date);
+                        authorization.setIdentifier(phone);
+                        if(authMapper.insert(authorization)>0){
+                            if(imService.registTencent(user)){
+                                return Msg.success();
+                            }else{
+                                msg = Msg.fail();
+                                msg.setMsg("腾讯云账号注册失败");
+                                return msg;
+                            }
+                        }
+                    }
+                }else {
+                    msg = Msg.fail();
+                    msg.setCode(1003);
+                    msg.setMsg("头像上传失败");
+                    System.out.println(msg.toString());
+                    return msg;
+                }
+
+
+
+            }
+        }else {
+            System.out.println("验证码错误");
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("验证码错误");
+            return msg;
+        }
+        return Msg.fail();
     }
 
 

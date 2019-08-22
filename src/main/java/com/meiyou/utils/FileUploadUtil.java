@@ -14,7 +14,7 @@ import java.util.UUID;
  * @author: dengshilin
  * @create: 2019-08-22 11:00
  **/
-public class FiltUploadUtil {
+public class FileUploadUtil {
 
     /**
      * 上传文件工具类
@@ -39,7 +39,7 @@ public class FiltUploadUtil {
         try {
             //用于图片上传时，把内存中图片写入磁盘
             uploadFile.transferTo(new File(folder, newName));
-            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/"+fileDir + format + newName;
+            filePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/upload/"+fileDir+"/" + format + newName;
             Msg msg = Msg.success();
             msg.add("path",filePath);
             return msg;

@@ -16,6 +16,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -27,6 +28,7 @@ import java.util.*;
  * @author: dengshilin
  * @create: 2019-08-22 10:33
  **/
+@Service
 public class TencentImServiceImpl implements TencentImService {
 
 

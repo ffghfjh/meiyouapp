@@ -1,9 +1,13 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.service.ActivityService;
+import com.meiyou.utils.FileUploadUtil;
+import com.meiyou.utils.Msg;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author     ：huangzhaoyang
@@ -35,34 +37,34 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityMapper activityMapper;
 
     @Override
-    public int postActivity(int uid, MultipartFile file, String content
-            , HttpServletRequest request, HttpServletResponse responsee) throws IOException {
-        //获得磁盘文件
-        DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-        //设置 缓存的大小，当上传文件的容量超过该缓存时，直接暂存起来
-        diskFileItemFactory.setSizeThreshold(10*1024*1024);
-        ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
-        //图片上传成功后，将图片的地址写到数据库
-        String filePath = request.getServletContext().getRealPath("/resources/ActivityPic");//“/”表示WebRoot//保存图片的路径
-        //获取原始图片的拓展名
-        String originalFilename = file.getOriginalFilename();
-        //新的文件名字
-        String newFileName = UUID.randomUUID()+originalFilename;
-        //封装上传文件位置的全路径
-        File targetFile = new File(filePath, newFileName);
-        //把本地文件上传到封装上传文件位置的全路径
-        file.transferTo(targetFile);
+    public int postActivity(int uid, String content, MultipartFile[] files
+            , HttpServletRequest request, HttpServletResponse response){
         Activity activity = new Activity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
         activity.setPublishId(uid);
-        activity.setImgsUrl(newFileName);
+        //使用Hutool进行json操作
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
+            }
+        }
+        if (array.size() == 0) {
+            return 0;
+        }
+        activity.setImgsUrl(array.toString());//以json数组的形式存图片
         activity.setContent(content);
         activity.setReadNum(0);
         activity.setLikeNum(0);
         activity.setCommontNum(0);
         activity.setBoolClose(false);
-        return activityMapper.insertSelective(activity);
+        int i = activityMapper.insertSelective(activity);
+        if (i == 1) {
+            return 1;
+        }
+        return 0;
     }
 
     @Override

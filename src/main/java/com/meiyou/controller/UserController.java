@@ -11,12 +11,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@Api("用户控制器")
+@Api(value = "用户控制器",tags = "用户接口层")
 public class UserController {
 
 
@@ -41,6 +42,30 @@ public class UserController {
             return Msg.nullParam();
         }else{
             Msg msg = userService.phoneLogin(phone,password);
+            return msg;
+        }
+    }
+
+    /**
+     * 手机注册
+     * @param code
+     * @param phone
+     * @param password
+     * @param nickname
+     * @param birthday
+     * @param sex
+     * @param signature
+     * @param img
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "phoneRegist",method = RequestMethod.POST)
+    @ApiOperation(value = "手机号注册",notes = "1001 手机号被注册 1003 头像上传失败  1000验证码错误")
+    public Msg phoneRegist(String code, String phone, String password, String nickname, String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req){
+        if(phone==null||password==null){
+            return Msg.nullParam();
+        }else{
+            Msg msg = userService.userRegist(code,phone,password,nickname,birthday,sex,signature,img,req);
             return msg;
         }
     }

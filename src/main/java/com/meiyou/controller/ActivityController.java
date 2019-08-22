@@ -1,7 +1,11 @@
 package com.meiyou.controller;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
+import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.pojo.Activity;
 import com.meiyou.service.ActivityService;
+import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -9,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -30,18 +31,41 @@ import java.util.List;
  * @version: 1.0.0
  */
 @Api(value = "动态控制层", tags = {"动态Controller"})
-@Controller
+@RestController
 @RequestMapping(value = "/Activity")
 public class ActivityController {
 
     @Autowired
     ActivityService activityService;
 
-    @ApiOperation(value = "发布动态", notes = "发布动态", httpMethod = "POST")
-    @RequestMapping(value = "/postActivity", method = RequestMethod.POST)
-    @ResponseBody
-    public Msg postActivity(int uid, MultipartFile file ,String  content, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int i = activityService.postActivity(uid, file, content, request, response);
+    @Autowired
+    ActivityMapper activityMapper;
+
+    @ApiOperation(value = "用户发布一个图片", notes = "用户发布一个图片", httpMethod = "POST")
+    @PostMapping(value = "/postActivityWithOnePic")
+    public Msg postActivityWithOnePic(int uid, String content, MultipartFile file
+            , HttpServletRequest request, HttpServletResponse response) {
+        Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
+        if (msg.getCode() == 200) {
+            return Msg.fail();
+        }
+        JSONArray array = JSONUtil.createArray();
+        array.add(msg.getExtend().get("path"));
+        Activity activity = new Activity();
+        activity.setContent("测试测试");
+        activity.setImgsUrl(array.toString());
+        int i = activityMapper.insertSelective(activity);
+        if (i == 1) {
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+
+    @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
+    @PostMapping(value = "/postActivity")
+    public Msg postActivity(int uid, String content, MultipartFile[] files
+            , HttpServletRequest request, HttpServletResponse response) {
+        int i = activityService.postActivity(uid, content, files, request, response);
         if (i == 1) {
             return Msg.success();
         }
@@ -56,7 +80,6 @@ public class ActivityController {
      */
     @ApiOperation(value = "管理员获取所有用户动态", notes = "管理员获取所有用户动态", httpMethod = "POST")
     @RequestMapping("/listActivity")
-    @ResponseBody
     public List<Activity> listActivity() {
         return activityService.listActivity();
     }

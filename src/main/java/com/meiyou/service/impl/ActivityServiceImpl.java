@@ -16,10 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author     ：huangzhaoyang
@@ -35,34 +33,9 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityMapper activityMapper;
 
     @Override
-    public int postActivity(int uid, MultipartFile file, String content
-            , HttpServletRequest request, HttpServletResponse responsee) throws IOException {
-        //获得磁盘文件
-        DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-        //设置 缓存的大小，当上传文件的容量超过该缓存时，直接暂存起来
-        diskFileItemFactory.setSizeThreshold(10*1024*1024);
-        ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
-        //图片上传成功后，将图片的地址写到数据库
-        String filePath = request.getServletContext().getRealPath("/resources/ActivityPic");//“/”表示WebRoot//保存图片的路径
-        //获取原始图片的拓展名
-        String originalFilename = file.getOriginalFilename();
-        //新的文件名字
-        String newFileName = UUID.randomUUID()+originalFilename;
-        //封装上传文件位置的全路径
-        File targetFile = new File(filePath, newFileName);
-        //把本地文件上传到封装上传文件位置的全路径
-        file.transferTo(targetFile);
-        Activity activity = new Activity();
-        activity.setCreateTime(new Date());
-        activity.setUpdateTime(new Date());
-        activity.setPublishId(uid);
-        activity.setImgsUrl(newFileName);
-        activity.setContent(content);
-        activity.setReadNum(0);
-        activity.setLikeNum(0);
-        activity.setCommontNum(0);
-        activity.setBoolClose(false);
-        return activityMapper.insertSelective(activity);
+    public int postActivity(int uid, String content, MultipartFile[] files
+            , HttpServletRequest request, HttpServletResponse response){
+
     }
 
     @Override

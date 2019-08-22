@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -37,11 +34,12 @@ public class ActivityController {
     @Autowired
     ActivityService activityService;
 
-    @ApiOperation(value = "发布动态", notes = "发布动态", httpMethod = "POST")
-    @RequestMapping(value = "/postActivity", method = RequestMethod.POST)
+    @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
+    @PostMapping(value = "/postActivity")
     @ResponseBody
-    public Msg postActivity(int uid, MultipartFile file ,String  content, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int i = activityService.postActivity(uid, file, content, request, response);
+    public Msg postActivity(int uid, String content, MultipartFile[] files
+            , HttpServletRequest request, HttpServletResponse response) {
+        int i = activityService.postActivity(uid, content, files, request, response);
         if (i == 1) {
             return Msg.success();
         }

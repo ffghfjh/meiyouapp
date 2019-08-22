@@ -45,4 +45,5 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         criteria.andLikeIdEqualTo(uid);
         return activityLikeMapper.deleteByExample(example);
     }
+
 }

@@ -28,6 +28,7 @@ public class RootMessageServiceImpl implements RootMessageService {
     @Autowired
     RootMessageMapper rootMessageMapper;
 
+
     @Override
     public int saveMessage(String name, String value) {
         RootMessage message = new RootMessage();

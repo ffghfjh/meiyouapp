@@ -1,5 +1,6 @@
 package com.meiyou.service;
 
+import com.meiyou.pojo.User;
 import com.meiyou.utils.Msg;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,5 +13,13 @@ public interface UserService {
     public Msg phoneLogin(String phone,String password);
     //用户注册
     public Msg userRegist(String code, String phone, String password,  String nickname, String birthday, boolean sex, String qianming, MultipartFile img, HttpServletRequest req);
+
+    /**
+     * hzy
+     * 根据id获取用户信息
+     * @param uid
+     * @return
+     */
+    User getUserById(int uid);
 
 }

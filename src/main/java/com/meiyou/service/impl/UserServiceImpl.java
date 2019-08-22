@@ -17,6 +17,8 @@ import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
+@CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -287,6 +290,26 @@ public class UserServiceImpl implements UserService {
             return msg;
         }
         return Msg.fail();
+    }
+
+
+    /**
+     * hzy
+     * 根据id获取用户信息
+     *
+     * @param uid
+     * @return
+     */
+    @Cacheable //缓存到Redis中
+    @Override
+    public User getUserById(int uid) {
+        User user = userMapper.selectByPrimaryKey(uid);
+        if (user == null) {
+            User user1 = new User();
+            user1.setNickname("找不到任何用户");
+            return user1;
+        }
+        return user;
     }
 
 

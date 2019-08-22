@@ -22,8 +22,8 @@ import java.util.List;
 public interface ActivityService {
 
     //发布动态
-    int postActivity(MultipartFile file, Activity activity, ModelMap map
-            , HttpServletRequest request, HttpServletResponse response) throws IOException;
+    int postActivity(int uid, String content, MultipartFile[] files
+            , HttpServletRequest request, HttpServletResponse response);
 
     //删除动态
     int removeActivity(int aid);

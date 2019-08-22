@@ -26,7 +26,7 @@ public interface AppointmentService {
     /**
      * 取消发布
      */
-    int deletePublish(Integer uid,Integer id);
+    Msg deletePublish(Integer id,String token);
 
     /**
      * 开始报名

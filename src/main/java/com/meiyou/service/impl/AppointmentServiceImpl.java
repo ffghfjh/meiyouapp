@@ -132,18 +132,29 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Date: 2019/8/22
     */
     @Override
-    public int deletePublish(Integer uid, Integer id) {
+    public Msg deletePublish(Integer id,String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
+        boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
+        Msg msg = new Msg();
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
+        //获取当前订单状态
         Integer state = appointment.getState();
         int i = 0;
         if (state == 0) {
             AppointmentExample example = new AppointmentExample();
-            example.createCriteria().andIdEqualTo(id)
-                    .andPublisherIdEqualTo(uid);
+            example.createCriteria().andIdEqualTo(id);
             i = appointmentMapper.deleteByExample(example);
-
+            if (i == 1){
+                return Msg.success();
+            }
+            return Msg.fail();
         }
-        return i;
+        msg.setCode(1005);
+        msg.setMsg("不能取消订单");
+        return msg;
     }
     
     /** 

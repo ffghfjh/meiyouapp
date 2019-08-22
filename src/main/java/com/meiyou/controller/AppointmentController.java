@@ -110,13 +110,9 @@ public class AppointmentController {
     */
     @ApiOperation(value = "取消发布约会订单", notes = "取消发布约会订单", httpMethod = "POST")
     @PostMapping(value = "/deletePublish")
-    public Msg deletePublish(Integer uid,Integer id){
-        int i = appointmentService.deletePublish(uid, id);
-        if (i == 1){
-            return Msg.success();
-        }else {
-            return Msg.fail();
-        }
+    public Msg deletePublish(Integer id,String token){
+        return appointmentService.deletePublish(id, token);
+
     }
 
     /**

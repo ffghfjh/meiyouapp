@@ -1,5 +1,10 @@
 package com.meiyou.service.impl;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipaySystemOauthTokenRequest;
+import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.Authorization;
@@ -28,8 +33,47 @@ public class UserServiceImpl implements UserService {
     AuthorizationMapper authMapper;
 
 
+    // 支付宝调用接口之前的初始化
+    AlipayClient alipayClient = new DefaultAlipayClient(Constants.ALIURL, Constants.APP_ID,
+            Constants.APP_PRIVATE_KEY, Constants.FORMAT, Constants.CHARSET, Constants.ALIPAY_PUBLIC_KEY,
+            Constants.SIGN_TYPE);
+
     @Override
     public Msg alipayLogin(String auth_code) {
+
+        Msg msg;
+        // 支付宝请求
+        AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();// 初始化请求
+        request.setGrantType("authorization_code");// 值为authorization_code时，代表用code换取；值为refresh_token时，代表用refresh_token换取
+        request.setCode(auth_code);// 参数为授权码
+
+        try {
+            AlipaySystemOauthTokenResponse response = alipayClient.execute(request);
+            if(response.isSuccess()){
+                String alipayUserId = response.getUserId();//获取用户id
+                AuthorizationExample example = new AuthorizationExample();
+                AuthorizationExample.Criteria criteria = example.createCriteria();
+                criteria.andIdentityTypeEqualTo(2);//验证方式为支付宝
+                criteria.andIdentifierEqualTo(alipayUserId);
+
+                //是否存在该支付宝用户
+                List<Authorization> authorizations = authMapper.selectByExample(example);
+                if(authorizations.size()>0){
+                    Authorization authorization = authorizations.get(0);
+                    if(authorization.getBoolVerified()){
+
+                    }else {
+                      msg = Msg.fail();
+                      msg.setCode(1000);
+                    }
+                }
+                else{
+
+                }
+            }
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }

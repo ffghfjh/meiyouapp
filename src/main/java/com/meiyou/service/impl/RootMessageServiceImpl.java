@@ -5,28 +5,51 @@ import com.meiyou.pojo.RootMessage;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.service.RootMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 /**
- * @author ：huangzhaoyang
- * @date ：Created in 2019/8/22 16:47
- * @description：系统参数服务实现层
- * @modified By：huangzhaoyang
- * @version: 1.0.0
- */
+ * @program: meiyouapp
+ * @description:
+ * @author: JK
+ * @create: 2019-08-21 15:27
+ **/
 @Service
 @CacheConfig(cacheNames = "MeiyouCache")
 public class RootMessageServiceImpl implements RootMessageService {
-
     @Autowired
-    RootMessageMapper rootMessageMapper;
+    private RootMessageMapper rootMessageMapper;
+
+    /**
+     * @Description: 查询所有动态数据
+     * @Author: JK
+     * @Date: 2019/8/22
+     */
+    @Override
+    public List<RootMessage> select() {
+        RootMessageExample rootMessageExample = new RootMessageExample();
+        //设置查询条件，设置系统动态数据表中 name = sincerity_money
+        rootMessageExample.createCriteria().andNameEqualTo("sincerity_money");
+        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
+        return list;
+    }
+
+    /**
+     * @author ：huangzhaoyang
+     * @date ：Created in 2019/8/22 16:47
+     * @description：系统参数服务实现层
+     * @modified By：huangzhaoyang
+     * @version: 1.0.0
+     */
+
 
 
     @Override
@@ -65,7 +88,7 @@ public class RootMessageServiceImpl implements RootMessageService {
         RootMessageExample.Criteria criteria = example.createCriteria();
         criteria.andNameEqualTo(name);
         List<RootMessage> messages = rootMessageMapper.selectByExample(example);
-        if (messages.size()>0 && messages!=null) {
+        if (messages.size() > 0 && messages != null) {
             return messages.get(0).getValue();
         }
         return null;

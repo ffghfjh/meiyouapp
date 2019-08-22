@@ -16,7 +16,7 @@ public interface ClubService {
      * 添加会所
      * @param club
      */
-    void addClub(Club club);
+    void addClub(Club club,Integer time);
 
     /**
      * 通过会所id删除指定的会所

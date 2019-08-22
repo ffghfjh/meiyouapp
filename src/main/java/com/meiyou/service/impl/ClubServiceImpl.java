@@ -22,9 +22,13 @@ public class ClubServiceImpl implements ClubService {
     ClubMapper clubMapper;
 
     @Override
-    public void addClub(Club club) {
-        club.setCreateTime(new Date());
-        club.setUpdateTime(new Date());
+    public void addClub(Club club,Integer time) {
+        Date now = new Date();
+        club.setCreateTime(now);
+        club.setUpdateTime(now);
+        //添加过期时间
+        Long millisecond = now.getTime()+24*60*60*1000*time;
+        club.setOutTime(new Date(millisecond));
         clubMapper.insert(club);
     }
 

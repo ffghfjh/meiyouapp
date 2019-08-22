@@ -1,9 +1,11 @@
 package com.meiyou.controller;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
+import com.meiyou.pojo.AppointAsk;
 import com.meiyou.pojo.Appointment;
-import com.meiyou.pojo.RootMessage;
 import com.meiyou.service.AppointmentService;
-import com.meiyou.service.RootMessageService;
+import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,12 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * @program: meiyouapp
@@ -33,9 +34,6 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    @Autowired
-    private RootMessageService rootMessageService;
-
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd/");
 
     /**
@@ -45,70 +43,55 @@ public class AppointmentController {
     */
     @ApiOperation(value = "发布约会", notes = "发布约会", httpMethod = "POST")
     @PostMapping(value = "/insertAppointment")
-    public Msg insertAppointment(
+    public Msg insertAppointment(@RequestParam(value = "publisherId",required = false)Integer publisherId,
                                  @RequestParam(value = "appointAddress",required = false)String appointAddress,
                                  @RequestParam(value = "appointTime",required = false)String appointTime,
                                  @RequestParam(value = "appointContext",required = false)String appointContext,
-                                 @RequestParam(value = "needNumber",required = false)int needNumber,
                                  @RequestParam(value = "payType",required = false)int payType,
-                                 @RequestParam(value = "appointImgs",required = false)String appointImgs,
-                                 MultipartFile[] uploadFile,
+                                 @RequestParam(value = "reward",required = false)Integer reward,
+                                 MultipartFile[] files,
+                                 @RequestParam(value = "password",required = false)String password,
+                                 @RequestParam(value = "token",required = false)String token,
                                  HttpServletRequest request
                                  ){
-        //获取真实路径
-        String realPath=request.getSession().getServletContext().getRealPath("/uploadFile/");
-        //设置日期格式
-        String format=sdf.format(new Date());
-        //新建一个文件，文件名是真实路径加日期
-        File folder=new File(realPath+format);
-        //是否目录
-        if(!folder.isDirectory()){
-            folder.mkdirs();
-        }
-        HashMap<String,String> map=new HashMap<String,String>();
-        String filePath="";
-        for(MultipartFile multipartFile:uploadFile){
-            String oldName=multipartFile.getOriginalFilename();
-            String newName= UUID.randomUUID().toString()+oldName.substring(oldName.lastIndexOf("."),oldName.length());
-            try {
-                //用于图片上传时，把内存中图片写入磁盘
-                multipartFile.transferTo(new File(folder,newName));
-                //文件上传路径
-                filePath=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/uploadFile/"+format+newName;
-                map.put(newName, filePath);
-            } catch (Exception e) {
-                e.printStackTrace();
+
+        //使用Hutool进行json操作
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
             }
         }
-
-        //如果选择线下付款
-        if (payType == 1){
-            List<RootMessage> list = rootMessageService.select();
-            //通过诚意金名称拿到对应的金额
-            RootMessage rootMessage = list.get(0);
-            String sincerityMoney = rootMessage.getValue();
-            System.out.println(sincerityMoney);
-            request.setAttribute("sincerityMoney",sincerityMoney);
+        if (array.size() == 0) {
+            return Msg.fail();
         }
-
         Appointment appointment = new Appointment();
         appointment.setCreateTime(new Date());
         appointment.setUpdateTime(new Date());
+        appointment.setPublisherId(publisherId);
         appointment.setAppointAddress(appointAddress);
         appointment.setAppointTime(appointTime);
         appointment.setAppointContext(appointContext);
-        appointment.setNeedNumber(needNumber);
+        appointment.setNeedNumber(1);
+        appointment.setReward(reward);
         appointment.setPayType(payType);
-        appointment.setAppointImgs(filePath);
-        int insert = appointmentService.insert(appointment);
-        if (insert == 1){
-            return Msg.success();
-        }else {
-            return Msg.fail();
+        appointment.setAppointImgs(array.toString());
+
+
+        return appointmentService.insert(appointment,password,token);
+    }
+
+    @PostMapping(value = "/selectAppointmentList")
+    public Map<String, Object> selectAppointmentList(){
+        List<Appointment> appointments = appointmentService.selectAppointmentList();
+        Map<String, Object> map = new HashMap<>();
+        if (appointments != null) {
+            map.put("appointments",appointments);
+            Msg success = Msg.success();
+            map.put("success",success);
         }
-
-
-
+        return map;
     }
 
     /**
@@ -116,8 +99,56 @@ public class AppointmentController {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @PostMapping(value = "/deletePublish")
     public Msg deletePublish(Integer uid,Integer id){
         int i = appointmentService.deletePublish(uid, id);
+        if (i == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
+    }
+
+    /**
+     * @Description: 从多个约会订单中选择一个进行报名
+     * @Author: JK
+     * @Date: 2019/8/22
+     */
+    @PostMapping(value = "/startEnrollment")
+    public Msg startEnrollment(Integer uid,Integer id){
+        int i = appointmentService.startEnrollment(uid,id);
+        if (i == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
+    }
+
+    /**
+    * @Description: 查询所有报名某个约会的人员信息，并选择一个进行确认
+    * @Author: JK
+    * @Date: 2019/8/22
+    */
+    @PostMapping(value = "/selectAppointAskList")
+    public Map<String,Object> selectAppointAskList(Integer appointId){
+        Map<String, Object> map = new HashMap<>();
+        List<AppointAsk> appointAsks = appointmentService.selectAppointAskList(appointId);
+        if (appointAsks != null) {
+            map.put("appointAsks",appointAsks);
+            Msg success = Msg.success();
+            map.put("success",success);
+        }
+        return map;
+    }
+
+    /**
+    * @Description: 从所有报名某个约会的人员信息中选择一个进行确认
+    * @Author: JK
+    * @Date: 2019/8/22
+    */
+    @PostMapping(value = "/confirmUserId")
+    public Msg confirmUserId(Integer askerId, Integer appointId) {
+        int i = appointmentService.confirmUserId(askerId, appointId);
         if (i == 1){
             return Msg.success();
         }else {

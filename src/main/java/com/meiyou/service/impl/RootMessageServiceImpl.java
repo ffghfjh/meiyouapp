@@ -20,12 +20,17 @@ public class RootMessageServiceImpl implements RootMessageService {
     @Autowired
     private RootMessageMapper rootMessageMapper;
 
+    /**
+    * @Description: 查询所有动态数据
+    * @Author: JK
+    * @Date: 2019/8/22
+    */
     @Override
     public List<RootMessage> select() {
-        RootMessageExample example = new RootMessageExample();
+        RootMessageExample rootMessageExample = new RootMessageExample();
         //设置查询条件，设置系统动态数据表中 name = sincerity_money
-        example.createCriteria().andNameEqualTo("sincerity_money");
-        List<RootMessage> list = rootMessageMapper.selectByExample(example);
+        rootMessageExample.createCriteria().andNameEqualTo("sincerity_money");
+        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
         return list;
     }
 }

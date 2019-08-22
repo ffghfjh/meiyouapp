@@ -24,6 +24,7 @@ public class ClubController {
     @PostMapping("/add")
     @ApiOperation(value = "发布推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
     public Msg addClub(@RequestParam("publish_id") Integer publishId,
+                       @RequestParam("token") String token,
                        @RequestParam("imgs_url") String imgsUrl,
                        @RequestParam("project_name") String projectName,
                        @RequestParam("project_desc") String projectDesc,
@@ -42,14 +43,14 @@ public class ClubController {
         club.setProjectPrice(projectPrice);
         club.setMarketPrice(marketPrice);
 
-        return clubService.addClub(club,time,password);
+        return clubService.addClub(club,token,time,password);
     }
 
-    @DeleteMapping("/delete")
-    @ApiOperation(value = "取消推拿会所",notes = "取消")
+    @PutMapping("/update")
+    @ApiOperation(value = "取消发布推拿会所",notes = "取消即更发布状态，实际数据不删除")
     public Msg deleteClub(@RequestParam("uid") Integer uid,
                           @RequestParam("cid") Integer cid){
-        return clubService.deleteClub(uid, cid);
+        return clubService.updateClub(uid, cid);
     }
 
     @GetMapping("/get")

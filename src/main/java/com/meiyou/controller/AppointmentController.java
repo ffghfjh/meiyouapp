@@ -8,7 +8,9 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +45,8 @@ public class AppointmentController {
     */
     @ApiOperation(value = "发布约会", notes = "发布约会", httpMethod = "POST")
     @PostMapping(value = "/insertAppointment")
-    public Msg insertAppointment(@RequestParam(value = "appointAddress",required = false)String appointAddress,
+    public Msg insertAppointment(
+                                 @RequestParam(value = "appointAddress",required = false)String appointAddress,
                                  @RequestParam(value = "appointTime",required = false)String appointTime,
                                  @RequestParam(value = "appointContext",required = false)String appointContext,
                                  @RequestParam(value = "needNumber",required = false)int needNumber,
@@ -97,10 +100,28 @@ public class AppointmentController {
         appointment.setNeedNumber(needNumber);
         appointment.setPayType(payType);
         appointment.setAppointImgs(filePath);
-        Msg msg = appointmentService.insert(appointment);
+        int insert = appointmentService.insert(appointment);
+        if (insert == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
 
-        return msg;
+
 
     }
 
+    /**
+    * @Description: 取消发布约会订单
+    * @Author: JK
+    * @Date: 2019/8/22
+    */
+    public Msg deletePublish(Integer uid,Integer id){
+        int i = appointmentService.deletePublish(uid, id);
+        if (i == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
+    }
 }

@@ -64,7 +64,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
-            System.out.println(user.getPayWord());
             msg.setCode(1001);
             msg.setMsg("支付密码错误");
             return msg;
@@ -131,6 +130,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @Transactional
     @Override
     public Msg deletePublish(Integer id,String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
@@ -161,22 +161,75 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Description: 从多个约会订单中选择一个进行报名
     * @Author: JK 
     * @Date: 2019/8/22 
-    */ 
+    */
+    @Transactional
     @Override
-    public int startEnrollment(Integer uid,Integer id) {
+    public Msg startEnrollment(String uid,String password,Integer id,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        Msg msg = new Msg();
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
+        //根据报名者id查询出他所有信息
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        //获取报名者账户余额
+        Float money = user.getMoney();
+
+        RootMessageExample rootMessageExample = new RootMessageExample();
+        rootMessageExample.createCriteria().andNameEqualTo("ask_money");
+        //查询系统动态数据表中所有的数据
+        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
+        //获取报名金的名称
+        RootMessage askMoney = list.get(0);
+
+        //获取报名金的金额
+        String askMoneyValue = askMoney.getValue();
+        //将发布金从String转换成Integer
+        Integer askMoneyValue1=Integer.parseInt(askMoneyValue);
+
+        //判断用户输入密码是否正确
+        if (!password.equals(user.getPayWord())){
+            msg.setCode(1001);
+            msg.setMsg("支付密码错误");
+            return msg;
+        }
+        //报名扣款后剩余余额
+        float balance = money-askMoneyValue1;
+
+        if (balance <0){
+            msg.setCode(1002);
+            msg.setMsg("余额不足");
+            return msg;
+        }
+        user.setMoney(balance);
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
+        //更新报名者账户余额
+        userMapper.updateByExample(user,userExample);
+
         AppointAsk appointAsk = new AppointAsk();
-        appointAsk.setAskerId(uid);
+        appointAsk.setAskerId(Integer.parseInt(uid));
         appointAsk.setAppointId(id);
-        appointAsk.setAskState(0);
+        appointAsk.setAskState(1);
         appointAsk.setCreateTime(new Date());
         appointAsk.setUpdateTime(new Date());
+        //约会记录表中增加一条记录
         appointAskMapper.insertSelective(appointAsk);
-        AppointmentExample example = new AppointmentExample();
+        //根据约会订单表id查出该订单所有信息
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
+        AppointmentExample example = new AppointmentExample();
         example.createCriteria().andIdEqualTo(id);
-        appointment.setState(1);
+        appointment.setState(2);
+        appointment.setUpdateTime(new Date());
+        //更改该订单状态
         int i = appointmentMapper.updateByExample(appointment, example);
-        return i;
+        if (i == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
     }
 
     /**

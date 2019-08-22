@@ -63,7 +63,6 @@ public class TourServiceImpl implements TourService {
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
-            System.out.println(user.getPayWord());
             msg.setCode(1001);
             msg.setMsg("支付密码错误");
             return msg;

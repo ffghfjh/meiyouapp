@@ -31,7 +31,7 @@ public interface AppointmentService {
     /**
      * 开始报名
      */
-    int startEnrollment(Integer uid,Integer id);
+    Msg startEnrollment(String uid,String password,Integer id,String token);
 
 
     /**

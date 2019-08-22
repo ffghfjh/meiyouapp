@@ -22,8 +22,8 @@ import java.util.List;
 public interface ActivityService {
 
     //发布动态
-    int postActivity(int uid, String content, MultipartFile[] files
-            , HttpServletRequest request, HttpServletResponse response);
+    int postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
+            ,HttpServletRequest request);
 
     //删除动态
     int removeActivity(int aid);

@@ -31,6 +31,7 @@ spring:
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
 
+
   redis:
     database: 0
     host: 127.0.0.1
@@ -43,8 +44,11 @@ spring:
         max-idle: 10 # 连接池中的最大空闲连接
         min-idle: 0 # 连接池中的最小空闲连接
     timeout: 1000 # 连接超时时间（毫秒）
+
+  #Redis缓存名
   cache:
     cache-names: MeiyouCache
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.meiyou.pojo

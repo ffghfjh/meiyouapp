@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -41,35 +42,26 @@ public class ActivityController {
     @Autowired
     ActivityMapper activityMapper;
 
-    @ApiOperation(value = "用户发布一个图片", notes = "用户发布一个图片", httpMethod = "POST")
-    @PostMapping(value = "/postActivityWithOnePic")
-    public Msg postActivityWithOnePic(int uid, String content, MultipartFile file
-            , HttpServletRequest request, HttpServletResponse response) {
-        Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
-        if (msg.getCode() == 200) {
-            return Msg.fail();
-        }
-        JSONArray array = JSONUtil.createArray();
-        array.add(msg.getExtend().get("path"));
-        Activity activity = new Activity();
-        activity.setContent("测试测试");
-        activity.setImgsUrl(array.toString());
-        int i = activityMapper.insertSelective(activity);
+    @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
+    @PostMapping(value = "/postActivity")
+    public Msg postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
+            ,HttpServletRequest request) {
+        int i = activityService.postActivity(uid,latitude,longitude,content,files, request);
         if (i == 1) {
             return Msg.success();
         }
         return Msg.fail();
     }
 
-    @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
-    @PostMapping(value = "/postActivity")
-    public Msg postActivity(int uid, String content, MultipartFile[] files
-            , HttpServletRequest request, HttpServletResponse response) {
-        int i = activityService.postActivity(uid, content, files, request, response);
+    @ApiOperation(value = "我的动态", notes = "我的动态")
+    @GetMapping(value = "/listMyActivity")
+    public HashMap<String,String> listMyActivity(int uid, double latitude, double longitude, String content, MultipartFile[] files
+            , HttpServletRequest request) {
+        int i = activityService.postActivity(uid,latitude,longitude,content,files, request);
         if (i == 1) {
-            return Msg.success();
+
         }
-        return Msg.fail();
+        return null;
     }
 
 

@@ -3,11 +3,14 @@ package com.meiyou.service.impl;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.mapper.ActivityMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.service.ActivityService;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +39,12 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     ActivityMapper activityMapper;
 
+    @Autowired
+    RootMessageService rootMessageService;
+
     @Override
-    public int postActivity(int uid, String content, MultipartFile[] files
-            , HttpServletRequest request, HttpServletResponse response){
+    public int postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
+            ,HttpServletRequest request){
         Activity activity = new Activity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
@@ -62,6 +68,15 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setBoolClose(false);
         int i = activityMapper.insertSelective(activity);
         if (i == 1) {
+            //添加地理位置和uid到Redis缓存中
+            Coordinate coordinate = new Coordinate();
+            coordinate.setLatitude(latitude);
+            coordinate.setLongitude(longitude);
+            coordinate.setKey(Integer.toString(uid));
+            Long reo = RedisUtil.addReo(coordinate, "activity");
+            if (reo == null) {
+                return 0;
+            }
             return 1;
         }
         return 0;

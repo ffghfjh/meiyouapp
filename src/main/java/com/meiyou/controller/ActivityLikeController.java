@@ -26,7 +26,7 @@ public class ActivityLikeController {
     ActivityLikeService activityLikeService;
 
     @ApiOperation(value = "点赞", notes = "点赞", httpMethod = "POST")
-    @RequestMapping(value = "like")
+    @RequestMapping(value = "/like")
     @ResponseBody
     public Msg like(int aid, int uid) {
         int like = activityLikeService.like(aid, uid);
@@ -37,7 +37,7 @@ public class ActivityLikeController {
     }
 
     @ApiOperation(value = "点赞", notes = "点赞", httpMethod = "POST")
-    @RequestMapping(value = "removeLike")
+    @RequestMapping(value = "/removeLike")
     @ResponseBody
     public Msg removeLike(int aid, int uid) {
         int like = activityLikeService.removeLike(aid, uid);

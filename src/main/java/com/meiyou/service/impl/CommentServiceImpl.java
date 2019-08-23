@@ -1,7 +1,9 @@
 package com.meiyou.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.CommentMapper;
+import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.Comment;
 import com.meiyou.pojo.CommentExample;
 import com.meiyou.pojo.User;
@@ -31,6 +33,9 @@ public class CommentServiceImpl implements CommentService {
     CommentMapper commentMapper;
 
     @Autowired
+    ActivityMapper activityMapper;
+
+    @Autowired
     UserService userService;
 
     /**
@@ -49,9 +54,20 @@ public class CommentServiceImpl implements CommentService {
         comment.setPersonId(uid);
         comment.setContent(content);
         comment.setBoolSee(false);
-        comment.setBoolSee(false);
+        comment.setBoolClose(false);
         int insert = commentMapper.insert(comment);
         if (insert == 0) {
+            return Msg.fail();
+        }
+        CommentExample example = new CommentExample();
+        CommentExample.Criteria criteria = example.createCriteria();
+        criteria.andActivityIdEqualTo(aid);
+        int count = commentMapper.countByExample(example);
+        Activity activity = new Activity();
+        activity.setId(aid);
+        activity.setCommontNum(count);
+        int i = activityMapper.updateByPrimaryKeySelective(activity);
+        if (i == 0) {
             return Msg.fail();
         }
         return Msg.success();

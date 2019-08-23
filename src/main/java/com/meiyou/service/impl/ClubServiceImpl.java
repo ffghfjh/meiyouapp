@@ -1,13 +1,12 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubMapper;
-import com.meiyou.mapper.RootMessageMapper;
-import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubExample;
-import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
 import com.meiyou.service.ClubService;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,7 +37,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      */
     @Override
     @Transactional
-    public Msg addClub(Club club,String token, Integer time, String password) {
+    public Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -56,31 +54,41 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         String payWord = getUserByUid(club.getPublishId()).getPayWord();
         Float money = getUserByUid(club.getPublishId()).getMoney();
 
-        //从系统数据表获取置顶费用
+        //从系统数据表获取置顶费用和发布费用
         String top_money = getRootMessage("top_money");
-        //Todo 获取发布所需的金额
+        String publish_money = getRootMessage("publish_money");
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
             //用户金额与发布金额进行比较
             //Todo
-        }else if(money < Float.valueOf(top_money)*time){
+        }
+        if(money < Float.valueOf(top_money)*time){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
         }else {
-            clubMapper.insert(club);
+            int rows = clubMapper.insertSelective(club);
+
+            if (rows != 1) {
+                return Msg.fail();
+            }
+
+            //添加地理位置到缓存
+            String message = setPosition(latitude, longitude, club.getId(), Constants.GEO_CLUB);
+            System.out.println(message);
 
             //执行扣钱操作
             User user = new User();
             //Todo
-            money = money - Float.valueOf(top_money)*time;
+            money = money - Float.valueOf(top_money)*time - Float.valueOf(publish_money);
             user.setMoney(money);
             user.setId(club.getPublishId());
             user.setUpdateTime(new Date());
@@ -96,12 +104,17 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg updateClub(Integer uid, Integer cid) {
+    public Msg updateClub(Integer uid,String token, Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Integer state = clubMapper.selectByPrimaryKey(cid).getState();
         if(state != 0){
             return Msg.fail();
         }
         //更改状态为已失效
+        //Todo
         Club club = new Club();
         club.setPublishId(uid);
         club.setId(cid);
@@ -120,21 +133,24 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid) {
+    public Msg selectByUid(Integer uid,String token) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
-        clubExample.createCriteria().andPublishIdEqualTo(uid).andStateBetween(0,1);
+        clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
         if(result.size() == 0){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
         }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("club",result);
 
-        msg.setExtend(map);
+        //Todo 人数
+        msg.add("club",result);
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;
@@ -146,7 +162,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByCid(Integer cid) {
+    public Msg selectByCid(Integer uid,String token,Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         Club result = clubMapper.selectByPrimaryKey(cid);
         if(result == null){
@@ -154,13 +174,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             msg.setCode(404);
             return msg;
         }
-        if(result.getState() == 2){
-            return Msg.fail();
-        }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("club",result);
 
-        msg.setExtend(map);
+        //Todo 人数
+        msg.add("club",result);
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;

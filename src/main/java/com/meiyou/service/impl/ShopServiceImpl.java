@@ -1,10 +1,13 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Shop;
+import com.meiyou.pojo.ShopExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
 import com.meiyou.service.ShopService;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,8 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
-    public Msg addShop(Shop shop, String token, Integer time, String password) {
+    public Msg addShop(Shop shop, String token, Integer time, String password,
+                       Double latitude, Double longitude) {
 //        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -71,7 +75,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             msg.setCode(1002);
             return msg;
         }else {
-            shopMapper.insertSelective(shop);
+            int rows = shopMapper.insertSelective(shop);
+
+            if (rows != 1) {
+                return Msg.fail();
+            }
+
+            //添加地理位置到缓存
+            String message = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            System.out.println(message);
 
             //执行扣钱操作
             User user = new User();
@@ -87,19 +99,90 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         }
     }
 
+    /**
+     * 取消发布景点商家状态
+     * @param uid
+     * @param token
+     * @param sid
+     * @return
+     */
     @Override
     public Msg updateShop(Integer uid, String token, Integer sid) {
-        return null;
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+        Integer status = shopMapper.selectByPrimaryKey(sid).getState();
+        if(status!=0){
+            return Msg.fail();
+        }
+        //设置状态为2，已失效
+        Shop shop = new Shop();
+        shop.setState(2);
+
+        ShopExample shopExample = new ShopExample();
+        shopExample.createCriteria().andPublishIdEqualTo(uid).andIdEqualTo(sid);
+        int rows = shopMapper.updateByExampleSelective(shop, shopExample);
+        if (rows != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
     }
 
+    /**
+     * 查找用户的shop
+     * @param uid
+     * @param token
+     * @return
+     */
     @Override
     public Msg selectByUid(Integer uid, String token) {
-        return null;
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+        Msg msg = new Msg();
+        ShopExample shopExample = new ShopExample();
+        shopExample.createCriteria().andPublishIdEqualTo(uid);
+        List<Shop> result = shopMapper.selectByExample(shopExample);
+        if(result.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("没有找到指定对象的Shop");
+            return msg;
+        }
+
+        //Todo 人数
+        msg.add("shop",result);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
     }
 
+    /**
+     * 查找指定的景点商家
+     * @param uid
+     * @param token
+     * @param sid
+     * @return
+     */
     @Override
     public Msg selectBySid(Integer uid, String token, Integer sid) {
-        return null;
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+        Msg msg = new Msg();
+        ShopExample shopExample = new ShopExample();
+        shopExample.createCriteria().andIdEqualTo(sid);
+        List<Shop> result = shopMapper.selectByExample(shopExample);
+        if(result.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("没有找到指定的经典商家");
+            return msg;
+        }
+
+        //Todo 人数
+        msg.add("shop",result.get(0));
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
     }
 
     @Override

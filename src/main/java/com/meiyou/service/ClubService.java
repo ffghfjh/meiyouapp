@@ -18,7 +18,7 @@ public interface ClubService {
      * @param time 置顶天数
      * @param password 支付密码
      */
-    Msg addClub(Club club,String token, Integer time, String password);
+    Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude);
 
     /**
      * 通过会所id删除指定的会所
@@ -27,7 +27,7 @@ public interface ClubService {
      * @return
      */
     //Todo
-    Msg updateClub(Integer uid,Integer cid);
+    Msg updateClub(Integer uid,String token,Integer cid);
 
     /**
      * 通过用户id查找全部发布的会所
@@ -35,7 +35,7 @@ public interface ClubService {
      * @return
      */
     //Todo
-    Msg selectByUid(Integer uid);
+    Msg selectByUid(Integer uid,String token);
 
     /**
      * 通过会所id查找会所信息
@@ -43,7 +43,7 @@ public interface ClubService {
      * @return
      */
     //Todo
-    Msg selectByCid(Integer cid);
+    Msg selectByCid(Integer uid,String token,Integer cid);
 
     /**
      * 根据经纬度查询附近的会所

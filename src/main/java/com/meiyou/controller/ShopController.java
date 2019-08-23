@@ -1,15 +1,18 @@
 package com.meiyou.controller;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.meiyou.pojo.Shop;
 import com.meiyou.service.ShopService;
+import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @description: 同城导游控制器
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @create: 2019-08-23 11:30
  **/
 @RestController
-@Api(value = "同城导游控制器",tags = "同城导游")
+@Api(value = "同城导游控制器",tags = "发布景点商家")
 @RequestMapping("/shop")
 public class ShopController {
 
@@ -31,15 +34,52 @@ public class ShopController {
                        @RequestParam("service_area") String service_area,
                        @RequestParam("travel_time") String travel_time,
                        @RequestParam("charge") Integer charge,
-                       @RequestParam("imgs_url") String imgsUrl,
                        @RequestParam("time") Integer time,
-                       @RequestParam("password") String password){
+                       @RequestParam("password") String password,
+                       @RequestParam("files") MultipartFile[] files,
+                       Double latitude, Double longitude,HttpServletRequest request){
+
+        //使用Hutool进行json操作
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "shop", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
+            }
+        }
+        if (array.size() == 0) {
+            return Msg.fail();
+        }
+
         Shop shop = new Shop();
         shop.setPublishId(publishId);
-        shop.setImgsUrl(imgsUrl);
+        shop.setImgsUrl(array.toString());////以json数组的形式存图片
         shop.setServiceArea(service_area);
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
-        return shopService.addShop(shop,token,time,password);
+        return shopService.addShop(shop,token,time, password, latitude, longitude);
+    }
+
+    @PutMapping("/update")
+    @ApiOperation(value = "取消发布聘请同城导游",notes = "取消即更发布状态，实际数据不删除")
+    public Msg updateShop(@RequestParam("uid") Integer uid,
+                          @RequestParam("token") String token,
+                          @RequestParam("sid") Integer sid){
+        return shopService.updateShop(uid,token,sid);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "查找")
+    public Msg getClubByUid(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token){
+        return shopService.selectByUid(uid,token);
+    }
+
+    @GetMapping("/find")
+    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "查找")
+    public Msg findClubByCid(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("sid") Integer sid){
+        return shopService.selectBySid(uid,token,sid);
     }
 }

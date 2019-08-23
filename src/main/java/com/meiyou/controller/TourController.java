@@ -27,15 +27,16 @@ public class TourController {
     @ApiOperation(value = "发布旅游", notes = "发布旅游", httpMethod = "POST")
     @PostMapping(value = "/insertTour")
     public Msg insertTour(
-                          @RequestParam(value = "publishId",required = false)Integer publishId,
-                          @RequestParam(value = "startAddress",required = false)String startAddress,
-                          @RequestParam(value = "endAddress",required = false)String endAddress,
-                          @RequestParam(value = "goTime",required = false)String goTime,
-                          @RequestParam(value = "goMessage",required = false)String goMessage,
-                          @RequestParam(value = "reward",required = false)Integer reward,
-                          @RequestParam(value = "payType",required = false)int payType,
-                          @RequestParam(value = "password",required = false)String password,
-                          @RequestParam(value = "token",required = false)String token){
+            @RequestParam(value = "publishId",required = false)Integer publishId,
+            @RequestParam(value = "startAddress",required = false)String startAddress,
+            @RequestParam(value = "endAddress",required = false)String endAddress,
+            @RequestParam(value = "goTime",required = false)String goTime,
+            @RequestParam(value = "goMessage",required = false)String goMessage,
+            @RequestParam(value = "reward",required = false)Integer reward,
+            @RequestParam(value = "payType",required = false)int payType,
+            @RequestParam(value = "password",required = false)String password,
+            @RequestParam(value = "token",required = false)String token,
+            double latitude,double longitude){
 
         Tour tour = new Tour();
         tour.setCreateTime(new Date());
@@ -48,7 +49,7 @@ public class TourController {
         tour.setNeedNum(1);
         tour.setReward(reward);
         tour.setPayType(payType);
-        return tourService.insert(tour,password,token);
+        return tourService.insert(tour,password,token,latitude,longitude);
 
     }
 

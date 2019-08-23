@@ -13,7 +13,7 @@ public interface AppointmentService {
     /**
      * 发布约会
      */
-    Msg insert(Appointment appointment, String password, String token);
+    Msg insert(Appointment appointment, String password, String token,double latitude,double longitude);
 
     /**
      * 查询我的发布

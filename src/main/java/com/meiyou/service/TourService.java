@@ -13,5 +13,5 @@ public interface TourService {
     /**
      * 发布约会旅游
      */
-    Msg insert(Tour tour, String password, String token);
+    Msg insert(Tour tour, String password, String token, double latitude,double longitude);
 }

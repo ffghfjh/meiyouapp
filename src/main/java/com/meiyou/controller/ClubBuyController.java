@@ -45,8 +45,7 @@ public class ClubBuyController {
     @ApiOperation(value = "通过用户id查找指定用户id的全部购买的推拿会所",notes = "查找")
     public Msg getClubBuyByUid(@RequestParam("uid") Integer uid,
                                @RequestParam("token") String token){
-        //Todo
-        return clubBuyService.selectByUid(uid);
+        return clubBuyService.selectByUid(uid,token);
     }
 
     @GetMapping("/find")

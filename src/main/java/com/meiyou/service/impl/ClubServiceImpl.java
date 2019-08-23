@@ -96,7 +96,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg updateClub(Integer uid, Integer cid) {
+    public Msg updateClub(Integer uid,String token, Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Integer state = clubMapper.selectByPrimaryKey(cid).getState();
         if(state != 0){
             return Msg.fail();
@@ -121,7 +125,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid) {
+    public Msg selectByUid(Integer uid,String token) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
@@ -146,7 +154,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByCid(Integer cid) {
+    public Msg selectByCid(Integer uid,String token,Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         Club result = clubMapper.selectByPrimaryKey(cid);
         if(result == null){

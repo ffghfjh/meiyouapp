@@ -137,7 +137,11 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid) {
+    public Msg selectByUid(Integer uid,String token) {
+//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         //查找购买按摩会所的记录
         ClubBuyExample clubBuyExample = new ClubBuyExample();

@@ -28,7 +28,7 @@ public interface ClubBuyService {
      * @param uid
      * @return
      */
-    Msg selectByUid(Integer uid);
+    Msg selectByUid(Integer uid,String token);
 
     /**
      * 查找指定的会所购买记录

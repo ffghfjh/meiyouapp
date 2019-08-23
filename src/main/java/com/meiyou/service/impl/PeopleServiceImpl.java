@@ -49,6 +49,7 @@ public class PeopleServiceImpl implements PeopleService {
                     map.put("ucount",user.getAccount());
                     map.put("sex",user.getSex());
                     map.put("age",Integer.parseInt(user.getBirthday()));
+                    map.put("bg",user.getBgPicture());
                     map.put("id",user.getId());
                     list.add(map);
                 }

@@ -82,7 +82,7 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         Activity activity = new Activity();
         activity.setId(aid);
         activity.setLikeNum(count);
-        int i1 = activityMapper.insertSelective(activity);
+        int i1 = activityMapper.updateByPrimaryKeySelective(activity);
         if (i1 == 0) {
             return Msg.fail();
         }

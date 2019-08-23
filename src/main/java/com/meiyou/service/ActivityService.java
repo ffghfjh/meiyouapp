@@ -40,7 +40,7 @@ public interface ActivityService {
     Activity getActivityByAid(int aid);
 
     //通过用户id查询用户和他的所有动态
-    ArrayList<HashMap<String, Object>> listUserActivityByUid(int uid);
+    Msg listUserActivityByUid(int uid);
 
     //通过用户id查询ta的所有动态
     List<Activity> listActivityByUid(int uid);

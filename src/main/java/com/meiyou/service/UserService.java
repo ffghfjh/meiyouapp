@@ -12,7 +12,9 @@ public interface UserService {
     //手机号登录
     public Msg phoneLogin(String phone,String password);
     //用户注册
-    public Msg userRegist(String code, String phone, String password,  String nickname, String birthday, boolean sex, String qianming, MultipartFile img, HttpServletRequest req);
+    public Msg userRegist(String code,String shareCode, String phone, String password,  String nickname, String birthday, boolean sex, String qianming, MultipartFile img, HttpServletRequest req);
+   //获取腾讯云IM鉴权Sig
+    public Msg getSig(int uid,String token);
 
     /**
      * hzy
@@ -21,5 +23,21 @@ public interface UserService {
      * @return
      */
     User getUserById(int uid);
+
+    /**
+     * 添加金币
+     * @param id
+     * @param money
+     * @return
+     */
+    boolean addMoney(int id,float money);
+
+    /**
+     * 减少金币
+     * @param id
+     * @param money
+     * @return
+     */
+    boolean delMoney(int id,float money);
 
 }

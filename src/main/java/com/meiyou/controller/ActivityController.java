@@ -53,13 +53,17 @@ public class ActivityController {
 
     @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
     @PostMapping(value = "/postActivity")
-    public Msg postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
+    public Msg postActivity(int uid,String token, double latitude, double longitude, String content,  MultipartFile[] files
             ,HttpServletRequest request) {
-        int i = activityService.postActivity(uid,latitude,longitude,content,files, request);
-        if (i == 1) {
-            return Msg.success();
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            int i = activityService.postActivity(uid,latitude,longitude,content,files, request);
+            if (i == 1) {
+                return Msg.success();
+            }
+            return Msg.fail();
+        }else {
+            return Msg.noLogin();
         }
-        return Msg.fail();
     }
 
     @ApiOperation(value = "获得我所有的动态", notes = "获得我所有的动态")

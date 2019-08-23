@@ -60,7 +60,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(content);
         comment.setBoolSee(false);
         comment.setBoolClose(false);
-        int insert = commentMapper.insert(comment);
+        comment.setLikeNum(0);
+        int insert = commentMapper.insertSelective(comment);
         if (insert == 0) {
             return Msg.fail();
         }
@@ -88,7 +89,7 @@ public class CommentServiceImpl implements CommentService {
         List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         CommentExample example = new CommentExample();
         CommentExample.Criteria criteria = example.createCriteria();
-        criteria.andIdEqualTo(aid);
+        criteria.andActivityIdEqualTo(aid);
         List<Comment> comments = commentMapper.selectByExample(example);
         if (comments == null || comments.size() == 0) {
             return Msg.fail();

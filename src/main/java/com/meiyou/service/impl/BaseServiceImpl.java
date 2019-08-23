@@ -2,8 +2,13 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
+import com.meiyou.utils.Constants;
+import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -38,5 +43,26 @@ public class BaseServiceImpl {
      */
     public User getUserByUid(Integer uid){
         return userMapper.selectByPrimaryKey(uid);
+    }
+
+    /**
+     * 发布添加地理位置
+     * @param latitude 经度
+     * @param longitude 纬度
+     * @param key 活动的id
+     * @param value
+     * @return
+     */
+    public String setPosition(Double latitude, Double longitude, Integer key, String value){
+        //添加地理位置和aid到Redis缓存中
+        Coordinate coordinate = new Coordinate();
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        coordinate.setKey(Integer.toString(key));
+        Long reo = RedisUtil.addReo(coordinate, value);
+        if (reo == null) {
+            return "获取地理位置失败";
+        }
+        return "获取地理位置成功";
     }
 }

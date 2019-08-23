@@ -30,6 +30,10 @@ public interface AppointmentService {
      */
     Msg startEnrollment(String uid,String password,Integer id,String token);
 
+    /**
+     * 取消报名
+     */
+    Msg endEnrollment(String uid,Integer id,String token);
 
     /**
      * 查询所有报名某个约会的人员信息
@@ -37,11 +41,28 @@ public interface AppointmentService {
     Msg selectAppointAskList(String uid,Integer appointId,String token);
 
     /**
-     * 从所有报名某个约会的人员信息中选择一个进行确认
+     * 从所有报名某个约会的人员信息中选择一个进行确认，
+     * 没有被选中的人退还报名金
      */
-    Msg confirmUserId(Integer askerId,Integer appointId);
+    Msg confirmUserId(String uid,Integer askerId,Integer appointId,String token);
 
     /**
-     * 确认到达
+     * 对方取消赴约，重新发布，不退还报名金
      */
+    Msg endAppointment(String uid,Integer id,String token);
+
+    /**
+     * 自己重新发布，退还报名金
+     */
+    Msg againRelease(String uid,Integer id,String token);
+
+    /**
+     * 报名人确认赴约
+     */
+    Msg confirmAppointment(String uid,Integer id,String token);
+
+    /**
+     * 确认报名人已到达
+     */
+    Msg confirmArrive(String uid,Integer id,String token);
 }

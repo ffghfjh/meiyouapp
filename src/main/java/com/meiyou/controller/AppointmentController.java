@@ -110,8 +110,8 @@ public class AppointmentController {
      */
     @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "POST")
     @PostMapping(value = "/selectAppointAskList")
-    public Map<String, Object> selectAppointAskList(Integer appointId) {
-        Msg msg = appointmentService.selectAppointAskList(appointId);
+    public Map<String, Object> selectAppointAskList(String uid,Integer appointId,String token) {
+        Msg msg = appointmentService.selectAppointAskList(uid,appointId,token);
         Map<String, Object> extend = msg.getExtend();
         return extend;
     }

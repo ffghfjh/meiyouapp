@@ -34,7 +34,7 @@ public interface AppointmentService {
     /**
      * 查询所有报名某个约会的人员信息
      */
-    Msg selectAppointAskList(Integer appointId);
+    Msg selectAppointAskList(String uid,Integer appointId,String token);
 
     /**
      * 从所有报名某个约会的人员信息中选择一个进行确认

@@ -113,16 +113,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
-        HashMap<String, Object> map = new HashMap<>();
         Msg msg = new Msg();
         if (appointments != null && appointments.size() != 0) {
-            map.put("lists",appointments);
-            msg.setExtend(map);
-            msg.setMsg("查询成功");
-            msg.setCode(100);
+            Msg success = Msg.success();
+            msg.add("appointments",appointments);
+            msg.add("success",success);
             return msg;
         }
-        return Msg.fail();
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
     }
 
     /**
@@ -233,11 +233,21 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Date: 2019/8/22
     */
     @Override
-    public List<AppointAsk> selectAppointAskList(Integer appointId) {
+    public Msg selectAppointAskList(Integer appointId) {
         AppointAskExample example = new AppointAskExample();
         example.createCriteria().andAppointIdEqualTo(appointId);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(example);
-        return appointAsks;
+
+        Msg msg = new Msg();
+        if (appointAsks != null && appointAsks.size() != 0) {
+            Msg success = Msg.success();
+            msg.add("appointAsks", appointAsks );
+            msg.add("success",success);
+            return msg;
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
     }
 
     /**

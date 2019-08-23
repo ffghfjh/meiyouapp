@@ -97,14 +97,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         //更新用户账户余额
         userMapper.updateByExample(user, userExample);
 
-        //获取发布时定位
-        Coordinate coordinate = new Coordinate();
-        coordinate.setLatitude(latitude);
-        coordinate.setLongitude(longitude);
-        RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
-
         int i = appointmentMapper.insertSelective(appointment);
         if (i == 1) {
+            //获取发布时定位
+            Coordinate coordinate = new Coordinate();
+            coordinate.setLatitude(latitude);
+            coordinate.setLongitude(longitude);
+            coordinate.setKey(appointment.getId().toString());
+            RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
             return Msg.success();
         } else {
             return Msg.fail();

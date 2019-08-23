@@ -34,27 +34,28 @@
 
         <!-- 列出要生成代码的所有表，这里配置的是不生成Example文件 -->
         <!-- 这个地方呢 也是你需要自动修改的地方  第一个参数是你数据库的表名  第二个参数就是想要生成实体类的名称  -->
-        <table tableName="activity" domainObjectName="Activity"></table>
-        <table tableName="activity_like" domainObjectName="ActivityLike"></table>
-        <table tableName="admin" domainObjectName="Admin"></table>
-        <table tableName="appoint_ask" domainObjectName="AppointAsk"></table>
-        <table tableName="appointment" domainObjectName="Appointment"></table>
-        <table tableName="authorization" domainObjectName="Authorization"></table>
-        <table tableName="cash" domainObjectName="Cash"></table>
-        <table tableName="club" domainObjectName="Club"></table>
-        <table tableName="club_buy" domainObjectName="ClubBuy"></table>
-        <table tableName="comment" domainObjectName="Comment"></table>
-        <table tableName="read" domainObjectName="Read"></table>
-        <table tableName="recharge" domainObjectName="Recharge"></table>
-        <table tableName="red_packet" domainObjectName="RedPacket"></table>
-        <table tableName="root_message" domainObjectName="RootMessage"></table>
-        <table tableName="share" domainObjectName="Share"></table>
-        <table tableName="shop" domainObjectName="Shop"></table>
-        <table tableName="shop_buy" domainObjectName="ShopBuy"></table>
-        <table tableName="tour" domainObjectName="Tour"></table>
-        <table tableName="tour_ask" domainObjectName="TourAsk"></table>
-        <table tableName="user" domainObjectName="User"></table>
-        <table tableName="club_star" domainObjectName="ClubStar"></table>
-        <table tableName="shop_star" domainObjectName="ShopStar"></table>
+<!--        <table tableName="activity" domainObjectName="Activity"></table>-->
+<!--        <table tableName="activity_like" domainObjectName="ActivityLike"></table>-->
+<!--        <table tableName="admin" domainObjectName="Admin"></table>-->
+<!--        <table tableName="appoint_ask" domainObjectName="AppointAsk"></table>-->
+<!--        <table tableName="appointment" domainObjectName="Appointment"></table>-->
+<!--        <table tableName="authorization" domainObjectName="Authorization"></table>-->
+<!--        <table tableName="cash" domainObjectName="Cash"></table>-->
+<!--        <table tableName="club" domainObjectName="Club"></table>-->
+<!--        <table tableName="club_buy" domainObjectName="ClubBuy"></table>-->
+<!--        <table tableName="comment" domainObjectName="Comment"></table>-->
+<!--        <table tableName="read" domainObjectName="Read"></table>-->
+<!--        <table tableName="recharge" domainObjectName="Recharge"></table>-->
+<!--        <table tableName="red_packet" domainObjectName="RedPacket"></table>-->
+<!--        <table tableName="root_message" domainObjectName="RootMessage"></table>-->
+<!--        <table tableName="share" domainObjectName="Share"></table>-->
+<!--        <table tableName="shop" domainObjectName="Shop"></table>-->
+<!--        <table tableName="shop_buy" domainObjectName="ShopBuy"></table>-->
+<!--        <table tableName="tour" domainObjectName="Tour"></table>-->
+<!--        <table tableName="tour_ask" domainObjectName="TourAsk"></table>-->
+<!--        <table tableName="user" domainObjectName="User"></table>-->
+<!--        <table tableName="club_star" domainObjectName="ClubStar"></table>-->
+<!--        <table tableName="shop_star" domainObjectName="ShopStar"></table>-->
+        <table tableName="comment_like" domainObjectName="CommentLike"></table>
     </context>
 </generatorConfiguration>

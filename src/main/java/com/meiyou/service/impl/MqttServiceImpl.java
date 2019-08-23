@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.model.MqttMessageModel;
 import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.RootMessageExample;
@@ -14,6 +15,7 @@ import com.meiyou.utils.ConnectionOptionWrapper;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.MqttConstants;
 import com.meiyou.utils.MqttMessageFactory;
+import org.apache.tomcat.util.bcel.Const;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,13 +118,30 @@ public class MqttServiceImpl implements MqttService {
                     public void messageArrived(String topic, MqttMessage message) throws Exception {
                         System.out.println("收到mqtt消息");
                         String msg = message.getPayload().toString();
+                        //解析消息
                         MqttMessageModel mqttMessage = JSON.parseObject(msg,MqttMessageModel.class);
                         System.out.println(mqttMessage.getReceiver());
                         if(mqttMessage.getMsgType()== MqttConstants.CALL){
                             String sender = mqttMessage.getSender();//发送者
+                            //检测余额
                             if(authSenderMoey(sender)){
-
+                                mqttClient.publish(parentTopic+"/"+mqttMessage.getReceiver(),message);
                             }else{
+                                MqttMessageFactory factory = new MqttMessageFactory(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getSender(),null);
+                                MqttMessage message1 = new MqttMessage();
+                                message1.setQos(2);
+                                message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            System.out.println("发送mqtt消息");
+                                            mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
+                                        } catch (MqttException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
 
                             }
                         }
@@ -193,8 +212,8 @@ public class MqttServiceImpl implements MqttService {
     }
 
 
-    private void sendMessage(int chatType,int msgType,String sender,String reiver,String topic){
-        MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver);
+    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, AliRtcAuthInfo info){
+        MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());
         new Thread(new Runnable() {

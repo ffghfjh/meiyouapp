@@ -1,6 +1,8 @@
 package com.meiyou.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.service.MqttService;
 
 /**
@@ -15,11 +17,12 @@ public class MqttMessageFactory {
     JSONObject jsonObject = new JSONObject();
 
 
-     public MqttMessageFactory(int chatType,int msgType,String sender,String receiver){
+     public MqttMessageFactory(int chatType,int msgType,String sender,String receiver,AliRtcAuthInfo authInfo){
          setChatType(chatType);
          setMessType(msgType);
          setSender(sender);
          setReceiver(receiver);
+         setAuthInfo(authInfo);
      }
 
     /**
@@ -58,6 +61,30 @@ public class MqttMessageFactory {
      * @param receiver 接收者     */
     public void setReceiver(String receiver){
         jsonObject.put("receiver",receiver);
+    }
+
+
+    /**
+     *
+     * @param info
+     */
+    public void setAuthInfo(AliRtcAuthInfo info){
+        if(info!=null){
+            JSONObject authinfo = new JSONObject();
+            authinfo.put("mConferenceId",info.getConferenceId());//会议id
+            authinfo.put("mUserId",info.getUserId());//用户id
+            authinfo.put("mAppid",info.getAppid());
+            authinfo.put("mNonce",info.getNonce());
+            authinfo.put("mTimestamp",info.getNonce());
+            authinfo.put("mToken",info.getToken());
+            authinfo.put("mGslb",info.getGslb());
+            jsonObject.put("authInfo",authinfo);
+        }else {
+            jsonObject.put("authInfo",null);
+        }
+
+
+
     }
 
 

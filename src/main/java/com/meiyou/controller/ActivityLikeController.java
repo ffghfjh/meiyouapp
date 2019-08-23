@@ -25,26 +25,12 @@ public class ActivityLikeController {
     @Autowired
     ActivityLikeService activityLikeService;
 
-    @ApiOperation(value = "点赞", notes = "点赞", httpMethod = "POST")
+    @ApiOperation(value = "动态点赞接口", notes = "动态点赞接口", httpMethod = "POST")
     @RequestMapping(value = "/like")
     @ResponseBody
-    public Msg like(int aid, int uid) {
-        int like = activityLikeService.like(aid, uid);
-        if (like == 1) {
-            return Msg.success();
-        }
-        return Msg.fail();
+    public int like(int aid, int uid, int type) {
+        return activityLikeService.like(aid, uid, type);
     }
 
-    @ApiOperation(value = "点赞", notes = "点赞", httpMethod = "POST")
-    @RequestMapping(value = "/removeLike")
-    @ResponseBody
-    public Msg removeLike(int aid, int uid) {
-        int like = activityLikeService.removeLike(aid, uid);
-        if (like == 1) {
-            return Msg.success();
-        }
-        return Msg.fail();
-    }
 }
 

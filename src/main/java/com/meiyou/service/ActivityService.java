@@ -10,6 +10,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,15 +39,17 @@ public interface ActivityService {
     //查询我的单个动态
     Activity getActivityByAid(int aid);
 
-    //通过用户id查询他的所有动态
+    //通过用户id查询用户和他的所有动态
+    ArrayList<HashMap<String, Object>> listUserActivityByUid(int uid);
+
+    //通过用户id查询ta的所有动态
     List<Activity> listActivityByUid(int uid);
 
     //获取所有动态
     List<Activity> listActivity();
 
-    //通过经纬度获取所有动态
-    List<Activity> listActivityBy(float longitude, float latitude);
-
+    //通过uid和经纬度获取所有动态
+    Msg listNeighborActivity(int uid, double latitude, double longitude);
 
 
 }

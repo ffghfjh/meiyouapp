@@ -140,11 +140,6 @@ public class AppointmentController {
     @ApiOperation(value = "从所有报名某个约会的人员信息中选择一个进行确认", notes = "从所有报名某个约会的人员信息中选择一个进行确认", httpMethod = "POST")
     @PostMapping(value = "/confirmUserId")
     public Msg confirmUserId(Integer askerId, Integer appointId) {
-        int i = appointmentService.confirmUserId(askerId, appointId);
-        if (i == 1) {
-            return Msg.success();
-        } else {
-            return Msg.fail();
-        }
+        return appointmentService.confirmUserId(askerId, appointId);
     }
 }

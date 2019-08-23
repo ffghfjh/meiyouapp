@@ -1,23 +1,31 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.BetweenFormater;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
+import com.meiyou.pojo.User;
 import com.meiyou.service.ActivityService;
 import com.meiyou.service.RootMessageService;
+import com.meiyou.service.UserService;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,8 +48,22 @@ public class ActivityServiceImpl implements ActivityService {
     ActivityMapper activityMapper;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     RootMessageService rootMessageService;
 
+    /**
+     * hzy
+     * 用户发布动态
+     * @param uid
+     * @param latitude
+     * @param longitude
+     * @param content
+     * @param files
+     * @param request
+     * @return
+     */
     @Override
     public int postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
             ,HttpServletRequest request){
@@ -73,7 +95,7 @@ public class ActivityServiceImpl implements ActivityService {
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
             coordinate.setKey(Integer.toString(uid));
-            Long reo = RedisUtil.addReo(coordinate, "activity");
+            Long reo = RedisUtil.addReo(coordinate, Constants.GEO_ACTIVITY);
             if (reo == null) {
                 return 0;
             }
@@ -102,9 +124,73 @@ public class ActivityServiceImpl implements ActivityService {
         return null;
     }
 
+    /**
+     * hzy
+     * 根据用户id获得所有动态
+     * @param uid
+     * @return ArrayList<HashMap<String, Object>>
+     */
+    @Override
+    public ArrayList<HashMap<String, Object>>  listUserActivityByUid(int uid) {
+        ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        //根据uid获取用户动态
+        List<Activity> activities = listActivityByUid(uid);
+        HashMap<String, Object> hashMapNo = new HashMap<>();
+        User user = userService.getUserById(uid);
+        boolean flag = (activities ==null && activities.size()==0);
+        //用户或动态不存在的话，返回默认信息，防止空指针异常
+        if (user == null || flag) {
+            hashMapNo.put("header", "no picture");
+            hashMapNo.put("nickname", "无昵称");
+            hashMapNo.put("sex", 0);
+            hashMapNo.put("birthday", "0");
+            hashMapNo.put("content", "无动态内容");
+            hashMapNo.put("imgsUrl", "no picture");
+            hashMapNo.put("distance", "0.0km");
+            hashMapNo.put("time", "时间不存在");
+            hashMapNo.put("readNum", 0);
+            hashMapNo.put("likeNum", 0);
+            hashMapNo.put("commontNum", 0);
+            list.add(hashMapNo);
+            return list;
+        }
+        for (Activity activity : activities) {
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("header", user.getHeader());
+            hashMap.put("nickname", user.getNickname());
+            hashMap.put("sex", user.getSex());
+            hashMap.put("birthday", user.getBirthday());
+            hashMap.put("content", activity.getContent());
+            hashMap.put("imgsUrl", activity.getImgsUrl());
+            hashMap.put("distance", "0.0km");
+            //发布时间
+            Date createTime = activity.getCreateTime();
+            //当前时间
+            Date nowTime = DateUtil.date();
+            //时间差
+            String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
+            hashMap.put("time", formatBetween);
+            hashMap.put("readNum", activity.getReadNum());
+            hashMap.put("likeNum", activity.getLikeNum());
+            hashMap.put("commontNum", activity.getCommontNum());
+            list.add(hashMap);
+        }
+        return list;
+    }
+
+    /**
+     * hzy
+     * 通过用户id查询ta的所有动态
+     * @param uid
+     * @return
+     * 待办事项：需要加redis缓存
+     */
     @Override
     public List<Activity> listActivityByUid(int uid) {
-        return null;
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        return activityMapper.selectByExample(example);
     }
 
     @Override
@@ -119,8 +205,75 @@ public class ActivityServiceImpl implements ActivityService {
         return activities;
     }
 
+    /**
+     * hzy
+     * 通过用户id和经纬度获取附近所有动态
+     * @param uid
+     * @param latitude
+     * @param longitude
+     * @return
+     */
     @Override
-    public List<Activity> listActivityBy(float longitude, float latitude) {
+    public ArrayList<HashMap<String, Object>> listNeighborActivity(int uid, double latitude, double longitude) {
+        ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> hashMapNo = new HashMap<>();
+        //范围半径
+        String range = rootMessageService.getMessageByName("range");
+        double radius = Double.parseDouble(range);
+        //从Redis获取附近的所有用户
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(Integer.toString(uid));
+        coordinate.setLongitude(longitude);
+        coordinate.setLatitude(latitude);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryActivity(coordinate, radius);
+        if (responseList == null && responseList.size() ==0) {
+            hashMapNo.put("header", "no picture");
+            hashMapNo.put("nickname", "无昵称");
+            hashMapNo.put("sex", 0);
+            hashMapNo.put("birthday", "0");
+            hashMapNo.put("content", "无动态内容");
+            hashMapNo.put("imgsUrl", "no picture");
+            hashMapNo.put("distance", "0.0km");
+            hashMapNo.put("time", "时间不存在");
+            hashMapNo.put("readNum", 0);
+            hashMapNo.put("likeNum", 0);
+            hashMapNo.put("commontNum", 0);
+            list.add(hashMapNo);
+            return list;
+        }
+        for (GeoRadiusResponse response : responseList) {
+            String memberByString = response.getMemberByString();
+            int nbhId = Integer.parseInt(memberByString);
+        }
+//
+//        boolean flag = (activities ==null && activities.size()==0);
+//        //用户或动态不存在的话，返回默认信息，防止空指针异常
+//        if (user == null || flag) {
+//
+//        }
+//        for (Activity activity : activities) {
+//            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+//            hashMap.put("header", user.getHeader());
+//            hashMap.put("nickname", user.getNickname());
+//            hashMap.put("sex", user.getSex());
+//            hashMap.put("birthday", user.getBirthday());
+//            hashMap.put("content", activity.getContent());
+//            hashMap.put("imgsUrl", activity.getImgsUrl());
+//            hashMap.put("distance", "0.0km");
+//            //发布时间
+//            Date createTime = activity.getCreateTime();
+//            //当前时间
+//            Date nowTime = DateUtil.date();
+//            //时间差
+//            String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
+//            hashMap.put("time", formatBetween);
+//            hashMap.put("readNum", activity.getReadNum());
+//            hashMap.put("likeNum", activity.getLikeNum());
+//            hashMap.put("commontNum", activity.getCommontNum());
+//            list.add(hashMap);
+//        }
+//        return list;
         return null;
     }
+
 }

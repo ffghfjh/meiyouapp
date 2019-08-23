@@ -63,11 +63,12 @@ public class UserController {
      */
     @RequestMapping(value = "phoneRegist",method = RequestMethod.POST)
     @ApiOperation(value = "手机号注册",notes = "1001 手机号被注册 1003 头像上传失败  1000验证码错误")
-    public Msg phoneRegist(String code, String phone, String password, String nickname, String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req){
+    public Msg phoneRegist(String code, String phone, String password,String shareCode, String nickname, String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req){
+        System.out.println("用户注册");
         if(phone==null||password==null||phone.equals("")||password.equals("")){
             return Msg.nullParam();
         }else{
-            Msg msg = userService.userRegist(code,phone,password,nickname,birthday,sex,signature,img,req);
+            Msg msg = userService.userRegist(code,shareCode,phone,password,nickname,birthday,sex,signature,img,req);
             return msg;
         }
     }

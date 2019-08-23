@@ -131,7 +131,18 @@ public class MqttServiceImpl implements MqttService {
                                 MqttMessage message1 = new MqttMessage();
                                 message1.setQos(2);
                                 message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
-                                mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            System.out.println("发送mqtt消息");
+                                            mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
+                                        } catch (MqttException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
                             }
                         }
 

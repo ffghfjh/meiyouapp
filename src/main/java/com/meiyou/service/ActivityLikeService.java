@@ -1,6 +1,7 @@
 package com.meiyou.service;
 
 import com.meiyou.pojo.ActivityLike;
+import com.meiyou.utils.Msg;
 
 /**
  * @author ：huangzhaoyang
@@ -14,7 +15,7 @@ public interface ActivityLikeService {
     //点赞
     int like(int aid, int uid, int type);
 
-    //取消点赞
-    int removeLike(int aid, int uid);
+    //根据aid和uid查找我是否点赞过这个动态
+    boolean getBoolLikeByAidUid(int aid, int uid);
 
 }

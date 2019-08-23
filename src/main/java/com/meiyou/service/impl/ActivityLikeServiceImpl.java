@@ -7,11 +7,13 @@ import com.meiyou.pojo.ActivityLike;
 import com.meiyou.pojo.ActivityLikeExample;
 import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.ActivityService;
+import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author ：huangzhaoyang
@@ -59,12 +61,17 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
     }
 
     @Override
-    public int removeLike(int aid, int uid) {
+    public boolean getBoolLikeByAidUid(int aid, int uid) {
         ActivityLikeExample example = new ActivityLikeExample();
         ActivityLikeExample.Criteria criteria = example.createCriteria();
         criteria.andActivityIdEqualTo(aid);
         criteria.andLikeIdEqualTo(uid);
-        return activityLikeMapper.deleteByExample(example);
+        List<ActivityLike> activityLikes = activityLikeMapper.selectByExample(example);
+        if (activityLikes == null || activityLikes.size() ==0) {
+            return false;
+        }
+        return true;
     }
+
 
 }

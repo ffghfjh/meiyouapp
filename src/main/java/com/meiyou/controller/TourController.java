@@ -4,6 +4,7 @@ import com.meiyou.pojo.Tour;
 import com.meiyou.service.TourService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ public class TourController {
     @Autowired
     private TourService tourService;
 
+    @ApiOperation(value = "发布旅游", notes = "发布旅游", httpMethod = "POST")
     @PostMapping(value = "/insertTour")
     public Msg insertTour(
                           @RequestParam(value = "publishId",required = false)Integer publishId,

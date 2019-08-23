@@ -2,18 +2,17 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
-import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: meiyouapp
@@ -30,7 +29,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private RootMessageMapper rootMessageMapper;
+    private AppointmentUtil appointmentUtil;
     /**
     * @Description: 发布约会
     * @Author: JK
@@ -50,40 +49,25 @@ public class AppointmentServiceImpl implements AppointmentService {
         User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
         //获取发布者账户余额
         Float money = user.getMoney();
-        RootMessageExample rootMessageExample = new RootMessageExample();
-        rootMessageExample.createCriteria().andNameEqualTo("publish_money");
-        //查询系统动态数据表中所有的数据
-        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
-        //获取发布金的名称
-        RootMessage publishMoney = list.get(0);
-
-        //获取发布金的金额
-        String publishMoneyValue = publishMoney.getValue();
-        //将发布金从String转换成Integer
-        Integer publishMoneyValue1=Integer.parseInt(publishMoneyValue);
+        //获取发布金
+        String publishMoneyName = "publish_money";
+        int publishMoneyValue = appointmentUtil.getRootMessage(publishMoneyName);
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
-            System.out.println(user.getPayWord());
             msg.setCode(1001);
             msg.setMsg("支付密码错误");
             return msg;
         }
 
-        //设置查询条件，设置系统动态数据表中 name = sincerity_money
-        rootMessageExample.createCriteria().andNameEqualTo("sincerity_money");
-        List<RootMessage> list1 = rootMessageMapper.selectByExample(rootMessageExample);
-        //获取诚意金的名称
-        RootMessage sincerityMoney = list1.get(0);
-        //获取诚意金的金额
-        String sincerityMoneyValue = sincerityMoney.getValue();
-        //将诚意金从String转换成Integer
-        Integer sincerityMoneyValue1=Integer.parseInt(sincerityMoneyValue);
+        //获取诚意金
+        String sincerityMoneyName = "sincerity_money";
+        int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
 
         //选择平台担保扣款后剩余余额
-        float balance = money-(publishMoneyValue1 + appointment.getReward());
+        float balance = money-(publishMoneyValue + appointment.getReward());
         //选择线下付款扣款后剩余余额
-        float balance1 = money-(publishMoneyValue1 + sincerityMoneyValue1 + appointment.getReward());
+        float balance1 = money-(publishMoneyValue + sincerityMoneyValue + appointment.getReward());
 
         //如果选择线下付款
         if (appointment.getPayType() == 1){
@@ -120,10 +104,25 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Date: 2019/8/22
     */
     @Override
-    public List<Appointment> selectAppointmentList() {
+    public Msg selectAppointmentList(String uid,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
         AppointmentExample example = new AppointmentExample();
+        example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
-        return appointments;
+        HashMap<String, Object> map = new HashMap<>();
+        Msg msg = new Msg();
+        if (appointments != null && appointments.size() != 0) {
+            map.put("lists",appointments);
+            msg.setExtend(map);
+            msg.setMsg("查询成功");
+            msg.setCode(100);
+            return msg;
+        }
+        return Msg.fail();
     }
 
     /**
@@ -131,41 +130,101 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Author: JK
     * @Date: 2019/8/22
     */
+    @Transactional
     @Override
-    public int deletePublish(Integer uid, Integer id) {
+    public Msg deletePublish(Integer id,String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
+        boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
+        Msg msg = new Msg();
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
+        //获取当前订单状态
         Integer state = appointment.getState();
         int i = 0;
-        if (state == 0) {
+        if (state == 1) {
             AppointmentExample example = new AppointmentExample();
-            example.createCriteria().andIdEqualTo(id)
-                    .andPublisherIdEqualTo(uid);
-            i = appointmentMapper.deleteByExample(example);
-
+            example.createCriteria().andIdEqualTo(id);
+            appointment.setState(4);
+            appointment.setUpdateTime(new Date());
+            i = appointmentMapper.updateByExample(appointment, example);
+            if (i == 1){
+                return Msg.success();
+            }
+            return Msg.fail();
         }
-        return i;
+        msg.setCode(1005);
+        msg.setMsg("不能取消订单");
+        return msg;
     }
     
     /** 
     * @Description: 从多个约会订单中选择一个进行报名
     * @Author: JK 
     * @Date: 2019/8/22 
-    */ 
+    */
+    @Transactional
     @Override
-    public int startEnrollment(Integer uid,Integer id) {
+    public Msg startEnrollment(String uid,String password,Integer id,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        Msg msg = new Msg();
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
+        //根据报名者id查询出他所有信息
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        //获取报名者账户余额
+        Float money = user.getMoney();
+
+        //获取报名金的金额
+        String askMoneyName = "ask_money";
+        int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+
+
+        //判断用户输入密码是否正确
+        if (!password.equals(user.getPayWord())){
+            msg.setCode(1001);
+            msg.setMsg("支付密码错误");
+            return msg;
+        }
+        //报名扣款后剩余余额
+        float balance = money-askMoneyValue;
+
+        if (balance <0){
+            msg.setCode(1002);
+            msg.setMsg("余额不足");
+            return msg;
+        }
+        user.setMoney(balance);
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
+        //更新报名者账户余额
+        userMapper.updateByExample(user,userExample);
+
         AppointAsk appointAsk = new AppointAsk();
-        appointAsk.setAskerId(uid);
+        appointAsk.setAskerId(Integer.parseInt(uid));
         appointAsk.setAppointId(id);
-        appointAsk.setAskState(0);
+        appointAsk.setAskState(1);
         appointAsk.setCreateTime(new Date());
         appointAsk.setUpdateTime(new Date());
+        //约会记录表中增加一条记录
         appointAskMapper.insertSelective(appointAsk);
-        AppointmentExample example = new AppointmentExample();
+        //根据约会订单表id查出该订单所有信息
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
+        AppointmentExample example = new AppointmentExample();
         example.createCriteria().andIdEqualTo(id);
-        appointment.setState(1);
+        appointment.setState(2);
+        appointment.setUpdateTime(new Date());
+        //更改该订单状态
         int i = appointmentMapper.updateByExample(appointment, example);
-        return i;
+        if (i == 1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
     }
 
     /**

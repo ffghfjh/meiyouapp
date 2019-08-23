@@ -1,6 +1,12 @@
 package com.meiyou.config;
 
-import org.springframework.beans.factory.annotation.Value;
+
+import com.meiyou.model.ProcessReceiver;
+import com.meiyou.utils.Constants;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,71 +18,79 @@ import org.springframework.context.annotation.Configuration;
  **/
 @Configuration
 public class AliMQConfig {
-    @Value("${producerId}")
-    public String producerId;
 
-    @Value("${consumerId}")
-    public String consumerId;
-
-    @Value("${accessKey}")
-    public String accessKey;
-
-    @Value("${secretKey}")
-    public String secretKey;
-
-    @Value("${topic}")
-    public String topic;
-
-    @Value("${tag}")
-    public String tag;
-
-    @Value("${onsAddr}")
-    public String onsAddr;
-
-    //超时时间
-    @Value("${sendMsgTimeoutMillis}")
-    public String sendMsgTimeoutMillis;
-
-    @Value("${suspendTimeMillis}")
-    public String suspendTimeMillis;
-
-    @Value("${maxReconsumeTimes}")
-    public String maxReconsumeTimes;
-
-    /*@Bean(initMethod = "start", destroyMethod = "shutdown")
-    public ProducerBean getProducer() {
-        ProducerBean producerBean = new ProducerBean();
-        Properties properties = new Properties();
-        properties.put(PropertyKeyConst.ProducerId, producerId);
-        // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.AccessKey, accessKey);
-        // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.SecretKey, secretKey);
-        properties.put(PropertyKeyConst.SendMsgTimeoutMillis, sendMsgTimeoutMillis);
-        properties.put(PropertyKeyConst.ONSAddr, onsAddr);
-        producerBean.setProperties(properties);
-        return producerBean;
+    /**
+     * TTL配置在消息上的消费队列
+     * @return
+     */
+    @Bean
+    Queue delayQueuePerMessageTTL() {
+        return QueueBuilder.durable(Constants.DELAY_QUEUE_PER_MESSAGE_TTL_NAME)
+                .withArgument("x-dead-letter-exchange", Constants.DELAY_EXCHANGE_NAME) // DLX，dead letter发送到的exchange
+                .withArgument("x-dead-letter-routing-key", Constants.DELAY_PROCESS_QUEUE_NAME) // dead letter携带的routing key
+                .build();
     }
 
-    @Bean(initMethod = "start", destroyMethod = "shutdown")
-    public ConsumerBean getConsumer() {
-        ConsumerBean consumerBean = new ConsumerBean();
-        Properties properties = new Properties();
-        properties.put(PropertyKeyConst.ConsumerId, consumerId);
-        // AccessKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.AccessKey, accessKey);
-        // SecretKey 阿里云身份验证，在阿里云服务器管理控制台创建
-        properties.put(PropertyKeyConst.SecretKey, secretKey);
-        properties.put(PropertyKeyConst.SuspendTimeMillis, suspendTimeMillis);
-        properties.put(PropertyKeyConst.MaxReconsumeTimes, maxReconsumeTimes);
-        properties.put(PropertyKeyConst.ONSAddr, onsAddr);
-        consumerBean.setProperties(properties);
-        Subscription subscription = new Subscription();
-        subscription.setTopic(topic);
-        subscription.setExpression(tag);
-        Map<Subscription, MessageListener> map = new HashMap();
-        map.put(subscription, new AliMQConsumerListener());
-        consumerBean.setSubscriptionTable(map);
-        return consumerBean;
-    }*/
+
+    /**
+     * TTL配置在队列上的消费队列
+     * @return
+     */
+    @Bean
+    Queue delayQueuePerQueueTTL() {
+        return QueueBuilder.durable(Constants.DELAY_QUEUE_PER_QUEUE_TTL_NAME)
+                .withArgument("x-dead-letter-exchange", Constants.DELAY_EXCHANGE_NAME) // DLX
+                .withArgument("x-dead-letter-routing-key", Constants.DELAY_PROCESS_QUEUE_NAME) // dead letter携带的routing key (实际消费队列)
+                .withArgument("x-message-ttl", Constants.QUEUE_EXPIRATION) // 设置队列的过期时间
+                .build();
+    }
+
+
+    /**
+     * 实际消费队列
+     * @return
+     */
+    @Bean
+    Queue delayProcessQueue() {
+        return QueueBuilder.durable(Constants.DELAY_PROCESS_QUEUE_NAME)
+                .build();
+    }
+
+    /**
+     * 死信交换机
+     * @return
+     */
+    @Bean
+    DirectExchange delayExchange() {
+        return new DirectExchange(Constants.DELAY_EXCHANGE_NAME);
+    }
+
+    /**
+     * 死新交换机绑定实际消费队列
+     * @param delayProcessQueue
+     * @param delayExchange
+     * @return
+     */
+    @Bean
+    Binding dlxBinding(Queue delayProcessQueue, DirectExchange delayExchange) {
+        return BindingBuilder.bind(delayProcessQueue)
+                .to(delayExchange)
+                .with(Constants.DELAY_PROCESS_QUEUE_NAME);
+    }
+
+    /**
+     * 监听容器 存放消费者
+     * @param connectionFactory
+     * @param processReceiver
+     * @return
+     */
+    @Bean
+    SimpleMessageListenerContainer processContainer(ConnectionFactory connectionFactory, ProcessReceiver processReceiver) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(Constants.DELAY_PROCESS_QUEUE_NAME); // 监听delay_process_queue
+        container.setMessageListener(new MessageListenerAdapter(processReceiver));
+        return container;
+    }
+
 }

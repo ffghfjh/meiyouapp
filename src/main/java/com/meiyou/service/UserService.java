@@ -15,7 +15,7 @@ public interface UserService {
     public Msg userRegist(String code,String shareCode, String phone, String password,  String nickname, String birthday, boolean sex, String qianming, MultipartFile img, HttpServletRequest req);
    //获取腾讯云IM鉴权Sig
     public Msg getSig(int uid,String token);
-  
+
 
     /**
      * hzy

@@ -77,5 +77,5 @@ public class Constants {
     public static String DELAY_QUEUE_PER_QUEUE_TTL_NAME = "delay_queue_per_queue_ttl";//死信队列缓存队列
     public static String DELAY_PROCESS_QUEUE_NAME = "delay_process_queue";//实际消费队列
     public static String DELAY_EXCHANGE_NAME = "dlx";//死信交换机
-    public static String QUEUE_EXPIRATION = "1000";//过期时间
+    public static int QUEUE_EXPIRATION = 1000;//过期时间
 };

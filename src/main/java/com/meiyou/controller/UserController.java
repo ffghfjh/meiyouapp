@@ -127,7 +127,7 @@ public class UserController {
 
 
     /**
-     * 获取usersig
+     * 登录鉴权
      */
     @RequestMapping(value = "authToken", method = RequestMethod.GET)
     @ApiOperation("获取用户sig")

@@ -229,7 +229,7 @@ public class ActivityServiceImpl implements ActivityService {
         coordinate.setLongitude(longitude);
         coordinate.setLatitude(latitude);
         List<GeoRadiusResponse> responseList = RedisUtil.geoQueryActivity(coordinate, radius);
-        if (responseList == null && responseList.size() ==0) {
+        if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
         }
         for (GeoRadiusResponse response : responseList) {

@@ -94,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
         List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         CommentExample example = new CommentExample();
         CommentExample.Criteria criteria = example.createCriteria();
-        criteria.andIdEqualTo(aid);
+        criteria.andActivityIdEqualTo(aid);
         List<Comment> comments = commentMapper.selectByExample(example);
         if (comments == null || comments.size() == 0) {
             return Msg.fail();

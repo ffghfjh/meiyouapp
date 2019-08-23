@@ -93,4 +93,6 @@ public interface ShopMapper {
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
     int updateByPrimaryKey(Shop record);
+
+    void selectByExample();
 }

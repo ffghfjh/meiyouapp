@@ -48,7 +48,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuy.setCreateTime(new Date());
         clubBuy.setUpdateTime(new Date());
 
-        //从系统数据表获取置顶费用
+        //从系统数据表获取报名费用
         String ask_money = getRootMessage("ask_money");
 
         //获取购买者的支付密码,余额及需要支付的费用(报名缴费+会所项目缴费)
@@ -57,7 +57,6 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         Float money = result.getMoney();
         Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice()
                 +Integer.valueOf(ask_money);
-        System.out.println(payWord);
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");
@@ -72,15 +71,20 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             msg.setCode(1002);
             return msg;
         }else {
-            clubBuyMapper.insert(clubBuy);
+            clubBuyMapper.insertSelective(clubBuy);
 
-            //执行扣钱操作
+            //计算剩余金额
             User user = new User();
-            money = money - price;
+            money = money - Float.valueOf(price);
             user.setMoney(money);
-            user.setId(clubBuy.getBuyerId());
-            user.setUpdateTime(new Date());
-            userMapper.updateByPrimaryKeySelective(user);
+            Date date = new Date();
+            user.setUpdateTime(date);
+
+            //执行扣钱的操作
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(clubBuy.getBuyerId());
+            userMapper.updateByExampleSelective(user, userExample);
+
             return Msg.success();
         }
     }
@@ -106,16 +110,19 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         Integer projectPrice = clubMapper.selectByPrimaryKey(cid).getProjectPrice();
 
         //修改购买表状态
-        ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
         ClubBuy clubBuy = new ClubBuy();
         clubBuy.setState(1);
+        clubBuy.setUpdateTime(new Date());
+
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
         clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
 
         //退钱操作
         Float money = Float.valueOf(ask_money)+Float.valueOf(projectPrice);
         User user = getUserByUid(uid);
         user.setMoney(user.getMoney()+money);
+        user.setUpdateTime(new Date());
 
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(uid);
@@ -124,6 +131,11 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return Msg.success();
     }
 
+    /**
+     * 查找指定用户的会所购买记录
+     * @param uid
+     * @return
+     */
     @Override
     public Msg selectByUid(Integer uid) {
         Msg msg = new Msg();
@@ -138,6 +150,8 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             msg.setCode(404);
             return msg;
         }
+
+        //Todo 人数
         HashMap<String, Object> map = new HashMap<>();
         map.put("clubBuy",result);
 
@@ -147,5 +161,32 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return msg;
     }
 
+    /**
+     * 查找指定的会所购买记录
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg selectByCid(Integer uid, Integer cid, String token) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        Msg msg = new Msg();
+        if(result.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("找不到指定的会所购买记录");
+            return msg;
+        }
+
+        msg.add("clubBuy", result.get(0));
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
 }

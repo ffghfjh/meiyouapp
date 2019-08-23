@@ -25,16 +25,10 @@ import java.util.List;
  * @create: 2019-08-21 14:31
  **/
 @Service
-public class ClubServiceImpl implements ClubService {
+public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
     @Autowired
     ClubMapper clubMapper;
-
-    @Autowired
-    UserMapper userMapper;
-
-    @Autowired
-    RootMessageMapper rootMessageMapper;
 
     /**
      * 发布按摩会所
@@ -46,9 +40,9 @@ public class ClubServiceImpl implements ClubService {
     @Override
     @Transactional
     public Msg addClub(Club club,String token, Integer time, String password) {
-        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
         Date now = new Date();
         club.setCreateTime(now);
@@ -59,13 +53,12 @@ public class ClubServiceImpl implements ClubService {
         club.setState(0);
 
         //获取用户密码和余额
-        String payWord = userMapper.selectByPrimaryKey(club.getPublishId()).getPayWord();
-        Float money = userMapper.selectByPrimaryKey(club.getPublishId()).getMoney();
+        String payWord = getUserByUid(club.getPublishId()).getPayWord();
+        Float money = getUserByUid(club.getPublishId()).getMoney();
 
         //从系统数据表获取置顶费用
-        RootMessageExample rootMessageExample = new RootMessageExample();
-        rootMessageExample.createCriteria().andNameEqualTo("top_money");
-        String top_money = rootMessageMapper.selectByExample(rootMessageExample).get(0).getValue();
+        String top_money = getRootMessage("top_money");
+        //Todo 获取发布所需的金额
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");
@@ -76,6 +69,7 @@ public class ClubServiceImpl implements ClubService {
             msg.setCode(1001);
             return msg;
             //用户金额与发布金额进行比较
+            //Todo
         }else if(money < Float.valueOf(top_money)*time){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
@@ -85,6 +79,7 @@ public class ClubServiceImpl implements ClubService {
 
             //执行扣钱操作
             User user = new User();
+            //Todo
             money = money - Float.valueOf(top_money)*time;
             user.setMoney(money);
             user.setId(club.getPublishId());

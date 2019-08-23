@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.pojo.ShopBuy;
 import com.meiyou.service.ShopBuyService;
+import com.meiyou.utils.Msg;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,23 +14,24 @@ import java.util.List;
  **/
 @Service
 public class ShopBuyServiceImpl implements ShopBuyService {
-    @Override
-    public void addShopBuy(ShopBuy shopBuy) {
-
-    }
 
     @Override
-    public void deleteShopBuy(Integer id) {
-
-    }
-
-    @Override
-    public List<ShopBuy> selectByUid() {
+    public Msg addShopBuy(ShopBuy shopBuy) {
         return null;
     }
 
     @Override
-    public ShopBuy selectBySid() {
+    public Msg deleteShopBuy(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Msg selectByUid() {
+        return null;
+    }
+
+    @Override
+    public Msg selectBySid() {
         return null;
     }
 }

@@ -4,17 +4,16 @@ import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
-import com.meiyou.pojo.ClubBuy;
-import com.meiyou.pojo.RootMessageExample;
-import com.meiyou.pojo.User;
+import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
 import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -23,7 +22,7 @@ import java.util.List;
  * @create: 2019-08-21 15:38
  **/
 @Service
-public class ClubBuyServiceImpl implements ClubBuyService {
+public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyService {
 
     @Autowired
     ClubBuyMapper clubBuyMapper;
@@ -33,9 +32,6 @@ public class ClubBuyServiceImpl implements ClubBuyService {
 
     @Autowired
     ClubMapper clubMapper;
-
-    @Autowired
-    RootMessageMapper rootMessageMapper;
 
     /**
      * 生成购买会所记录
@@ -53,15 +49,15 @@ public class ClubBuyServiceImpl implements ClubBuyService {
         clubBuy.setUpdateTime(new Date());
 
         //从系统数据表获取置顶费用
-        RootMessageExample rootMessageExample = new RootMessageExample();
-        rootMessageExample.createCriteria().andNameEqualTo("ask_money");
-        String ask_money = rootMessageMapper.selectByExample(rootMessageExample).get(0).getValue();
+        String ask_money = getRootMessage("ask_money");
 
         //获取购买者的支付密码,余额及需要支付的费用(报名缴费+会所项目缴费)
-        String payWord = userMapper.selectByPrimaryKey(clubBuy.getBuyerId()).getPayWord();
-        Float money = userMapper.selectByPrimaryKey(clubBuy.getBuyerId()).getMoney();
+        User result = getUserByUid(clubBuy.getBuyerId());
+        String payWord = result.getPayWord();
+        Float money = result.getMoney();
         Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice()
                 +Integer.valueOf(ask_money);
+        System.out.println(payWord);
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");
@@ -89,13 +85,67 @@ public class ClubBuyServiceImpl implements ClubBuyService {
         }
     }
 
+    /**
+     * 取消购买(退款全部)
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    @Transactional
     @Override
-    public Msg deleteBuyClub(Integer id) {
-        return null;
+    public Msg updateBuyClub(Integer uid,Integer cid,String token) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+
+        //从系统数据表获取置顶费用
+        String ask_money = getRootMessage("ask_money");
+
+        //获取项目金额
+        Integer projectPrice = clubMapper.selectByPrimaryKey(cid).getProjectPrice();
+
+        //修改购买表状态
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        ClubBuy clubBuy = new ClubBuy();
+        clubBuy.setState(1);
+        clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
+
+        //退钱操作
+        Float money = Float.valueOf(ask_money)+Float.valueOf(projectPrice);
+        User user = getUserByUid(uid);
+        user.setMoney(user.getMoney()+money);
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(uid);
+        userMapper.updateByExampleSelective(user,userExample);
+
+        return Msg.success();
     }
 
     @Override
-    public Msg selectByUid(Integer id) {
-        return null;
+    public Msg selectByUid(Integer uid) {
+        Msg msg = new Msg();
+        //查找购买按摩会所的记录
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        //购买者id为uid的购买记录
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        if(result.size() == 0){
+            msg.setMsg("没有找到对应的ClubBuy记录");
+            msg.setCode(404);
+            return msg;
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("clubBuy",result);
+
+        msg.setExtend(map);
+        msg.setCode(100);
+        msg.setMsg("成功");
+        return msg;
     }
+
+
 }

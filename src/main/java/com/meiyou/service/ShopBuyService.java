@@ -1,6 +1,7 @@
 package com.meiyou.service;
 
 import com.meiyou.pojo.ShopBuy;
+import com.meiyou.utils.Msg;
 
 import java.util.List;
 
@@ -15,23 +16,23 @@ public interface ShopBuyService {
      * 添加景点商家(同城导游)购买记录
      * @param shopBuy
      */
-    void addShopBuy(ShopBuy shopBuy);
+    Msg addShopBuy(ShopBuy shopBuy);
 
     /**
      * 通过景点商家(同城导游)id 取消购买指定的景点商家(同城导游)
      * @param id
      */
-    void deleteShopBuy(Integer id);
+    Msg deleteShopBuy(Integer id);
 
     /**
      * 通过用户id查找全部景点商家(同城导游)的购买记录
      * @return
      */
-    List<ShopBuy> selectByUid();
+    Msg selectByUid();
 
     /**
      * 通过id查找指定的景点商家(同城导游)购买记录
      * @return
      */
-    ShopBuy selectBySid();
+    Msg selectBySid();
 }

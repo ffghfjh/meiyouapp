@@ -122,6 +122,19 @@ public class UserController {
     @RequestMapping(value = "getSig", method = RequestMethod.POST)
     @ApiOperation("获取用户sig")
     public  Msg getSig(int uid,String token) {
-       return userService.getSig(uid,token);
+        return userService.getSig(uid,token);
+    }
+
+
+    /**
+     * 获取usersig
+     */
+    @RequestMapping(value = "authToken", method = RequestMethod.GET)
+    @ApiOperation("获取用户sig")
+    public  Boolean authToken(int uid,String token) {
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            return true;
+        }
+        return false;
     }
 }

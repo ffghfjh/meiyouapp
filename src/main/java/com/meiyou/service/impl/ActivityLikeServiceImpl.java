@@ -29,7 +29,8 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
     ActivityLikeMapper activityLikeMapper;
 
     @Override
-    public int like(int aid, int uid, int type) {
+    public Msg like(int aid, int uid, int type) {
+        Msg msg = new Msg();
         if (type == 0) {
             ActivityLikeExample example = new ActivityLikeExample();
             ActivityLikeExample.Criteria criteria = example.createCriteria();
@@ -37,12 +38,16 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
             criteria.andLikeIdEqualTo(uid);
             int i = activityLikeMapper.deleteByExample(example);
             if (i == 0) {
-                return 0;
+                return Msg.fail();
             }
             ActivityLikeExample example01 = new ActivityLikeExample();
             ActivityLikeExample.Criteria criteria1 = example01.createCriteria();
             criteria1.andActivityIdEqualTo(aid);
-            return activityLikeMapper.countByExample(example01);
+            int count = activityLikeMapper.countByExample(example01);
+            msg.setCode(100);
+            msg.setMsg("取消点赞成功");
+            msg.add("likeNum", count);
+            return msg;
         }
         ActivityLike activityLike = new ActivityLike();
         activityLike.setCreateTime(new Date());
@@ -52,12 +57,16 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         activityLike.setBoolSee(false);
         int i = activityLikeMapper.insertSelective(activityLike);
         if (i == 0) {
-            return 0;
+            return Msg.fail();
         }
         ActivityLikeExample example02 = new ActivityLikeExample();
         ActivityLikeExample.Criteria criteria = example02.createCriteria();
         criteria.andActivityIdEqualTo(aid);
-        return activityLikeMapper.countByExample(example02);
+        int count =  activityLikeMapper.countByExample(example02);
+        msg.setCode(100);
+        msg.setMsg("点赞成功");
+        msg.add("likeNum", count);
+        return msg;
     }
 
     @Override

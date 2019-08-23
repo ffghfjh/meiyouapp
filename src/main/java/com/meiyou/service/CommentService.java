@@ -20,6 +20,11 @@ public interface CommentService {
      */
     Msg postComment(int uid, int aid, String content);
 
+    /**
+     * 通过动态id获取所有评论
+     * @param aid
+     * @return
+     */
     Msg listCommentByAid(int aid);
 
 }

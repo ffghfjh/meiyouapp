@@ -96,12 +96,17 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg updateClub(Integer uid, Integer cid) {
+    public Msg updateClub(Integer uid,String token, Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Integer state = clubMapper.selectByPrimaryKey(cid).getState();
         if(state != 0){
             return Msg.fail();
         }
         //更改状态为已失效
+        //Todo
         Club club = new Club();
         club.setPublishId(uid);
         club.setId(cid);
@@ -120,21 +125,24 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid) {
+    public Msg selectByUid(Integer uid,String token) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
-        clubExample.createCriteria().andPublishIdEqualTo(uid).andStateBetween(0,1);
+        clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
         if(result.size() == 0){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
         }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("club",result);
 
-        msg.setExtend(map);
+        //Todo 人数
+        msg.add("club",result);
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;
@@ -146,7 +154,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    public Msg selectByCid(Integer cid) {
+    public Msg selectByCid(Integer uid,String token,Integer cid) {
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
+
         Msg msg = new Msg();
         Club result = clubMapper.selectByPrimaryKey(cid);
         if(result == null){
@@ -154,13 +166,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             msg.setCode(404);
             return msg;
         }
-        if(result.getState() == 2){
-            return Msg.fail();
-        }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("club",result);
 
-        msg.setExtend(map);
+        //Todo 人数
+        msg.add("club",result);
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;

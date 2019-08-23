@@ -15,24 +15,35 @@ public interface ShopBuyService {
     /**
      * 添加景点商家(同城导游)购买记录
      * @param shopBuy
+     * @param token
+     * @param password
+     * @return
      */
-    Msg addShopBuy(ShopBuy shopBuy);
+    Msg addShopBuy(ShopBuy shopBuy, String token,Integer password);
 
     /**
      * 通过景点商家(同城导游)id 取消购买指定的景点商家(同城导游)
-     * @param id
-     */
-    Msg deleteShopBuy(Integer id);
-
-    /**
-     * 通过用户id查找全部景点商家(同城导游)的购买记录
+     * @param uid
+     * @param token
+     * @param sid
      * @return
      */
-    Msg selectByUid();
+    Msg updateShopBuy(Integer uid, String token, Integer sid);
 
     /**
-     * 通过id查找指定的景点商家(同城导游)购买记录
+     * 查找用户的景点商家(同城导游)购买记录
+     * @param uid
+     * @param token
      * @return
      */
-    Msg selectBySid();
+    Msg selectByUid(Integer uid, String token);
+
+    /**
+     * 查找指定的景点商家(同城导游)购买记录
+     * @param uid
+     * @param token
+     * @param sid
+     * @return
+     */
+    Msg selectBySid(Integer uid, String token,Integer sid);
 }

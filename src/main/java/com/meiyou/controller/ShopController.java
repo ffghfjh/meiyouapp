@@ -6,10 +6,7 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description: 同城导游控制器
@@ -41,5 +38,28 @@ public class ShopController {
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
         return shopService.addShop(shop,token,time,password);
+    }
+
+    @PutMapping("/update")
+    @ApiOperation(value = "取消发布聘请同城导游",notes = "取消即更发布状态，实际数据不删除")
+    public Msg updateShop(@RequestParam("uid") Integer uid,
+                          @RequestParam("token") String token,
+                          @RequestParam("sid") Integer sid){
+        return shopService.updateShop(uid,token,sid);
+    }
+
+    @GetMapping("/get")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "查找")
+    public Msg getClubByUid(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token){
+        return shopService.selectByUid(uid,token);
+    }
+
+    @GetMapping("/find")
+    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "查找")
+    public Msg findClubByCid(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("sid") Integer sid){
+        return shopService.selectBySid(uid,token,sid);
     }
 }

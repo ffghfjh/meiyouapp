@@ -101,6 +101,7 @@ public class CommentServiceImpl implements CommentService {
             hashMap.put("header", user.getHeader());
             hashMap.put("nickname", user.getNickname());
             hashMap.put("sex", user.getSex());
+            hashMap.put("birthday", user.getBirthday());
             hashMap.put("content", comment.getContent());
             hashMap.put("time", comment.getCreateTime());
             hashMap.put("likeNum", comment.getLikeNum());

@@ -8,15 +8,18 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.mapper.AuthorizationMapper;
+import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
-import com.meiyou.pojo.Authorization;
-import com.meiyou.pojo.AuthorizationExample;
-import com.meiyou.pojo.User;
+import com.meiyou.pojo.*;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
+import com.tls.tls_sigature.tls_sigature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
+@CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -37,6 +41,10 @@ public class UserServiceImpl implements UserService {
     TencentImService imService;
     @Resource
     RedisTemplate redisTemplate;
+    @Autowired
+    RootMessageService rootMessageService;
+    @Autowired
+    ShareMapper shareMapper;
 
 
     // 支付宝调用接口之前的初始化
@@ -210,11 +218,11 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Msg userRegist(String code, String phone, String password,  String nickname,
+    @Transactional
+    public Msg userRegist(String code,String shareCodeRegist, String phone, String password,  String nickname,
                           String birthday, boolean sex, String signature, MultipartFile img, HttpServletRequest req) {
         Msg msg;
         //校验验证码
-
         if(RedisUtil.authCode(phone,code)){
             //检测手机号
             AuthorizationExample example = new AuthorizationExample();
@@ -227,6 +235,7 @@ public class UserServiceImpl implements UserService {
                 msg.setMsg("手机号已注册");
                 return msg;
             }else{
+
                 User user = new User();
                 String account = UUID.randomUUID().toString();//用户账号
                 String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
@@ -243,6 +252,9 @@ public class UserServiceImpl implements UserService {
                 user.setBirthday(birthday);
                 user.setBoolClose(false);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);
+
+
+
 
                 //文件上传判断
                 Msg fileMsg = FileUploadUtil.uploadUtil(img,"headers",req);
@@ -287,6 +299,88 @@ public class UserServiceImpl implements UserService {
             return msg;
         }
         return Msg.fail();
+    }
+
+    @Override
+    public Msg getSig(int uid,String token) {
+        Msg msg;
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            String account = userMapper.selectByPrimaryKey(uid).getAccount();
+            String usersig = tls_sigature.genSig(Constants.SDKAPPID, account, Constants.PRIKEY).urlSig;
+            msg = Msg.success();
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("userSig",usersig);
+            msg.setExtend(map);
+            return msg;
+        }else{
+            return Msg.noLogin();
+        }
+
+    }
+
+
+    /**
+     * 添加邀请记录
+     * @param shareCodeRegist 邀请码
+     * @param bid 被分享人id
+     * @return
+     */
+    private boolean addShare(String shareCodeRegist,int bid){
+
+        UserExample example1 = new UserExample();
+        UserExample.Criteria criteria1 = example1.createCriteria();
+        criteria1.andShareCodeEqualTo(shareCodeRegist);
+        User user1 = userMapper.selectByExample(example1).get(0);//分享人
+        Share share = new Share();
+        share.setByPeopleId(bid);
+        share.setPeopleId(user1.getId());
+        Date date = new Date();
+        share.setCreateTime(date);
+        share.setUpdateTime(date);
+        int money = Integer.parseInt(rootMessageService.getMessageByName("share_money"));
+        share.setShareMoney(money);
+        int i = shareMapper.insert(share);
+        if(i==1){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * hzy
+     * 根据id获取用户信息
+     *
+     * @param uid
+     * @return
+     */
+    @Cacheable //缓存到Redis中
+    @Override
+    public User getUserById(int uid) {
+        User user = userMapper.selectByPrimaryKey(uid);
+        if (user == null) {
+            User user1 = new User();
+            user1.setId(0);
+            user1.setHeader("no Pic");
+            user1.setSex(false);
+            user1.setNickname("找不到任何用户");
+            user1.setBirthday("0");
+            return user1;
+        }
+        return user;
+    }
+
+    @Override
+    public boolean addMoney(int id, float money) {
+
+        User user = userMapper.selectByPrimaryKey(id);
+        user.setMoney(user.getMoney()+money);
+        userMapper.updateByPrimaryKey(user);
+        return false;
+    }
+
+    @Override
+    public boolean delMoney(int id, float money) {
+        return false;
     }
 
 

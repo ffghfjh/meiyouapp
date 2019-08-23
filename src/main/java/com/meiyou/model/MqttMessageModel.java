@@ -19,6 +19,15 @@ public class MqttMessageModel {
     private int msgType;
     private String sender;
     private String receiver;
+    private AliRtcAuthInfo authInfo;
+
+    public AliRtcAuthInfo getAuthInfo() {
+        return authInfo;
+    }
+
+    public void setAuthInfo(AliRtcAuthInfo authInfo) {
+        this.authInfo = authInfo;
+    }
 
     public int getChatType() {
         return chatType;

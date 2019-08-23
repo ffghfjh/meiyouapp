@@ -27,14 +27,35 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
     ActivityLikeMapper activityLikeMapper;
 
     @Override
-    public int like(int aid, int uid) {
+    public int like(int aid, int uid, int type) {
+        if (type == 0) {
+            ActivityLikeExample example = new ActivityLikeExample();
+            ActivityLikeExample.Criteria criteria = example.createCriteria();
+            criteria.andActivityIdEqualTo(aid);
+            criteria.andLikeIdEqualTo(uid);
+            int i = activityLikeMapper.deleteByExample(example);
+            if (i == 0) {
+                return 0;
+            }
+            ActivityLikeExample example01 = new ActivityLikeExample();
+            ActivityLikeExample.Criteria criteria1 = example01.createCriteria();
+            criteria1.andActivityIdEqualTo(aid);
+            return activityLikeMapper.countByExample(example01);
+        }
         ActivityLike activityLike = new ActivityLike();
         activityLike.setCreateTime(new Date());
         activityLike.setUpdateTime(new Date());
         activityLike.setActivityId(aid);
         activityLike.setLikeId(uid);
         activityLike.setBoolSee(false);
-        return activityLikeMapper.insertSelective(activityLike);
+        int i = activityLikeMapper.insertSelective(activityLike);
+        if (i == 0) {
+            return 0;
+        }
+        ActivityLikeExample example02 = new ActivityLikeExample();
+        ActivityLikeExample.Criteria criteria = example02.createCriteria();
+        criteria.andActivityIdEqualTo(aid);
+        return activityLikeMapper.countByExample(example02);
     }
 
     @Override

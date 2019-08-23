@@ -13,7 +13,7 @@ import com.meiyou.utils.Msg;
 public interface ActivityLikeService {
 
     //点赞
-    int like(int aid, int uid, int type);
+    Msg like(int aid, int uid, int type);
 
     //根据aid和uid查找我是否点赞过这个动态
     boolean getBoolLikeByAidUid(int aid, int uid);

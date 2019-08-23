@@ -13,7 +13,7 @@ public interface AppointmentService {
     /**
      * 发布约会
      */
-    Msg insert(Appointment appointment, String password, String token);
+    Msg insert(Appointment appointment, String password, String token,double latitude,double longitude);
 
     /**
      * 查询我的发布
@@ -39,7 +39,7 @@ public interface AppointmentService {
     /**
      * 从所有报名某个约会的人员信息中选择一个进行确认
      */
-    int confirmUserId(Integer askerId,Integer appointId);
+    Msg confirmUserId(Integer askerId,Integer appointId);
 
     /**
      * 确认到达

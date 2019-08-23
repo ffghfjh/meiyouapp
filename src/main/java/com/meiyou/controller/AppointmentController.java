@@ -46,6 +46,7 @@ public class AppointmentController {
                                  MultipartFile[] files,
                                  @RequestParam(value = "password", required = false) String password,
                                  @RequestParam(value = "token", required = false) String token,
+                                 double latitude,double longitude,
                                  HttpServletRequest request
     ) {
 
@@ -74,7 +75,7 @@ public class AppointmentController {
         appointment.setAppointImgs(array.toString());
 
 
-        return appointmentService.insert(appointment, password, token);
+        return appointmentService.insert(appointment, password, token, latitude,longitude);
     }
 
     /**
@@ -140,11 +141,6 @@ public class AppointmentController {
     @ApiOperation(value = "从所有报名某个约会的人员信息中选择一个进行确认", notes = "从所有报名某个约会的人员信息中选择一个进行确认", httpMethod = "POST")
     @PostMapping(value = "/confirmUserId")
     public Msg confirmUserId(Integer askerId, Integer appointId) {
-        int i = appointmentService.confirmUserId(askerId, appointId);
-        if (i == 1) {
-            return Msg.success();
-        } else {
-            return Msg.fail();
-        }
+        return appointmentService.confirmUserId(askerId, appointId);
     }
 }

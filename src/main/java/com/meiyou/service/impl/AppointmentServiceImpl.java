@@ -3,16 +3,21 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.utils.AppointmentUtil;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @program: meiyouapp
@@ -37,9 +42,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     */
     @Transactional
     @Override
-    public Msg insert(Appointment appointment, String password, String token) {
-        boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
+    public Msg insert(Appointment appointment, String password, String token, double latitude,double longitude) {
         Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
         //判断是否登录
         if (!authToken){
             return Msg.noLogin();
@@ -90,6 +95,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         userExample.createCriteria().andIdEqualTo(appointment.getPublisherId());
         //更新用户账户余额
         userMapper.updateByExample(user,userExample);
+
+        //获取发布时定位
+        Coordinate coordinate = new Coordinate();
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
+
         int i = appointmentMapper.insertSelective(appointment);
         if (i == 1){
             return Msg.success();
@@ -117,9 +129,38 @@ public class AppointmentServiceImpl implements AppointmentService {
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
 
+        ArrayList<Object> arrayList = new ArrayList<>();
+
+        int size = 0;
+        for (Appointment appointment : appointments) {
+            HashMap<String, Object> map = new HashMap<>();
+            AppointAskExample appointAskExample = new AppointAskExample();
+            appointAskExample.createCriteria().andAskStateEqualTo(1).andAppointIdEqualTo(appointment.getId());
+            List<AppointAsk> list = appointAskMapper.selectByExample(appointAskExample);
+            //获取报名的总人数
+            size = list.size();
+            map.put("size",size);
+            appointment.getId();
+            appointment.getPublisherId();
+            appointment.getAppointAddress();
+            appointment.getAppointTime();
+            appointment.getAppointContext();
+            appointment.getNeedNumber();
+            appointment.getPayType();
+            appointment.getAppointImgs();
+            appointment.getReward();
+            appointment.getState();
+            appointment.getConfirmId();
+            appointment.getCreateTime();
+            appointment.getUpdateTime();
+
+            map.put("appointment",appointment);
+            arrayList.add(map);
+        }
+
         if (appointments != null && appointments.size() != 0) {
             Msg success = Msg.success();
-            msg.add("appointments",appointments);
+            msg.add("arrayList",arrayList);
             msg.add("success",success);
             return msg;
         }
@@ -149,7 +190,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (state == 1) {
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id);
-            appointment.setState(4);
+            appointment.setState(5);
             appointment.setUpdateTime(new Date());
             i = appointmentMapper.updateByExample(appointment, example);
             if (i == 1){
@@ -170,8 +211,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional
     @Override
     public Msg startEnrollment(String uid,String password,Integer id,String token) {
-        boolean authToken = RedisUtil.authToken(uid, token);
         Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken){
             return Msg.noLogin();
@@ -267,13 +308,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Date: 2019/8/22
     */
     @Override
-    public int confirmUserId(Integer askerId, Integer appointId) {
+    public Msg confirmUserId(Integer askerId, Integer appointId) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andIdEqualTo(appointId);
         appointment.setConfirmId(askerId);
-        appointment.setState(2);
+        //3是选中人员等待赴约状态
+        appointment.setState(3);
+        appointment.setUpdateTime(new Date());
         int i = appointmentMapper.updateByExample(appointment, example);
-        return i;
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 }

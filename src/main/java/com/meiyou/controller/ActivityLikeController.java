@@ -27,8 +27,7 @@ public class ActivityLikeController {
 
     @ApiOperation(value = "动态点赞接口", notes = "动态点赞接口", httpMethod = "POST")
     @RequestMapping(value = "/like")
-    @ResponseBody
-    public int like(int aid, int uid, int type) {
+    public Msg like(int aid, int uid, int type) {
         return activityLikeService.like(aid, uid, type);
     }
 

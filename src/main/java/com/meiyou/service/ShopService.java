@@ -1,6 +1,7 @@
 package com.meiyou.service;
 
 import com.meiyou.pojo.Shop;
+import com.meiyou.utils.Msg;
 
 import java.util.List;
 
@@ -14,28 +15,35 @@ public interface ShopService {
     /**
      * 发布景点商家(同城导游)
      * @param shop
+     * @param token
+     * @param time
+     * @param password
+     * @return
      */
-    void addShop(Shop shop);
+    Msg addShop(Shop shop,String token, Integer time, String password);
 
     /**
-     * 删除对应id的景点商家(同城导游)
-     * @param id
+     * 取消发布对应id的景点商家(同城导游)
+     * @param uid
+     * @param token
+     * @param sid
+     * @return
      */
-    void deleteShop(Integer id);
+    Msg updateShop(Integer uid,String token,Integer sid);
 
     /**
      * 查找指定用户所发布的景点商家(同城导游)
-     * @param id
+     * @param uid
      * @return
      */
-    List<Shop> selectByUid(Integer id);
+    Msg selectByUid(Integer uid,String token);
 
     /**
      * 查找景点商家(同城导游)id的详细信息
-     * @param id
+     * @param sid
      * @return
      */
-    Shop selectBySid(Integer id);
+    Msg selectBySid(Integer uid,String token,Integer sid);
 
     /**
      * 根据经纬度查找附近的景点商家
@@ -43,5 +51,5 @@ public interface ShopService {
      * @param latitude
      * @return
      */
-    List<Shop> selectShop(float longitude, float latitude);
+    Msg selectShop(float longitude, float latitude);
 }

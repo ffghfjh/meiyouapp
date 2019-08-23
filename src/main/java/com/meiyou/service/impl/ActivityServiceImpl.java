@@ -5,11 +5,13 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.pojo.User;
+import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.ActivityService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
@@ -52,6 +54,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     RootMessageService rootMessageService;
+
+    @Autowired
+    ActivityLikeService activityLikeService;
 
     /**
      * hzy
@@ -133,7 +138,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return ArrayList<HashMap<String, Object>>
      */
     @Override
-    public ArrayList<HashMap<String, Object>>  listUserActivityByUid(int uid) {
+    public Msg listUserActivityByUid(int uid) {
         ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         //根据uid获取用户动态
         List<Activity> activities = listActivityByUid(uid);
@@ -142,21 +147,7 @@ public class ActivityServiceImpl implements ActivityService {
         boolean flag = (activities ==null && activities.size()==0);
         //用户或动态不存在的话，返回默认信息，防止空指针异常
         if (user == null || flag) {
-            hashMapNo.put("header", "no picture");
-            hashMapNo.put("nickname", "无昵称");
-            hashMapNo.put("sex", 0);
-            hashMapNo.put("birthday", "0");
-            hashMapNo.put("content", "无动态内容");
-            hashMapNo.put("imgsUrl", "no picture");
-            hashMapNo.put("distance", "0.0km");
-            hashMapNo.put("time", "时间不存在");
-            hashMapNo.put("readNum", 0);
-            hashMapNo.put("likeNum", 0);
-            hashMapNo.put("commontNum", 0);
-            hashMapNo.put("uid", 0);
-            hashMapNo.put("aid", 0);
-            list.add(hashMapNo);
-            return list;
+            return Msg.fail();
         }
         for (Activity activity : activities) {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
@@ -173,15 +164,22 @@ public class ActivityServiceImpl implements ActivityService {
             Date nowTime = DateUtil.date();
             //时间差
             String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
+            //查询是否被我点赞过
+            boolean boolLike = activityLikeService.getBoolLikeByAidUid(activity.getId(), uid);
             hashMap.put("time", formatBetween);
             hashMap.put("readNum", activity.getReadNum());
             hashMap.put("likeNum", activity.getLikeNum());
+            hashMap.put("boolLike", boolLike);
             hashMap.put("commontNum", activity.getCommontNum());
             hashMap.put("uid", uid);
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
-        return list;
+        Msg msg = new Msg();
+        msg.setCode(100);
+        msg.setMsg("获取我的所有动态成功");
+        msg.add("activityList", list);
+        return msg;
     }
 
     /**
@@ -269,6 +267,8 @@ public class ActivityServiceImpl implements ActivityService {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //获得该动态的用户信息
             User user = userService.getUserById(activity.getPublishId());
+            //判断我自己是否点赞过这条动态
+            boolean boolLike = activityLikeService.getBoolLikeByAidUid(activity.getId(), uid);
             hashMap.put("header", user.getHeader());
             hashMap.put("nickname", user.getNickname());
             hashMap.put("sex", user.getSex());
@@ -284,14 +284,15 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("readNum", activity.getReadNum());
             hashMap.put("likeNum", activity.getLikeNum());
             hashMap.put("commontNum", activity.getCommontNum());
+            hashMap.put("boolLike", boolLike);
             hashMap.put("uid", activity.getPublishId());
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
         Msg msg = new Msg();
-        msg.add("activityList",list);
         msg.setCode(100);
         msg.setMsg("查找动态成功");
+        msg.add("activityList",list);
         return msg;
     }
 

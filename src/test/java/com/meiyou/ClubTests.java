@@ -2,6 +2,7 @@ package com.meiyou;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.pojo.ClubBuy;
+import com.meiyou.pojo.ClubBuyExample;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,5 +32,17 @@ public class ClubTests {
         if(i == 1){
             System.out.println("购买成功!!!");
         }
+    }
+
+    @Test
+    public void udate(){
+        ClubBuy clubBuy = new ClubBuy();
+        //clubBuy.setId(2);
+        clubBuy.setState(6);
+        //clubBuy.setClubId(7);
+        //clubBuy.setBuyerId(9);
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andClubIdEqualTo(7).andBuyerIdEqualTo(9);
+        clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
     }
 }

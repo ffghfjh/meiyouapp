@@ -306,7 +306,11 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectByPrimaryKey(uid);
         if (user == null) {
             User user1 = new User();
+            user1.setId(0);
+            user1.setHeader("no Pic");
+            user1.setSex(false);
             user1.setNickname("找不到任何用户");
+            user1.setBirthday("0");
             return user1;
         }
         return user;

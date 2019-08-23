@@ -88,13 +88,15 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setLikeNum(0);
         activity.setCommontNum(0);
         activity.setBoolClose(false);
-        int i = activityMapper.insertSelective(activity);
+        int i = activityMapper.insert(activity);
+        //获得插入的id
+        int aid = activity.getId();
         if (i == 1) {
-            //添加地理位置和uid到Redis缓存中
+            //添加地理位置和aid到Redis缓存中
             Coordinate coordinate = new Coordinate();
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
-            coordinate.setKey(Integer.toString(uid));
+            coordinate.setKey(Integer.toString(aid));
             Long reo = RedisUtil.addReo(coordinate, Constants.GEO_ACTIVITY);
             if (reo == null) {
                 return 0;
@@ -151,6 +153,8 @@ public class ActivityServiceImpl implements ActivityService {
             hashMapNo.put("readNum", 0);
             hashMapNo.put("likeNum", 0);
             hashMapNo.put("commontNum", 0);
+            hashMapNo.put("uid", 0);
+            hashMapNo.put("aid", 0);
             list.add(hashMapNo);
             return list;
         }
@@ -162,7 +166,7 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("birthday", user.getBirthday());
             hashMap.put("content", activity.getContent());
             hashMap.put("imgsUrl", activity.getImgsUrl());
-            hashMap.put("distance", "0.0km");
+            hashMap.put("distance", "0.00");
             //发布时间
             Date createTime = activity.getCreateTime();
             //当前时间
@@ -173,6 +177,8 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("readNum", activity.getReadNum());
             hashMap.put("likeNum", activity.getLikeNum());
             hashMap.put("commontNum", activity.getCommontNum());
+            hashMap.put("uid", uid);
+            hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
         return list;
@@ -220,7 +226,7 @@ public class ActivityServiceImpl implements ActivityService {
         //范围半径
         String range = rootMessageService.getMessageByName("range");
         double radius = Double.parseDouble(range);
-        //从Redis获取附近的所有用户
+        //从Redis获取附近的所有用户的动态
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
         coordinate.setLongitude(longitude);
@@ -231,49 +237,73 @@ public class ActivityServiceImpl implements ActivityService {
             hashMapNo.put("nickname", "无昵称");
             hashMapNo.put("sex", 0);
             hashMapNo.put("birthday", "0");
-            hashMapNo.put("content", "无动态内容");
+            hashMapNo.put("content", "无附近动态内容");
             hashMapNo.put("imgsUrl", "no picture");
             hashMapNo.put("distance", "0.0km");
             hashMapNo.put("time", "时间不存在");
             hashMapNo.put("readNum", 0);
             hashMapNo.put("likeNum", 0);
             hashMapNo.put("commontNum", 0);
+            hashMapNo.put("uid", uid);
+            hashMapNo.put("aid",0);
             list.add(hashMapNo);
             return list;
         }
         for (GeoRadiusResponse response : responseList) {
             String memberByString = response.getMemberByString();
-            int nbhId = Integer.parseInt(memberByString);
+            //距离我多远
+            Double dis = response.getDistance();
+            String distance = "0.00";
+            if (dis != null) {
+                distance = Double.toString(dis);
+            }
+            int nbhAid = 0;
+            if (memberByString != null) {
+                nbhAid = Integer.parseInt(memberByString);
+            }
+            Activity activity = activityMapper.selectByPrimaryKey(nbhAid);
+            //如果activity不存在
+            if (activity == null) {
+                HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                hashMap.put("header", "no picture");
+                hashMap.put("nickname", "无昵称");
+                hashMap.put("sex", 0);
+                hashMap.put("birthday", "0");
+                hashMap.put("content", "无附近动态内容");
+                hashMap.put("imgsUrl", "no picture");
+                hashMap.put("distance", "0.00");
+                hashMap.put("time", "时间不存在");
+                hashMap.put("readNum", 0);
+                hashMap.put("likeNum", 0);
+                hashMap.put("commontNum", 0);
+                hashMap.put("uid", 0);
+                hashMap.put("aid", nbhAid);
+                list.add(hashMap);
+            }
+            //如果activity存在
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            //获得该动态的用户信息
+            User user = userService.getUserById(activity.getPublishId());
+            hashMap.put("header", user.getHeader());
+            hashMap.put("nickname", user.getNickname());
+            hashMap.put("sex", user.getSex());
+            hashMap.put("birthday", user.getBirthday());
+            hashMap.put("content", activity.getContent());
+            hashMap.put("imgsUrl", activity.getImgsUrl());
+            hashMap.put("distance", distance);
+            Date createTime = activity.getCreateTime();
+            Date nowTime = DateUtil.date();
+            //时间差
+            String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
+            hashMap.put("time", formatBetween);
+            hashMap.put("readNum", activity.getReadNum());
+            hashMap.put("likeNum", activity.getLikeNum());
+            hashMap.put("commontNum", activity.getCommontNum());
+            hashMap.put("uid", activity.getPublishId());
+            hashMap.put("aid", activity.getId());
+            list.add(hashMap);
         }
-//
-//        boolean flag = (activities ==null && activities.size()==0);
-//        //用户或动态不存在的话，返回默认信息，防止空指针异常
-//        if (user == null || flag) {
-//
-//        }
-//        for (Activity activity : activities) {
-//            HashMap<String, Object> hashMap = new HashMap<String, Object>();
-//            hashMap.put("header", user.getHeader());
-//            hashMap.put("nickname", user.getNickname());
-//            hashMap.put("sex", user.getSex());
-//            hashMap.put("birthday", user.getBirthday());
-//            hashMap.put("content", activity.getContent());
-//            hashMap.put("imgsUrl", activity.getImgsUrl());
-//            hashMap.put("distance", "0.0km");
-//            //发布时间
-//            Date createTime = activity.getCreateTime();
-//            //当前时间
-//            Date nowTime = DateUtil.date();
-//            //时间差
-//            String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
-//            hashMap.put("time", formatBetween);
-//            hashMap.put("readNum", activity.getReadNum());
-//            hashMap.put("likeNum", activity.getLikeNum());
-//            hashMap.put("commontNum", activity.getCommontNum());
-//            list.add(hashMap);
-//        }
-//        return list;
-        return null;
+        return list;
     }
 
 }

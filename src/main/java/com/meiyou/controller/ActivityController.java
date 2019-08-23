@@ -47,7 +47,7 @@ public class ActivityController {
 
     @ApiOperation(value = "获取附近所有动态", notes = "获取附近所有动态", httpMethod = "POST")
     @PostMapping(value = "/listNeighborActivity")
-    public ArrayList<HashMap<String, Object>> listNeighborActivity(int uid, double latitude, double longitude) {
+    public Msg listNeighborActivity(int uid, double latitude, double longitude) {
         return activityService.listNeighborActivity(uid, latitude, longitude);
     }
 

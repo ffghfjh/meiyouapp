@@ -1,8 +1,11 @@
 package com.meiyou.controller;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.meiyou.pojo.AppointAsk;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -27,8 +30,6 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
-
     /**
      * @Description: 发布约会
      * @Author: JK
@@ -42,13 +43,13 @@ public class AppointmentController {
                                  @RequestParam(value = "appointContext", required = false) String appointContext,
                                  @RequestParam(value = "payType", required = false) int payType,
                                  @RequestParam(value = "reward", required = false) Integer reward,
-                                 /*MultipartFile[] files,*/
+                                 MultipartFile[] files,
                                  @RequestParam(value = "password", required = false) String password,
                                  @RequestParam(value = "token", required = false) String token,
                                  HttpServletRequest request
     ) {
 
-        /*//使用Hutool进行json操作
+        //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
         for (MultipartFile file : files) {
             Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
@@ -58,7 +59,7 @@ public class AppointmentController {
         }
         if (array.size() == 0) {
             return Msg.fail();
-        }*/
+        }
         Appointment appointment = new Appointment();
         appointment.setCreateTime(new Date());
         appointment.setUpdateTime(new Date());
@@ -70,8 +71,7 @@ public class AppointmentController {
         appointment.setReward(reward);
         appointment.setPayType(payType);
         appointment.setState(1);
-        /*appointment.setAppointImgs(array.toString());*/
-        appointment.setAppointImgs("1");
+        appointment.setAppointImgs(array.toString());
 
 
         return appointmentService.insert(appointment, password, token);
@@ -84,21 +84,10 @@ public class AppointmentController {
      */
     @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "POST")
     @PostMapping(value = "/selectAppointmentList")
-    public Map<String, Object> selectAppointmentList() {
-        List<Appointment> appointments = appointmentService.selectAppointmentList();
-        Map<String, Object> map = new HashMap<>();
-        if (appointments != null && appointments.size() != 0) {
-            ArrayList<Appointment> lists = new ArrayList<>();
-            for (Appointment appointment : appointments) {
-                lists.add(appointment);
-            }
-            map.put("lists", lists);
-            Msg success = Msg.success();
-            map.put("success", success);
-        }
-
-
-        return map;
+    public Map<String, Object> selectAppointmentList(String uid,String token) {
+        Msg msg = appointmentService.selectAppointmentList(uid, token);
+        Map<String, Object> extend = msg.getExtend();
+        return extend;
     }
 
     /**
@@ -108,7 +97,7 @@ public class AppointmentController {
      */
     @ApiOperation(value = "取消发布约会订单", notes = "取消发布约会订单", httpMethod = "POST")
     @PostMapping(value = "/deletePublish")
-    public Msg deletePublish(@RequestParam(value = "uid", required = false) Integer id,
+    public Msg deletePublish(@RequestParam(value = "id", required = false) Integer id,
                              @RequestParam(value = "token", required = false) String token) {
         return appointmentService.deletePublish(id, token);
 

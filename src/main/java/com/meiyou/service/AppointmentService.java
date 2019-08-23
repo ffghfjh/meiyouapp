@@ -21,7 +21,7 @@ public interface AppointmentService {
     /**
      * 查询我的发布
      */
-    List<Appointment> selectAppointmentList();
+    Msg selectAppointmentList(String uid,String token);
 
     /**
      * 取消发布

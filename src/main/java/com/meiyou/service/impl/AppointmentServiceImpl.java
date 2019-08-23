@@ -2,7 +2,6 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
-import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
@@ -13,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: meiyouapp
@@ -30,8 +28,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     private AppointAskMapper appointAskMapper;
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private RootMessageMapper rootMessageMapper;
     @Autowired
     private AppointmentUtil appointmentUtil;
     /**
@@ -108,10 +104,25 @@ public class AppointmentServiceImpl implements AppointmentService {
     * @Date: 2019/8/22
     */
     @Override
-    public List<Appointment> selectAppointmentList() {
+    public Msg selectAppointmentList(String uid,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken){
+            return Msg.noLogin();
+        }
         AppointmentExample example = new AppointmentExample();
+        example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
-        return appointments;
+        HashMap<String, Object> map = new HashMap<>();
+        Msg msg = new Msg();
+        if (appointments != null && appointments.size() != 0) {
+            map.put("lists",appointments);
+            msg.setExtend(map);
+            msg.setMsg("查询成功");
+            msg.setCode(100);
+            return msg;
+        }
+        return Msg.fail();
     }
 
     /**
@@ -132,10 +143,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         //获取当前订单状态
         Integer state = appointment.getState();
         int i = 0;
-        if (state == 0) {
+        if (state == 1) {
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id);
-            i = appointmentMapper.deleteByExample(example);
+            appointment.setState(4);
+            appointment.setUpdateTime(new Date());
+            i = appointmentMapper.updateByExample(appointment, example);
             if (i == 1){
                 return Msg.success();
             }

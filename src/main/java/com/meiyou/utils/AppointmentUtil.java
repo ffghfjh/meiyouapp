@@ -27,9 +27,9 @@ public class AppointmentUtil {
         //根据传进来的名称获取系统动态数据表中的名称
         RootMessage rootMessage = list.get(0);
 
-        //获取发布金的金额
+        //获取系统动态数据表中的名称获取对应的金额
         String rootMessageValue = rootMessage.getValue();
-        //将发布金从String转换成Integer
+        //将金额从String转换成Integer
         Integer rootMessageValue1=Integer.parseInt(rootMessageValue);
         return rootMessageValue1;
     }

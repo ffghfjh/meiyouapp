@@ -3,16 +3,21 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.utils.AppointmentUtil;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @program: meiyouapp
@@ -37,7 +42,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     */
     @Transactional
     @Override
-    public Msg insert(Appointment appointment, String password, String token) {
+    public Msg insert(Appointment appointment, String password, String token, Coordinate coordinate, String table) {
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
         //判断是否登录
@@ -90,6 +95,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         userExample.createCriteria().andIdEqualTo(appointment.getPublisherId());
         //更新用户账户余额
         userMapper.updateByExample(user,userExample);
+
+        //获取发布时定位
+        RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
+
         int i = appointmentMapper.insertSelective(appointment);
         if (i == 1){
             return Msg.success();

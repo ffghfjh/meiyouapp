@@ -27,6 +27,7 @@ public class Constants {
     public static int REDIS_CODE_OUT_TIME = 1000;//验证码redis过期时间 单位/秒
     public static String GEO_USER_KEY = "user";
     public static String GEO_ACTIVITY = "activity";
+    public static String GEO_APPOINTMENT = "appointment";
     public static String ACCESSKEYID = "LTAILzv9HnGuCEPg";  //阿里云
     public static String ACCESSKEYSERECT = "9I8BN2KnkebQOS1O89utWPKtfPcRrl"; //阿里云
 

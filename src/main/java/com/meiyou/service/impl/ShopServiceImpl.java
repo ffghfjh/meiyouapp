@@ -1,11 +1,13 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Shop;
 import com.meiyou.pojo.ShopExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
 import com.meiyou.service.ShopService;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,8 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
-    public Msg addShop(Shop shop, String token, Integer time, String password) {
+    public Msg addShop(Shop shop, String token, Integer time, String password,
+                       Double latitude, Double longitude) {
 //        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -72,7 +75,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             msg.setCode(1002);
             return msg;
         }else {
-            shopMapper.insertSelective(shop);
+            int rows = shopMapper.insertSelective(shop);
+
+            if (rows != 1) {
+                return Msg.fail();
+            }
+
+            //添加地理位置到缓存
+            String message = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            System.out.println(message);
 
             //执行扣钱操作
             User user = new User();
@@ -159,7 +170,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 //        }
         Msg msg = new Msg();
         ShopExample shopExample = new ShopExample();
-        shopExample.createCriteria().andIdEqualTo(sid).andPublishIdEqualTo(uid);
+        shopExample.createCriteria().andIdEqualTo(sid);
         List<Shop> result = shopMapper.selectByExample(shopExample);
         if(result.size() == 0){
             msg.setCode(404);

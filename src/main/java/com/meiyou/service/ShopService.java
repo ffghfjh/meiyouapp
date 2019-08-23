@@ -3,7 +3,6 @@ package com.meiyou.service;
 import com.meiyou.pojo.Shop;
 import com.meiyou.utils.Msg;
 
-import java.util.List;
 
 /**
  * @description: 景点商家(同城导游)业务层接口
@@ -20,7 +19,7 @@ public interface ShopService {
      * @param password
      * @return
      */
-    Msg addShop(Shop shop, String token, Integer time, String password);
+    Msg addShop(Shop shop, String token, Integer time, String password, Double latitude, Double longitude);
 
     /**
      * 取消发布对应id的景点商家(同城导游)

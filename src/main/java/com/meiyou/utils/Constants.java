@@ -28,6 +28,7 @@ public class Constants {
     public static String GEO_USER_KEY = "user";
     public static String GEO_ACTIVITY = "activity";
     public static String GEO_APPOINTMENT = "appointment";
+    public static String GEO_TOUR = "tour";
     public static String ACCESSKEYID = "LTAILzv9HnGuCEPg";  //阿里云
     public static String ACCESSKEYSERECT = "9I8BN2KnkebQOS1O89utWPKtfPcRrl"; //阿里云
 

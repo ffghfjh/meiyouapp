@@ -42,7 +42,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     */
     @Transactional
     @Override
-    public Msg insert(Appointment appointment, String password, String token, Coordinate coordinate, String table) {
+    public Msg insert(Appointment appointment, String password, String token, double latitude,double longitude) {
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
         //判断是否登录
@@ -97,6 +97,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         userMapper.updateByExample(user,userExample);
 
         //获取发布时定位
+        Coordinate coordinate = new Coordinate();
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
         RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
 
         int i = appointmentMapper.insertSelective(appointment);

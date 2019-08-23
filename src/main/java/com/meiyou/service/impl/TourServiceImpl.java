@@ -3,11 +3,13 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.TourMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Tour;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
 import com.meiyou.service.TourService;
 import com.meiyou.utils.AppointmentUtil;
+import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class TourServiceImpl implements TourService {
     */
     @Transactional
     @Override
-    public Msg insert(Tour tour, String password, String token) {
+    public Msg insert(Tour tour, String password, String token, double latitude,double longitude) {
         boolean authToken = RedisUtil.authToken(tour.getPublishId().toString(), token);
         Msg msg = new Msg();
         //判断是否登录
@@ -95,6 +97,13 @@ public class TourServiceImpl implements TourService {
         userExample.createCriteria().andIdEqualTo(tour.getPublishId());
         //更新用户账户余额
         userMapper.updateByExample(user,userExample);
+
+        //获取发布时定位
+        Coordinate coordinate = new Coordinate();
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        RedisUtil.addReo(coordinate, Constants.GEO_TOUR);
+
         int i = tourMapper.insertSelective(tour);
         if (i == 1){
             return Msg.success();

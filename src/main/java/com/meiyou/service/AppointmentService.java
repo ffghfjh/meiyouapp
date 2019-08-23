@@ -1,6 +1,5 @@
 package com.meiyou.service;
 
-import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.utils.Msg;
 
@@ -14,7 +13,7 @@ public interface AppointmentService {
     /**
      * 发布约会
      */
-    Msg insert(Appointment appointment, String password, String token,Coordinate coordinate, String table);
+    Msg insert(Appointment appointment, String password, String token,double latitude,double longitude);
 
     /**
      * 查询我的发布

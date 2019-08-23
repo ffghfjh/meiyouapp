@@ -1,6 +1,7 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.service.CommentService;
+import com.meiyou.utils.Msg;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,4 +13,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CommentServiceImpl implements CommentService {
+    @Override
+    public Msg postComment(int uid, int aid, String content) {
+        return null;
+    }
+
+    @Override
+    public Msg listCommentByAid(int aid) {
+        return null;
+    }
 }

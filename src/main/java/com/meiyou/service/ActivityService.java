@@ -49,7 +49,7 @@ public interface ActivityService {
     List<Activity> listActivity();
 
     //通过uid和经纬度获取所有动态
-    ArrayList<HashMap<String, Object>> listNeighborActivity(int uid, double latitude, double longitude);
+    Msg listNeighborActivity(int uid, double latitude, double longitude);
 
 
 

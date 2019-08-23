@@ -53,7 +53,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
         //获取发布者账户余额
         Float money = user.getMoney();
-        //AppointmentUtil appointmentUtil = new AppointmentUtil();
         //获取发布金
         String publishMoneyName = "publish_money";
         int publishMoneyValue = appointmentUtil.getRootMessage(publishMoneyName);

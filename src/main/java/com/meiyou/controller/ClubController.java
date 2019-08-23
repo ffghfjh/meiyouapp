@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @create: 2019-08-21 14:34
  **/
 @RestController
-@Api(value = "推拿会所控制器",tags = "推拿会所")
+@Api(value = "ClubController",tags = "推拿会所")
 @RequestMapping("/club")
 public class ClubController {
 
@@ -49,19 +49,23 @@ public class ClubController {
     @PutMapping("/update")
     @ApiOperation(value = "取消发布推拿会所",notes = "取消即更发布状态，实际数据不删除")
     public Msg deleteClub(@RequestParam("uid") Integer uid,
+                          @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid){
-        return clubService.updateClub(uid, cid);
+        return clubService.updateClub(uid, token, cid);
     }
 
     @GetMapping("/get")
     @ApiOperation(value = "通过用户id查找指定用户id的全部推拿会所",notes = "查找")
-    public Msg getClubByUid(Integer uid){
-        return clubService.selectByUid(uid);
+    public Msg getClubByUid(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token){
+        return clubService.selectByUid(uid, token);
     }
 
     @GetMapping("/find")
     @ApiOperation(value = "通过会所id查找对应的会所",notes = "查找")
-    public Msg findClubByCid(Integer cid){
-        return clubService.selectByCid(cid);
+    public Msg findClubByCid(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("cid") Integer cid){
+        return clubService.selectByCid(uid, token, cid);
     }
 }

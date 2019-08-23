@@ -28,6 +28,15 @@ public interface ClubBuyService {
      * @param uid
      * @return
      */
-    Msg selectByUid(Integer uid);
+    Msg selectByUid(Integer uid,String token);
+
+    /**
+     * 查找指定的会所购买记录
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    Msg selectByCid(Integer uid,Integer cid,String token);
 
 }

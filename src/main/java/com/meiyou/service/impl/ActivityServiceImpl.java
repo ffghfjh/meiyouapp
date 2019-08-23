@@ -5,11 +5,13 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.pojo.User;
+import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.ActivityService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
@@ -52,6 +54,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     RootMessageService rootMessageService;
+
+    @Autowired
+    ActivityLikeService activityLikeService;
 
     /**
      * hzy
@@ -269,6 +274,8 @@ public class ActivityServiceImpl implements ActivityService {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //获得该动态的用户信息
             User user = userService.getUserById(activity.getPublishId());
+            //判断我自己是否点赞过这条动态
+            boolean boolLike = activityLikeService.getBoolLikeByAidUid(activity.getId(), uid);
             hashMap.put("header", user.getHeader());
             hashMap.put("nickname", user.getNickname());
             hashMap.put("sex", user.getSex());
@@ -284,14 +291,15 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("readNum", activity.getReadNum());
             hashMap.put("likeNum", activity.getLikeNum());
             hashMap.put("commontNum", activity.getCommontNum());
+            hashMap.put("boolLike", boolLike);
             hashMap.put("uid", activity.getPublishId());
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
         Msg msg = new Msg();
-        msg.add("activityList",list);
         msg.setCode(100);
         msg.setMsg("查找动态成功");
+        msg.add("activityList",list);
         return msg;
     }
 

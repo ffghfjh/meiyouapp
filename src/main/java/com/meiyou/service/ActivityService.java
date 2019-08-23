@@ -52,5 +52,4 @@ public interface ActivityService {
     Msg listNeighborActivity(int uid, double latitude, double longitude);
 
 
-
 }

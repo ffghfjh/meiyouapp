@@ -128,7 +128,7 @@ public class QueueConfig {
 
     /**
      * 定义delay_process_queue队列的Listener Container
-     *
+     * 监听实际消费队列
      * @param connectionFactory
      * @return
      */

@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
+import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
 import com.meiyou.pojo.ActivityLike;
 import com.meiyou.pojo.ActivityLikeExample;
@@ -28,6 +29,10 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
     @Autowired
     ActivityLikeMapper activityLikeMapper;
 
+    //注入动态表mapper
+    @Autowired
+    ActivityMapper activityMapper;
+
     @Override
     public Msg like(int aid, int uid, int type) {
         Msg msg = new Msg();
@@ -44,6 +49,17 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
             ActivityLikeExample.Criteria criteria1 = example01.createCriteria();
             criteria1.andActivityIdEqualTo(aid);
             int count = activityLikeMapper.countByExample(example01);
+            //在activity表中点赞数减1
+            Activity activity = activityMapper.selectByPrimaryKey(aid);
+            Activity activity1 = new Activity();
+            activity1.setId(aid);
+            //设置更新时间
+            activity1.setUpdateTime(new Date());
+            activity1.setLikeNum(count);
+            int i1 = activityMapper.updateByPrimaryKeySelective(activity1);
+            if (i1 == 0) {
+                return Msg.fail();
+            }
             msg.setCode(100);
             msg.setMsg("取消点赞成功");
             msg.add("likeNum", count);
@@ -63,6 +79,13 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         ActivityLikeExample.Criteria criteria = example02.createCriteria();
         criteria.andActivityIdEqualTo(aid);
         int count =  activityLikeMapper.countByExample(example02);
+        Activity activity = new Activity();
+        activity.setId(aid);
+        activity.setLikeNum(count);
+        int i1 = activityMapper.insertSelective(activity);
+        if (i1 == 0) {
+            return Msg.fail();
+        }
         msg.setCode(100);
         msg.setMsg("点赞成功");
         msg.add("likeNum", count);

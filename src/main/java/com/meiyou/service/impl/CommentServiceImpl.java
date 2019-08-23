@@ -81,8 +81,9 @@ public class CommentServiceImpl implements CommentService {
             hashMap.put("sex", user.getSex());
             hashMap.put("content", comment.getContent());
             hashMap.put("time", comment.getCreateTime());
-//缺评论点赞
+            //获取这条评论的所有点赞数
 
+            hashMap.put("cid", comment.getId());
             list.add(hashMap);
         }
         Msg msg = new Msg();

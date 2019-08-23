@@ -2,6 +2,7 @@ package com.meiyou.controller;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.utils.FileUploadUtil;
@@ -46,6 +47,7 @@ public class AppointmentController {
                                  MultipartFile[] files,
                                  @RequestParam(value = "password", required = false) String password,
                                  @RequestParam(value = "token", required = false) String token,
+                                 Coordinate coordinate, String table,
                                  HttpServletRequest request
     ) {
 
@@ -74,7 +76,7 @@ public class AppointmentController {
         appointment.setAppointImgs(array.toString());
 
 
-        return appointmentService.insert(appointment, password, token);
+        return appointmentService.insert(appointment, password, token,coordinate,table);
     }
 
     /**

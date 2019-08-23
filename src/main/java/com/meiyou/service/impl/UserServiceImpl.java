@@ -254,31 +254,30 @@ public class UserServiceImpl implements UserService {
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);
 
 
-
-
                 //文件上传判断
                 Msg fileMsg = FileUploadUtil.uploadUtil(img,"headers",req);
                 if(fileMsg.getCode()==100){
                     user.setHeader((String) fileMsg.getExtend().get("path"));
                     if(userMapper.insert(user)==1){
                         int uid = user.getId();
-                        Authorization authorization = new Authorization();
-                        authorization.setUserId(uid);
-                        authorization.setIdentityType(1);
-                        authorization.setCredential(password);
-                        authorization.setBoolVerified(true);
-                        authorization.setUpdateTime(date);
-                        authorization.setCreateTime(date);
-                        authorization.setIdentifier(phone);
-                        if(authMapper.insert(authorization)>0){
-                            if(imService.registTencent(user)){
-                                return Msg.success();
-                            }else{
-                                msg = Msg.fail();
-                                msg.setMsg("腾讯云账号注册失败");
-                                return msg;
+                            addShare(shareCodeRegist,uid);//邀请码业务
+                            Authorization authorization = new Authorization();
+                            authorization.setUserId(uid);
+                            authorization.setIdentityType(1);
+                            authorization.setCredential(password);
+                            authorization.setBoolVerified(true);
+                            authorization.setUpdateTime(date);
+                            authorization.setCreateTime(date);
+                            authorization.setIdentifier(phone);
+                            if(authMapper.insert(authorization)>0){
+                                if(imService.registTencent(user)){
+                                    return Msg.success();
+                                }else{
+                                    msg = Msg.fail();
+                                    msg.setMsg("腾讯云账号注册失败");
+                                    return msg;
+                                }
                             }
-                        }
                     }
                 }else {
                     msg = Msg.fail();
@@ -287,9 +286,6 @@ public class UserServiceImpl implements UserService {
                     System.out.println(msg.toString());
                     return msg;
                 }
-
-
-
             }
         }else {
             System.out.println("验证码错误");
@@ -330,18 +326,26 @@ public class UserServiceImpl implements UserService {
         UserExample example1 = new UserExample();
         UserExample.Criteria criteria1 = example1.createCriteria();
         criteria1.andShareCodeEqualTo(shareCodeRegist);
-        User user1 = userMapper.selectByExample(example1).get(0);//分享人
-        Share share = new Share();
-        share.setByPeopleId(bid);
-        share.setPeopleId(user1.getId());
-        Date date = new Date();
-        share.setCreateTime(date);
-        share.setUpdateTime(date);
-        int money = Integer.parseInt(rootMessageService.getMessageByName("share_money"));
-        share.setShareMoney(money);
-        int i = shareMapper.insert(share);
-        if(i==1){
-            return true;
+        List<User> list = userMapper.selectByExample(example1);//分享人
+        if(list==null||list.size()==0){
+            return false;
+        }else {
+            User user1 = list.get(0);
+            Share share = new Share();
+            share.setByPeopleId(bid);
+            share.setPeopleId(user1.getId());
+            Date date = new Date();
+            share.setCreateTime(date);
+            share.setUpdateTime(date);
+            int money = Integer.parseInt(rootMessageService.getMessageByName("share_money"));
+            share.setShareMoney(money);
+            int i = shareMapper.insert(share);
+            if(i==1){
+                //添加金币
+                if(addMoney(user1.getId(),money)){
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -374,12 +378,21 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.selectByPrimaryKey(id);
         user.setMoney(user.getMoney()+money);
-        userMapper.updateByPrimaryKey(user);
+        int i = userMapper.updateByPrimaryKey(user);
+        if(i==1){
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean delMoney(int id, float money) {
+        User user = userMapper.selectByPrimaryKey(id);
+        user.setMoney(user.getMoney()-money);
+        int i = userMapper.updateByPrimaryKey(user);
+        if(i==1){
+            return true;
+        }
         return false;
     }
 

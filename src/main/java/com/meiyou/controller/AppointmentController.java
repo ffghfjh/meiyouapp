@@ -2,7 +2,6 @@ package com.meiyou.controller;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
-import com.meiyou.pojo.AppointAsk;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.utils.FileUploadUtil;
@@ -16,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * @program: meiyouapp
@@ -104,6 +104,19 @@ public class AppointmentController {
     }
 
     /**
+     * @Description: 查询所有报名某个约会的人员信息
+     * @Author: JK
+     * @Date: 2019/8/22
+     */
+    @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "POST")
+    @PostMapping(value = "/selectAppointAskList")
+    public Map<String, Object> selectAppointAskList(String uid,Integer appointId,String token) {
+        Msg msg = appointmentService.selectAppointAskList(uid,appointId,token);
+        Map<String, Object> extend = msg.getExtend();
+        return extend;
+    }
+
+    /**
      * @Description: 从多个约会订单中选择一个进行报名
      * @Author: JK
      * @Date: 2019/8/22
@@ -117,23 +130,7 @@ public class AppointmentController {
         return appointmentService.startEnrollment(uid, password, id, token);
     }
 
-    /**
-     * @Description: 查询所有报名某个约会的人员信息，并选择一个进行确认
-     * @Author: JK
-     * @Date: 2019/8/22
-     */
-    @ApiOperation(value = "查询所有报名某个约会的人员信息，并选择一个进行确认", notes = "查询所有报名某个约会的人员信息，并选择一个进行确认", httpMethod = "POST")
-    @PostMapping(value = "/selectAppointAskList")
-    public Map<String, Object> selectAppointAskList(Integer appointId) {
-        Map<String, Object> map = new HashMap<>();
-        List<AppointAsk> appointAsks = appointmentService.selectAppointAskList(appointId);
-        if (appointAsks != null) {
-            map.put("appointAsks", appointAsks);
-            Msg success = Msg.success();
-            map.put("success", success);
-        }
-        return map;
-    }
+
 
     /**
      * @Description: 从所有报名某个约会的人员信息中选择一个进行确认

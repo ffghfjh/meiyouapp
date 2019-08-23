@@ -26,13 +26,15 @@ public interface ClubService {
      * @param cid
      * @return
      */
+    //Todo
     Msg updateClub(Integer uid,Integer cid);
 
     /**
      * 通过用户id查找全部发布的会所
-     * @param id
+     * @param uid
      * @return
      */
+    //Todo
     Msg selectByUid(Integer uid);
 
     /**
@@ -40,6 +42,7 @@ public interface ClubService {
      * @param cid
      * @return
      */
+    //Todo
     Msg selectByCid(Integer cid);
 
     /**

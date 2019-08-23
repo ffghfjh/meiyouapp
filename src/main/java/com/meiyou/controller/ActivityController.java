@@ -68,7 +68,7 @@ public class ActivityController {
 
     @ApiOperation(value = "获得我所有的动态", notes = "获得我所有的动态")
     @GetMapping(value = "/listMyActivity")
-    public ArrayList<HashMap<String, Object>> listMyActivity(int uid) {
+    public Msg listMyActivity(int uid) {
         return activityService.listUserActivityByUid(uid);
     }
 

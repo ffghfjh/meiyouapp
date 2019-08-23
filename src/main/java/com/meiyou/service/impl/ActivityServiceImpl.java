@@ -138,7 +138,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return ArrayList<HashMap<String, Object>>
      */
     @Override
-    public ArrayList<HashMap<String, Object>>  listUserActivityByUid(int uid) {
+    public Msg listUserActivityByUid(int uid) {
         ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         //根据uid获取用户动态
         List<Activity> activities = listActivityByUid(uid);
@@ -147,21 +147,7 @@ public class ActivityServiceImpl implements ActivityService {
         boolean flag = (activities ==null && activities.size()==0);
         //用户或动态不存在的话，返回默认信息，防止空指针异常
         if (user == null || flag) {
-            hashMapNo.put("header", "no picture");
-            hashMapNo.put("nickname", "无昵称");
-            hashMapNo.put("sex", 0);
-            hashMapNo.put("birthday", "0");
-            hashMapNo.put("content", "无动态内容");
-            hashMapNo.put("imgsUrl", "no picture");
-            hashMapNo.put("distance", "0.0km");
-            hashMapNo.put("time", "时间不存在");
-            hashMapNo.put("readNum", 0);
-            hashMapNo.put("likeNum", 0);
-            hashMapNo.put("commontNum", 0);
-            hashMapNo.put("uid", 0);
-            hashMapNo.put("aid", 0);
-            list.add(hashMapNo);
-            return list;
+            return Msg.fail();
         }
         for (Activity activity : activities) {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
@@ -178,15 +164,22 @@ public class ActivityServiceImpl implements ActivityService {
             Date nowTime = DateUtil.date();
             //时间差
             String formatBetween = DateUtil.formatBetween(createTime, nowTime, BetweenFormater.Level.SECOND) + "前";
+            //查询是否被我点赞过
+            boolean boolLike = activityLikeService.getBoolLikeByAidUid(activity.getId(), uid);
             hashMap.put("time", formatBetween);
             hashMap.put("readNum", activity.getReadNum());
             hashMap.put("likeNum", activity.getLikeNum());
+            hashMap.put("boolLike", boolLike);
             hashMap.put("commontNum", activity.getCommontNum());
             hashMap.put("uid", uid);
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
-        return list;
+        Msg msg = new Msg();
+        msg.setCode(100);
+        msg.setMsg("获取我的所有动态成功");
+        msg.add("activityList", list);
+        return msg;
     }
 
     /**

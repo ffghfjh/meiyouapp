@@ -19,15 +19,15 @@ public interface ClubBuyService {
 
     /**
      * 取消购买
-     * @param id
+     * @param cid
      */
-    Msg deleteBuyClub(Integer id);
+    Msg updateBuyClub(Integer uid,Integer cid,String token);
 
     /**
-     * 查找指定用户id下所有的会所购买记录
-     * @param id
+     * 查找指定用户uid下所有的会所购买记录
+     * @param uid
      * @return
      */
-    Msg selectByUid(Integer id);
+    Msg selectByUid(Integer uid);
 
 }

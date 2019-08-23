@@ -12,9 +12,9 @@ import com.meiyou.utils.Msg;
 public interface CommentLikeService {
 
     //评论点赞接口
-    Msg like(int uid, int cid);
+    Msg like(int uid, int cid, int type);
 
-    //获取该条评论的所有点赞
-
+    //判断我自己是否点赞过这条评论
+    boolean boolLike(int uid, int cid);
 
 }

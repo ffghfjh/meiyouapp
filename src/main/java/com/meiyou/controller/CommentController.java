@@ -1,7 +1,11 @@
 package com.meiyou.controller;
 
+import com.meiyou.service.CommentService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,10 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "评论控制层", tags = {"评论Controller"})
+@Api(value = "CommentController", tags = {"评论控制层"})
 @RestController
 @RequestMapping(value = "/Comment")
 public class CommentController {
+
+    @Autowired
+    CommentService commentService;
 
     /**
      * hzy
@@ -25,8 +32,17 @@ public class CommentController {
      * @param content
      * @return
      */
+    @ApiOperation(value = "发布评论", notes = "aid为动态id, uid为发布人id", httpMethod = "POST")
+    @PostMapping("/postComment")
     public Msg postComment(int aid, int uid, String content) {
-        return null;
+        return commentService.postComment(aid, uid, content);
     }
+
+    @ApiOperation(value = "拉取所有评论", notes = "uid为用户id, aid为动态id", httpMethod = "POST")
+    @PostMapping("listCommentByUidAid")
+    public Msg listCommentByUidAid(int uid, int aid){
+        return commentService.listCommentByUidAid(uid, aid);
+    }
+
 
 }

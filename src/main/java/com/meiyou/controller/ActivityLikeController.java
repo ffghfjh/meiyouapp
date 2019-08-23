@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "点赞控制层", tags = {"点赞控制层"})
+@Api(value = "ActivityLikeController", tags = {"动态点赞控制层"})
 @Controller
 @RequestMapping(value = "ActivityLike")
 public class ActivityLikeController {
@@ -25,7 +25,7 @@ public class ActivityLikeController {
     @Autowired
     ActivityLikeService activityLikeService;
 
-    @ApiOperation(value = "动态点赞接口", notes = "动态点赞接口", httpMethod = "POST")
+    @ApiOperation(value = "动态点赞接口", notes = "type为0时取消点赞，为1时点赞", httpMethod = "POST")
     @RequestMapping(value = "/like")
     public Msg like(int aid, int uid, int type) {
         return activityLikeService.like(aid, uid, type);

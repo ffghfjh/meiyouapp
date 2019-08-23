@@ -220,9 +220,8 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public ArrayList<HashMap<String, Object>> listNeighborActivity(int uid, double latitude, double longitude) {
+    public Msg listNeighborActivity(int uid, double latitude, double longitude) {
         ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
-        HashMap<String, Object> hashMapNo = new HashMap<>();
         //范围半径
         String range = rootMessageService.getMessageByName("range");
         double radius = Double.parseDouble(range);
@@ -233,21 +232,7 @@ public class ActivityServiceImpl implements ActivityService {
         coordinate.setLatitude(latitude);
         List<GeoRadiusResponse> responseList = RedisUtil.geoQueryActivity(coordinate, radius);
         if (responseList == null && responseList.size() ==0) {
-            hashMapNo.put("header", "no picture");
-            hashMapNo.put("nickname", "无昵称");
-            hashMapNo.put("sex", 0);
-            hashMapNo.put("birthday", "0");
-            hashMapNo.put("content", "无附近动态内容");
-            hashMapNo.put("imgsUrl", "no picture");
-            hashMapNo.put("distance", "0.0km");
-            hashMapNo.put("time", "时间不存在");
-            hashMapNo.put("readNum", 0);
-            hashMapNo.put("likeNum", 0);
-            hashMapNo.put("commontNum", 0);
-            hashMapNo.put("uid", uid);
-            hashMapNo.put("aid",0);
-            list.add(hashMapNo);
-            return list;
+            return Msg.fail();
         }
         for (GeoRadiusResponse response : responseList) {
             String memberByString = response.getMemberByString();
@@ -303,7 +288,11 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
-        return list;
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("activityList", list);
+        Msg msg = new Msg();
+        msg.success().setExtend(map);
+        return msg;
     }
 
 }

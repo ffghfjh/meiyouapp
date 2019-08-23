@@ -357,7 +357,7 @@ public class UserServiceImpl implements UserService {
      * @param uid
      * @return
      */
-    //@Cacheable //缓存到Redis中(待确定是否添加缓存处理)
+    @Cacheable //缓存到Redis中(待确定是否添加缓存处理)
     @Override
     public User getUserById(int uid) {
         User user = userMapper.selectByPrimaryKey(uid);

@@ -25,6 +25,6 @@ public interface CommentService {
      * @param aid
      * @return
      */
-    Msg listCommentByAid(int aid);
+    Msg listCommentByUidAid(int uid, int aid);
 
 }

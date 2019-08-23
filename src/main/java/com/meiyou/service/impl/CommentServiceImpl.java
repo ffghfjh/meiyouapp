@@ -1,12 +1,13 @@
 package com.meiyou.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.meiyou.mapper.ActivityMapper;
+import com.meiyou.mapper.CommentLikeMapper;
 import com.meiyou.mapper.CommentMapper;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.Comment;
 import com.meiyou.pojo.CommentExample;
 import com.meiyou.pojo.User;
+import com.meiyou.service.CommentLikeService;
 import com.meiyou.service.CommentService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
@@ -37,6 +38,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    CommentLikeService commentLikeService;
+
 
     /**
      * 发布评论
@@ -79,7 +84,7 @@ public class CommentServiceImpl implements CommentService {
      * @return
      */
     @Override
-    public Msg listCommentByAid(int aid) {
+    public Msg listCommentByUidAid(int uid, int aid) {
         List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         CommentExample example = new CommentExample();
         CommentExample.Criteria criteria = example.createCriteria();
@@ -97,8 +102,11 @@ public class CommentServiceImpl implements CommentService {
             hashMap.put("sex", user.getSex());
             hashMap.put("content", comment.getContent());
             hashMap.put("time", comment.getCreateTime());
-            //获取这条评论的所有点赞数
-
+            hashMap.put("likeNum", comment.getLikeNum());
+            //判断我自己是否点赞过这条
+            boolean boolLike = commentLikeService.boolLike(uid, aid);
+            hashMap.put("boolLike", boolLike);
+            hashMap.put("aid", aid);
             hashMap.put("cid", comment.getId());
             list.add(hashMap);
         }

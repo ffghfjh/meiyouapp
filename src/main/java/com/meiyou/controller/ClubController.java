@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @create: 2019-08-21 14:34
  **/
 @RestController
-@Api(value = "推拿会所控制器",tags = "推拿会所")
+@Api(value = "ClubController",tags = "推拿会所")
 @RequestMapping("/club")
 public class ClubController {
 

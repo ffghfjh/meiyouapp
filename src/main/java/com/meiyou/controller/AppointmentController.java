@@ -1,11 +1,8 @@
 package com.meiyou.controller;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import com.meiyou.pojo.AppointAsk;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentService;
-import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
@@ -46,13 +42,13 @@ public class AppointmentController {
                                  @RequestParam(value = "appointContext", required = false) String appointContext,
                                  @RequestParam(value = "payType", required = false) int payType,
                                  @RequestParam(value = "reward", required = false) Integer reward,
-                                 MultipartFile[] files,
+                                 /*MultipartFile[] files,*/
                                  @RequestParam(value = "password", required = false) String password,
                                  @RequestParam(value = "token", required = false) String token,
                                  HttpServletRequest request
     ) {
 
-        //使用Hutool进行json操作
+        /*//使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
         for (MultipartFile file : files) {
             Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
@@ -62,7 +58,7 @@ public class AppointmentController {
         }
         if (array.size() == 0) {
             return Msg.fail();
-        }
+        }*/
         Appointment appointment = new Appointment();
         appointment.setCreateTime(new Date());
         appointment.setUpdateTime(new Date());
@@ -74,7 +70,8 @@ public class AppointmentController {
         appointment.setReward(reward);
         appointment.setPayType(payType);
         appointment.setState(1);
-        appointment.setAppointImgs(array.toString());
+        /*appointment.setAppointImgs(array.toString());*/
+        appointment.setAppointImgs("1");
 
 
         return appointmentService.insert(appointment, password, token);

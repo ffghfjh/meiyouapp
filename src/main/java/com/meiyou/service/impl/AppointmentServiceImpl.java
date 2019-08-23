@@ -6,6 +6,7 @@ import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     private UserMapper userMapper;
     @Autowired
     private RootMessageMapper rootMessageMapper;
+    @Autowired
+    private AppointmentUtil appointmentUtil;
     /**
     * @Description: 发布约会
     * @Author: JK
@@ -50,17 +53,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
         //获取发布者账户余额
         Float money = user.getMoney();
-        RootMessageExample rootMessageExample = new RootMessageExample();
-        rootMessageExample.createCriteria().andNameEqualTo("publish_money");
-        //查询系统动态数据表中所有的数据
-        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
-        //获取发布金的名称
-        RootMessage publishMoney = list.get(0);
-
-        //获取发布金的金额
-        String publishMoneyValue = publishMoney.getValue();
-        //将发布金从String转换成Integer
-        Integer publishMoneyValue1=Integer.parseInt(publishMoneyValue);
+        //AppointmentUtil appointmentUtil = new AppointmentUtil();
+        //获取发布金
+        String publishMoneyName = "publish_money";
+        int publishMoneyValue = appointmentUtil.getRootMessage(publishMoneyName);
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
@@ -69,20 +65,14 @@ public class AppointmentServiceImpl implements AppointmentService {
             return msg;
         }
 
-        //设置查询条件，设置系统动态数据表中 name = sincerity_money
-        rootMessageExample.createCriteria().andNameEqualTo("sincerity_money");
-        List<RootMessage> list1 = rootMessageMapper.selectByExample(rootMessageExample);
-        //获取诚意金的名称
-        RootMessage sincerityMoney = list1.get(0);
-        //获取诚意金的金额
-        String sincerityMoneyValue = sincerityMoney.getValue();
-        //将诚意金从String转换成Integer
-        Integer sincerityMoneyValue1=Integer.parseInt(sincerityMoneyValue);
+        //获取诚意金
+        String sincerityMoneyName = "sincerity_money";
+        int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
 
         //选择平台担保扣款后剩余余额
-        float balance = money-(publishMoneyValue1 + appointment.getReward());
+        float balance = money-(publishMoneyValue + appointment.getReward());
         //选择线下付款扣款后剩余余额
-        float balance1 = money-(publishMoneyValue1 + sincerityMoneyValue1 + appointment.getReward());
+        float balance1 = money-(publishMoneyValue + sincerityMoneyValue + appointment.getReward());
 
         //如果选择线下付款
         if (appointment.getPayType() == 1){
@@ -176,17 +166,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         //获取报名者账户余额
         Float money = user.getMoney();
 
-        RootMessageExample rootMessageExample = new RootMessageExample();
-        rootMessageExample.createCriteria().andNameEqualTo("ask_money");
-        //查询系统动态数据表中所有的数据
-        List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
-        //获取报名金的名称
-        RootMessage askMoney = list.get(0);
-
         //获取报名金的金额
-        String askMoneyValue = askMoney.getValue();
-        //将发布金从String转换成Integer
-        Integer askMoneyValue1=Integer.parseInt(askMoneyValue);
+        String askMoneyName = "ask_money";
+        int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
@@ -195,7 +178,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             return msg;
         }
         //报名扣款后剩余余额
-        float balance = money-askMoneyValue1;
+        float balance = money-askMoneyValue;
 
         if (balance <0){
             msg.setCode(1002);

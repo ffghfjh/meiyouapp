@@ -21,17 +21,17 @@ public interface AppointmentService {
     /**
      * 查询我的发布
      */
-    List<Appointment> selectAppointmentList();
+    Msg selectAppointmentList(String uid,String token);
 
     /**
      * 取消发布
      */
-    int deletePublish(Integer uid,Integer id);
+    Msg deletePublish(Integer id,String token);
 
     /**
      * 开始报名
      */
-    int startEnrollment(Integer uid,Integer id);
+    Msg startEnrollment(String uid,String password,Integer id,String token);
 
 
     /**

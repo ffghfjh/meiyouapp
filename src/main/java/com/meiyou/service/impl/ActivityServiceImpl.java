@@ -288,15 +288,10 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("activityList", list);
         Msg msg = new Msg();
+        msg.add("activityList",list);
         msg.setCode(100);
         msg.setMsg("查找动态成功");
-        HashMap<String, Object> map1 = new HashMap<String, Object>();
-        map1.put("a", "hh");
-        map1.put("b", "sdf");
-        msg.setExtend(map);
         return msg;
     }
 

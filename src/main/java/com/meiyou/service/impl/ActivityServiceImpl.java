@@ -293,10 +293,8 @@ public class ActivityServiceImpl implements ActivityService {
         Msg msg = new Msg();
         msg.setCode(100);
         msg.setMsg("查找动态成功");
-        HashMap<String, Object> map1 = new HashMap<String, Object>();
-        map1.put("a", "hh");
-        map1.put("b", "sdf");
-        msg.setExtend(map);
+        msg.add("abc", "sdf");
+        msg.add("efg", "sdfsd");
         return msg;
     }
 

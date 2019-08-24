@@ -10,6 +10,8 @@ import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import java.util.List;
  * @author: Mr.Z
  * @create: 2019-08-21 14:31
  **/
+@CacheConfig(cacheNames = "club")
 @Service
 public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
@@ -43,6 +46,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      */
     @Override
     @Transactional
+    @Cacheable()
     public Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
@@ -119,6 +123,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
+    @CachePut(key = "#result.id")
     public Msg updateClub(Integer uid,String token, Integer cid) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
@@ -149,6 +154,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
+    @Cacheable()
     public Msg selectByUid(Integer uid,String token) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
@@ -159,7 +165,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubExample clubExample = new ClubExample();
         clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
-        if(result.size() == 0){
+        if(result == null){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
@@ -183,6 +189,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
+    @Cacheable()
     public Msg selectByCid(Integer uid,String token,Integer cid) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
@@ -192,7 +199,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubExample example = new ClubExample();
         example.createCriteria().andIdEqualTo(cid);
         List<Club> result = clubMapper.selectByExample(example);
-        if(result.size() == 0){
+        if(result == null){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
@@ -217,6 +224,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
+    @Cacheable(value = "nearClub")
     public Msg selectClubByPosition(Integer uid, String token, Double longitude, Double latitude) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
@@ -228,7 +236,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         coordinate.setLongitude(longitude);
 
         List<GeoRadiusResponse> geoRadiusResponses = RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
-        if(geoRadiusResponses.size() == 0){
+        if(geoRadiusResponses == null){
             return Msg.fail();
         }
 
@@ -243,7 +251,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 dis = 0.00;
             }
             Integer id = Integer.valueOf(member);
-            Club club = clubMapper.selectByPrimaryKey(id);
+
+            //Todo 需要判断该club是否失效
+            ClubExample example = new ClubExample();
+            example.createCriteria().andIdEqualTo(id);
+            Club club = clubMapper.selectByExample(example).get(0);
 
             ClubVO clubVO = new ClubVO();
             clubVO.setId(club.getId());
@@ -281,7 +293,8 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         //查找报名每个会所的人数
         ClubBuyExample example = new ClubBuyExample();
         example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
-        Integer nums = clubBuyMapper.selectByExample(example).size();
+        List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
+        Integer nums = clubBuys.size();
 
         ClubVO clubVO = new ClubVO();
         clubVO.setNums(nums);

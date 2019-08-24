@@ -61,11 +61,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password.toString())){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
-        }else if(money < charge){
+        }
+        if(money < charge){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
@@ -151,7 +153,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 
         Msg msg = new Msg();
-        if(result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到用户所购买的聘请记录");
         }
@@ -179,7 +181,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuyExample.createCriteria().andIdEqualTo(sid).andBuyerIdEqualTo(uid);
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
         Msg msg = new Msg();
-        if(result.size() ==0 ){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("没找到指定的聘请的导游记录");
             return msg;

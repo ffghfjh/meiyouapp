@@ -25,7 +25,7 @@ public class CommentLikeController {
     @Autowired
     CommentLikeService commentLikeService;
 
-    @ApiOperation(value = "评论点赞接口", notes = "type为0时取消点赞，为1时点赞", httpMethod = "POST")
+    @ApiOperation(value = "评论点赞接口", notes = "uid为我自己的id，不是评论人的id", httpMethod = "POST")
     @PostMapping(value = "/like")
     public Msg like(int uid, int cid, int type) {
         return commentLikeService.like(uid, cid, type);

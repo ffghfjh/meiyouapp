@@ -695,7 +695,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         coordinate.setKey(uid);
         coordinate.setLongitude(longitude);
         coordinate.setLatitude(latitude);
-        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryService(coordinate,radius);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryAppointment(coordinate,radius);
         //判断附近是否有热门约会
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();

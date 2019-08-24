@@ -132,7 +132,7 @@ public class RedisUtil {
     }
 
     /**
-     * 查询附近的club
+     * 查询附近热门约会
      * @param coordinate
      * @param radius
      * @return

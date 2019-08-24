@@ -23,11 +23,15 @@ public class ToolTest {
     public void printTime() {
         String dateStr1 = "2017-03-01 22:33:23";
         Date date1 = DateUtil.parse(dateStr1);
-
         String dateStr2 = "2018-04-01 22:33:15";
         Date date2 = DateUtil.parse(dateStr2);
         String formatBetween = DateUtil.formatBetween(date1, date2, BetweenFormater.Level.SECOND) + "前";
         System.out.println(formatBetween);
+    }
+
+    @Test
+    public void printTime02 () {
+        System.out.println("hzy---当前时间为" + DateUtil.formatDateTime(new Date()));
     }
 
 }

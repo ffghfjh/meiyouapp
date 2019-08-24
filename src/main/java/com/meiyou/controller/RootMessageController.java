@@ -2,6 +2,7 @@ package com.meiyou.controller;
 
 import com.meiyou.pojo.RootMessage;
 import com.meiyou.service.RootMessageService;
+import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Map;
 @Api(value = "系统动态数据控制层", tags = {"系统动态数据控制层"})
 @RestController
 public class RootMessageController {
+
     @Autowired
     private RootMessageService rootMessageService;
 
@@ -41,4 +43,41 @@ public class RootMessageController {
         }
         return map;
     }
+
+    @ApiOperation(value = "添加系统参数", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/saveMessage")
+    public Msg saveMessage(String name, String value) {
+        return rootMessageService.saveMessage(name, value);
+    }
+
+    @ApiOperation(value = "删除系统参数", notes = "mid: 参数主键", httpMethod = "POST")
+    @PostMapping(value = "/removeMessage")
+    public Msg removeMessage(int mid) {
+        return rootMessageService.removeMessage(mid);
+    }
+
+    @ApiOperation(value = "根据主键修改参数或参数值", notes = "mid: 参数主键，name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/updateMessageById")
+    public Msg updateMessageById(int mid, String name, String value){
+        return rootMessageService.updateMessageById(mid, name, value);
+    }
+
+    @ApiOperation(value = "根据参数名修改参数值", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/updateMessageByName")
+    public Msg updateMessageByName(String name, String value){
+        return rootMessageService.updateMessageByName(name, value);
+    }
+
+    @ApiOperation(value = "根据参数名获取参数值", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/getMessageByName")
+    public String getMessageByName(String name) {
+        return rootMessageService.getMessageByName(name);
+    }
+
+    @ApiOperation(value = "拉取所有系统参数", notes = "无参数，直接try out!", httpMethod = "POST")
+    @PostMapping(value = "/listMessage")
+    public Msg listMessage() {
+        return rootMessageService.listMessage();
+    }
+
 }

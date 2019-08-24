@@ -1,5 +1,6 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.CommentLikeMapper;
 import com.meiyou.mapper.CommentMapper;
@@ -103,13 +104,14 @@ public class CommentServiceImpl implements CommentService {
             hashMap.put("sex", user.getSex());
             hashMap.put("birthday", user.getBirthday());
             hashMap.put("content", comment.getContent());
-            hashMap.put("time", comment.getCreateTime());
+            //格式化评论时间
+            hashMap.put("time", DateUtil.formatDateTime(comment.getCreateTime()));
             hashMap.put("likeNum", comment.getLikeNum());
-            //判断我自己是否点赞过这条
-            boolean boolLike = commentLikeService.boolLike(uid, aid);
-            hashMap.put("boolLike", boolLike);
             hashMap.put("aid", aid);
             hashMap.put("cid", comment.getId());
+            //判断我自己是否点赞过这条
+            boolean boolLike = commentLikeService.boolLike(uid, comment.getId());
+            hashMap.put("boolLike", boolLike);
             list.add(hashMap);
         }
         Msg msg = new Msg();

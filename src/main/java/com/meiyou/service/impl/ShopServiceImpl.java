@@ -86,8 +86,13 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
 
             //添加地理位置到缓存
-            String message = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
-            System.out.println(message);
+            Boolean result = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            if (!result) {
+                msg.setCode(505);
+                msg.setMsg("获取地理位置失败");
+                return msg;
+            }
+            System.out.println("获取地理位置成功");
 
             //执行扣钱操作
             User user = new User();

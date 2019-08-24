@@ -1,16 +1,11 @@
 package com.meiyou.utils;
 
-import java.util.List;
-
-
 import com.meiyou.model.Coordinate;
-import redis.clients.jedis.GeoRadiusResponse;
-import redis.clients.jedis.GeoUnit;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.*;
 import redis.clients.jedis.params.GeoRadiusParam;
 import redis.clients.jedis.params.SetParams;
+
+import java.util.List;
 
 public class RedisUtil {
     
@@ -137,15 +132,61 @@ public class RedisUtil {
     }
 
     /**
-     * 查询附近动态
-     * key 经度  维度  范围
-     * return GeoRadiusResponse*/
-    public static List<GeoRadiusResponse> geoQueryClub(Coordinate coordinate, double radius) {
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryAppointment(Coordinate coordinate,double radius) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //200F GeoUnit.KM表示km
+            return jedis.georadius(Constants.GEO_APPOINTMENT,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+    }
+
+    /**
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryClub(Coordinate coordinate,double radius) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             //200F GeoUnit.KM表示km
             return jedis.georadius(Constants.GEO_CLUB,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+    }
+
+    /**
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryShop(Coordinate coordinate,double radius) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //200F GeoUnit.KM表示km
+            return jedis.georadius(Constants.GEO_SHOP,coordinate.getLongitude(),coordinate.getLatitude()
                     ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
         } catch (Exception e) {
             System.out.println(e.getMessage());

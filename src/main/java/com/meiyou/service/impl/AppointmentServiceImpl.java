@@ -6,6 +6,7 @@ import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
@@ -13,6 +14,7 @@ import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     private UserMapper userMapper;
     @Autowired
     private AppointmentUtil appointmentUtil;
+    @Autowired
+    private RootMessageService rootMessageService;
 
     /**
      * @Description: 发布约会
@@ -104,11 +108,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
             coordinate.setKey(appointment.getId().toString());
-            RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
-            return Msg.success();
-        } else {
-            return Msg.fail();
+            Long aLong = RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
+            if (aLong == 1){
+                return Msg.success();
+            }
         }
+        return Msg.fail();
     }
 
     /**
@@ -302,13 +307,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         //获取当前约会订单报名人数
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample1);
         //当前约会订单报名人数为空并且为0，则修改该约会订单状态为1
-        if (appointAsks == null || appointAsks.size() == 0){
+        if (appointAsks == null || appointAsks.size() == 0) {
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id);
             Appointment appointment = new Appointment();
             appointment.setState(1);
             appointment.setUpdateTime(new Date());
-            appointmentMapper.updateByExampleSelective(appointment,appointmentExample);
+            appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
         }
 
 
@@ -329,7 +334,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         int i1 = userMapper.updateByExampleSelective(user1, userExample);
 
         int i2 = i + i1;
-        if (i2 == 2){
+        if (i2 == 2) {
             return Msg.success();
         }
         return Msg.fail();
@@ -425,6 +430,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointAsk1.setAskState(3);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
+                if (i2 != 1){
+                    return Msg.fail();
+                }
 
                 User user1 = new User();
                 UserExample userExample = new UserExample();
@@ -432,6 +440,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 user1.setMoney(balance);
                 user1.setUpdateTime(new Date());
                 i3 = userMapper.updateByExampleSelective(user1, userExample);
+                if (i3 != 1){
+                    return Msg.fail();
+                }
             }
         }
 
@@ -447,19 +458,154 @@ public class AppointmentServiceImpl implements AppointmentService {
      * @Author: JK
      * @Date: 2019/8/23
      */
+    @Transactional
     @Override
     public Msg endAppointment(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAppointIdEqualTo(id)
+                .andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskStateEqualTo(2);
+        AppointAsk appointAsk = new AppointAsk();
+        appointAsk.setAskState(5);
+        appointAsk.setUpdateTime(new Date());
+
+
+        //将报名人员从被选中状态改为取消赴约状态
+        int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+
+        AppointmentExample appointmentExample = new AppointmentExample();
+        appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+        Appointment appointment = new Appointment();
+        appointment.setState(1);
+        appointment.setConfirmId(0);
+        appointment.setUpdateTime(new Date());
+        int i1 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+
+        int i2 = i + i1;
+        if (i2 == 2) {
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
     /**
-     * @Description: 自己重新发布，退还报名金
+     * @Description: 由于发布者自己原因重新发布，退还报名金
      * @Author: JK
      * @Date: 2019/8/23
      */
+    @Transactional
     @Override
     public Msg againRelease(String uid, Integer id, String token) {
-        return null;
+        Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        //获取当前订单状态
+        Integer state = appointment.getState();
+        //如果是有人报名等待选中状态，则退还所有报名者的报名金
+        int i1 = 0;
+        int i2 = 0;
+        if (state == 2) {
+            AppointAskExample appointAskExample = new AppointAskExample();
+            appointAskExample.createCriteria().andAskStateEqualTo(1)
+                    .andAppointIdEqualTo(id);
+
+            List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+            for (AppointAsk appointAsk : appointAsks) {
+                AppointAsk appointAsk1 = new AppointAsk();
+                //获取申请人ID
+                Integer askerId = appointAsk.getAskerId();
+                //根据报名者id查询出他所有信息
+                User user = userMapper.selectByPrimaryKey(askerId);
+                //获取发布者账户余额
+                Float money = user.getMoney();
+                //获取报名金的金额
+                String askMoneyName = "ask_money";
+                int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+                //金额退还后账户余额
+                float balance = money + askMoneyValue;
+
+                User user1 = new User();
+                UserExample userExample = new UserExample();
+                userExample.createCriteria().andIdEqualTo(askerId);
+                user1.setMoney(balance);
+                user1.setUpdateTime(new Date());
+                i1 = userMapper.updateByExampleSelective(user1, userExample);
+                if (i1 != 1){
+                    return Msg.fail();
+                }
+
+                AppointAskExample appointAskExample1 = new AppointAskExample();
+                appointAskExample1.createCriteria().andAskStateEqualTo(1)
+                        .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
+                //退还报名金后，报名者状态从1变成0
+                appointAsk1.setAskState(0);
+                appointAsk1.setUpdateTime(new Date());
+                i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
+                if (i2 != 1){
+                    return Msg.fail();
+                }
+            }
+            AppointmentExample appointmentExample = new AppointmentExample();
+            appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(2);
+            appointment.setState(1);
+            appointment.setUpdateTime(new Date());
+            int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+            int i = i1 + i2 + i3;
+            if (i == 3) {
+                return Msg.success();
+            }
+        }
+
+        if (state == 3) {
+            Integer confirmId = appointment.getConfirmId();
+            //根据报名者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(confirmId);
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取报名金的金额
+            String askMoneyName = "ask_money";
+            int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+            //金额退还后账户余额
+            float balance = money + askMoneyValue;
+
+            User user1 = new User();
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(confirmId);
+            user1.setMoney(balance);
+            user1.setUpdateTime(new Date());
+            //修改金额
+            i1 = userMapper.updateByExampleSelective(user1, userExample);
+
+
+            AppointAskExample appointAskExample = new AppointAskExample();
+            appointAskExample.createCriteria().andAskStateEqualTo(2)
+                    .andAppointIdEqualTo(id);
+            AppointAsk appointAsk = new AppointAsk();
+            //退还报名金后，报名者状态从2变成0
+            appointAsk.setAskState(0);
+            appointAsk.setUpdateTime(new Date());
+            i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+
+            AppointmentExample appointmentExample = new AppointmentExample();
+            appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+            appointment.setState(1);
+            appointment.setUpdateTime(new Date());
+            int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+
+            int i = i1 + i2 + i3;
+            if (i == 3) {
+                return Msg.success();
+            }
+        }
+            return Msg.fail();
     }
 
     /**
@@ -467,9 +613,36 @@ public class AppointmentServiceImpl implements AppointmentService {
      * @Author: JK
      * @Date: 2019/8/23
      */
+    @Transactional
     @Override
     public Msg confirmAppointment(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskStateEqualTo(2)
+                .andAppointIdEqualTo(id);
+        AppointAsk appointAsk = new AppointAsk();
+        appointAsk.setAskState(6);
+        appointAsk.setUpdateTime(new Date());
+        //更改报名者状态为6，确认赴约
+        int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+
+        AppointmentExample appointmentExample = new AppointmentExample();
+        appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+        Appointment appointment = new Appointment();
+        appointment.setState(4);
+        appointment.setUpdateTime(new Date());
+        //更改发布者状态为4，报名者确定赴约
+        int i1 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+
+        int i2 = i + i1;
+        if (i2 == 2){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
     /**
@@ -477,8 +650,80 @@ public class AppointmentServiceImpl implements AppointmentService {
      * @Author: JK
      * @Date: 2019/8/23
      */
+    @Transactional
     @Override
     public Msg confirmArrive(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        AppointmentExample appointmentExample = new AppointmentExample();
+        appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+        Appointment appointment = new Appointment();
+        appointment.setState(5);
+        appointment.setUpdateTime(new Date());
+        //更改发布者状态为5，报名者已到达，订单完成
+        int i = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+
+    /**
+    * @Description: 查看热门约会
+    * @Author: JK
+    * @Date: 2019/8/24
+    */
+    @Override
+    public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            Msg noLogin = Msg.noLogin();
+            msg.add("noLogin", noLogin);
+            return msg;
+        }
+
+        //范围半径
+        String range = rootMessageService.getMessageByName("range");
+        double radius = Double.parseDouble(range);
+        //从Redis获取附近的所有用户的动态
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(uid);
+        coordinate.setLongitude(longitude);
+        coordinate.setLatitude(latitude);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryService(coordinate,radius);
+        //判断附近是否有热门约会
+        if (responseList == null || responseList.size() == 0) {
+            return Msg.fail();
+        }
+
+        for (GeoRadiusResponse response : responseList) {
+            //获取缓存中的key
+            String memberByString = response.getMemberByString();
+            if (memberByString != null){
+                return Msg.fail();
+            }
+            //距离我多远
+            Double dis = response.getDistance();
+            String distance = "0.00";
+            if (dis != null) {
+                distance = Double.toString(dis);
+            }
+            //设置缓存中key的初始值
+            int primaryKey = 0;
+
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(primaryKey);
+            Integer state = appointment.getState();
+            if (state == 1 || state == 2){
+                msg.add("appointment",appointment);
+            }
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
     }
 }

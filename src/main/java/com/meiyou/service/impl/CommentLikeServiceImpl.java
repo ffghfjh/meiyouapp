@@ -1,6 +1,7 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.CommentLikeMapper;
+import com.meiyou.mapper.CommentMapper;
 import com.meiyou.pojo.Comment;
 import com.meiyou.pojo.CommentLike;
 import com.meiyou.pojo.CommentLikeExample;
@@ -25,6 +26,9 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     @Autowired
     CommentLikeMapper commentLikeMapper;
 
+    @Autowired
+    CommentMapper commentMapper;
+
 
     @Override
     public Msg like(int uid, int cid, int type) {
@@ -44,6 +48,15 @@ public class CommentLikeServiceImpl implements CommentLikeService {
             CommentLikeExample.Criteria criteria1 = example.createCriteria();
             criteria1.andCommentIdEqualTo(cid);
             int count = commentLikeMapper.countByExample(example);
+            //更新评论表的点赞数
+            Comment comment = new Comment();
+            comment.setId(cid);
+            comment.setLikeNum(count);
+            comment.setUpdateTime(new Date());
+            int i1 = commentMapper.updateByPrimaryKeySelective(comment);
+            if (i1 == 0) {
+                return Msg.fail();
+            }
             msg.setCode(100);
             msg.setMsg("取消点赞成功");
             msg.add("likeNum", count);
@@ -64,6 +77,15 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         CommentLikeExample.Criteria criteria = example.createCriteria();
         criteria.andCommentIdEqualTo(cid);
         int count = commentLikeMapper.countByExample(example);
+        //更新评论表点赞数
+        Comment comment = new Comment();
+        comment.setId(cid);
+        comment.setLikeNum(count);
+        comment.setUpdateTime(new Date());
+        int i1 = commentMapper.updateByPrimaryKeySelective(comment);
+        if (i1 == 0) {
+            return Msg.fail();
+        }
         msg.setCode(100);
         msg.setMsg("点赞评论成功");
         msg.add("likeNum", count);

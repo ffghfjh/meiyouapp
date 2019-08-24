@@ -68,7 +68,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         msg.setMsg("点赞评论成功");
         msg.add("likeNum", count);
         //判断我自己是否点赞过这条评论
-        return null;
+        return msg;
     }
 
     @Override

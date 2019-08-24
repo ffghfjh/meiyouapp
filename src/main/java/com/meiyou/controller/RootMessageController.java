@@ -32,7 +32,7 @@ public class RootMessageController {
     * @Date: 2019/8/22
     */
     @ApiOperation(value = "获取诚意金", notes = "获取诚意金", httpMethod = "POST")
-    @PostMapping(value = "/selectRootMessage")
+    @GetMapping(value = "/selectRootMessage")
     public Map<String,Object> selectRootMessage(){
         HashMap<String, Object> map = new HashMap<>();
         List<RootMessage> list = rootMessageService.select();

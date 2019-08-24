@@ -5,13 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.meiyou.config.AliMQConfig;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.mapper.VideoChatMapper;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
-import com.meiyou.utils.ConnectionOptionWrapper;
-import com.meiyou.utils.Constants;
-import com.meiyou.utils.MqttConstants;
-import com.meiyou.utils.MqttMessageFactory;
+import com.meiyou.pojo.VideoChat;
+import com.meiyou.service.AliyunVideoService;
+import com.meiyou.utils.*;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -40,6 +43,10 @@ public class MqttComsumer {
     RootMessageMapper rootMessageMapper;
     @Autowired
     AliMQConfig aliMQConfig;
+    @Autowired
+    AliyunVideoService aliyunVideoService;
+    @Autowired
+    VideoChatMapper videoChatMapper;
 
     /**
             * MQ4IOT 实例 ID，购买后控制台获取
@@ -159,6 +166,49 @@ public class MqttComsumer {
                         }
                         return;
                     }
+                    //通话同意
+                    if(mqttMessage.getMsgType()==MqttConstants.RECEIVE){
+                        String channelId = UUID.randomUUID().toString();
+                        Msg authMsg = aliyunVideoService.createChannel(Constants.VIDEOAPPID,channelId);
+                        ChannelAuth auth = (ChannelAuth) authMsg.getExtend().get("auth");
+                        if(authMsg.getCode()==100){
+                             VideoChat videoChat = new VideoChat();
+                             videoChat.setChannelId(channelId);
+                             videoChat.setReceiverAccount(mqttMessage.getSender());
+                             videoChat.setSenderAccount(mqttMessage.getReceiver());
+                             videoChat.setState(0);
+                             Date date = new Date();
+                             videoChat.setGreateTime(date);
+                             videoChat.setUpdateTime(date);
+                             if(videoChatMapper.insertSelective(videoChat)==1){  //写入通话记录成功
+                                 //接受方token
+                                 String token = aliyunVideoService.createToken(auth.getAppID(),mqttMessage.getSender(),auth.getChannelID(),auth.getChannelKey(),auth.getNonce(),auth.getTimestamp());
+                                 AliRtcAuthInfo info = new AliRtcAuthInfo();
+                                 info.setAppid(auth.getAppID());
+                                 info.setConferenceId(auth.getChannelID());
+                                 info.setToken(token);
+                                 info.setNonce(auth.getNonce());
+                                 info.setTimestamp(auth.getTimestamp());
+                                 info.setUserId(mqttMessage.getSender());
+                                 info.setGslb(Constants.GSLB);
+                                 //呼叫方
+                                 String token1 = aliyunVideoService.createToken(auth.getAppID(),mqttMessage.getReceiver(),auth.getChannelID(),auth.getChannelKey(),auth.getNonce(),auth.getTimestamp());
+                                 AliRtcAuthInfo info1 = new AliRtcAuthInfo();
+                                 info1.setAppid(auth.getAppID());
+                                 info1.setConferenceId(auth.getChannelID());
+                                 info1.setToken(token1);
+                                 info1.setNonce(auth.getNonce());
+                                 info1.setTimestamp(auth.getTimestamp());
+                                 info1.setUserId(mqttMessage.getSender());
+                                 info1.setGslb(Constants.GSLB);
+
+                                 //通知加入会话
+                                 aliMQConfig.getProducter().sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.JOIN,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getSender(),info);
+                                 aliMQConfig.getProducter().sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.JOIN,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getReceiver(),info1);
+
+                             }
+                        }
+                    }
                 }
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
@@ -217,7 +267,7 @@ public class MqttComsumer {
      * @param topic
      * @param info
      */
-    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
+    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic,AliRtcAuthInfo info){
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());

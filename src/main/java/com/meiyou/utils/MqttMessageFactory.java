@@ -1,6 +1,7 @@
 package com.meiyou.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.model.MqttMessageModel;
 
 /**
@@ -15,7 +16,7 @@ public class MqttMessageFactory {
     JSONObject jsonObject = new JSONObject();
 
 
-     public MqttMessageFactory(int chatType, int msgType, String sender, String receiver, MqttMessageModel.AliRtcAuthInfo authInfo){
+     public MqttMessageFactory(int chatType, int msgType, String sender, String receiver, AliRtcAuthInfo authInfo){
          setChatType(chatType);
          setMessType(msgType);
          setSender(sender);
@@ -66,7 +67,7 @@ public class MqttMessageFactory {
      *
      * @param info
      */
-    public void setAuthInfo(MqttMessageModel.AliRtcAuthInfo info){
+    public void setAuthInfo(AliRtcAuthInfo info){
         if(info!=null){
             JSONObject authinfo = new JSONObject();
             authinfo.put("mConferenceId",info.getConferenceId());//会议id

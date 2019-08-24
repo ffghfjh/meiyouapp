@@ -53,7 +53,7 @@ public class AppointmentController {
         //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
         for (MultipartFile file : files) {
-            Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
+            Msg msg = FileUploadUtil.uploadUtil(file, "appointment", request);
             if (msg.getCode() == 100) {
                 array.add(msg.getExtend().get("path"));
             }
@@ -131,16 +131,26 @@ public class AppointmentController {
         return appointmentService.startEnrollment(uid, password, id, token);
     }
 
-
+    /**
+     * @Description: 取消报名, 退还美金
+     * @Author: JK
+     * @Date: 2019/8/23
+     */
+    @ApiOperation(value = "取消报名", notes = "取消报名, 退还美金", httpMethod = "POST")
+    @PostMapping(value = "/endEnrollment")
+    public Msg endEnrollment(String uid, Integer id, String token){
+        return appointmentService.endEnrollment(uid,id,token);
+    }
 
     /**
-     * @Description: 从所有报名某个约会的人员信息中选择一个进行确认
+     * @Description: 从所有报名某个约会的人员信息中选择一个进行确认，
+     *               没有被选中的人退还报名金
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @ApiOperation(value = "从所有报名某个约会的人员信息中选择一个进行确认", notes = "从所有报名某个约会的人员信息中选择一个进行确认", httpMethod = "POST")
+    @ApiOperation(value = "确定约会人选", notes = "从所有报名某个约会的人员信息中选择一个进行确认，没有被选中的人退还报名金", httpMethod = "POST")
     @PostMapping(value = "/confirmUserId")
-    public Msg confirmUserId(Integer askerId, Integer appointId) {
-        return appointmentService.confirmUserId(askerId, appointId);
+    public Msg confirmUserId(String uid,Integer askerId,Integer appointId,String token) {
+        return appointmentService.confirmUserId(uid,askerId, appointId,token);
     }
 }

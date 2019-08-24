@@ -106,12 +106,15 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //获取每小时收费和聘请时间
         Integer projectPrice = shopMapper.selectByPrimaryKey(sid).getCharge();
-        Integer time = shopBuyMapper.selectByPrimaryKey(sid).getTime();
+
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
+        Integer time = shopBuyMapper.selectByExample(example).get(0).getTime();
         Integer money = time * projectPrice;
 
-        //修改聘用表状态-->取消状态-1
+        //修改聘用表状态-->取消状态-2
         ShopBuy shopBuy = new ShopBuy();
-        shopBuy.setState(1);
+        shopBuy.setState(2);
         shopBuy.setUpdateTime(new Date());
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
@@ -153,7 +156,6 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             msg.setMsg("找不到用户所购买的聘请记录");
         }
 
-        //Todo 人数
         msg.add("shopBuy",result);
         msg.setMsg("成功");
         msg.setCode(100);

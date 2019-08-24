@@ -132,17 +132,18 @@ public class RedisUtil {
     }
 
     /**
-     * 查询附近热门约会
-     * key 经度  维度  范围
-     * return GeoRadiusResponse
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
      */
-    public static List<GeoRadiusResponse> geoQueryService(Coordinate coordinate,double radius) {
+    public static List<GeoRadiusResponse> geoQueryAppointment(Coordinate coordinate,double radius) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             //200F GeoUnit.KM表示km
-            return jedis.georadius(Constants.GEO_APPOINTMENT,coordinate.getLongitude(),coordinate.getLatitude(),
-                    radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+            return jedis.georadius(Constants.GEO_APPOINTMENT,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -152,6 +153,49 @@ public class RedisUtil {
         }
     }
 
+    /**
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryClub(Coordinate coordinate,double radius) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //200F GeoUnit.KM表示km
+            return jedis.georadius(Constants.GEO_CLUB,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+    }
+
+    /**
+     * 查询附近的club
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryShop(Coordinate coordinate,double radius) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //200F GeoUnit.KM表示km
+            return jedis.georadius(Constants.GEO_SHOP,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+    }
 
     /**
      * 支付宝登录token设置、未绑定手机验证

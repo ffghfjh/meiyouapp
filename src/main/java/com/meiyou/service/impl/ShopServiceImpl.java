@@ -1,11 +1,11 @@
 package com.meiyou.service.impl;
 
+import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
-import com.meiyou.pojo.Shop;
-import com.meiyou.pojo.ShopExample;
-import com.meiyou.pojo.User;
-import com.meiyou.pojo.UserExample;
+import com.meiyou.model.ShopVO;
+import com.meiyou.pojo.*;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
@@ -13,6 +13,7 @@ import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
     @Autowired
     ShopMapper shopMapper;
+
+    @Autowired
+    ShopBuyMapper shopBuyMapper;
 
     /**
      * 发布
@@ -82,8 +86,13 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
 
             //添加地理位置到缓存
-            String message = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
-            System.out.println(message);
+            Boolean result = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            if (!result) {
+                msg.setCode(505);
+                msg.setMsg("获取地理位置失败");
+                return msg;
+            }
+            System.out.println("获取地理位置成功");
 
             //执行扣钱操作
             User user = new User();
@@ -149,8 +158,14 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             return msg;
         }
 
-        //Todo 人数
-        msg.add("shop",result);
+        //添加人数到VO类中
+        ArrayList<ShopVO> shopVOS = new ArrayList<>();
+        for(Shop shop : result){
+            //把每一个重新赋值的shopVOS类加到新的集合中
+            shopVOS.add(setShopToShopVO(shop));
+        }
+
+        msg.add("shopVOS",shopVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;
@@ -174,12 +189,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         List<Shop> result = shopMapper.selectByExample(shopExample);
         if(result.size() == 0){
             msg.setCode(404);
-            msg.setMsg("没有找到指定的经典商家");
+            msg.setMsg("没有找到指定的Shop");
             return msg;
         }
 
-        //Todo 人数
-        msg.add("shop",result.get(0));
+        //把购买数量重新赋值给shopVO类
+        ShopVO shopVO = setShopToShopVO(result.get(0));
+
+        //返回带有人数参数的ShopVO对象
+        msg.add("shopVO",shopVO);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;
@@ -188,5 +206,34 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     public Msg selectShop(float longitude, float latitude) {
         return null;
+    }
+
+    /**
+     * 把Shop对象中的值转移到ShopVO对象中
+     * @param Shop
+     * @return
+     */
+    public ShopVO setShopToShopVO(Shop Shop){
+
+        //查找报名每个会所的人数
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(Shop.getId());
+        Integer nums = shopBuyMapper.selectByExample(example).size();
+
+        ShopVO shopVO = new ShopVO();
+        shopVO.setNums(nums);
+        shopVO.setId(Shop.getId());
+        shopVO.setCreateTime(Shop.getCreateTime());
+        shopVO.setUpdateTime(Shop.getUpdateTime());
+        shopVO.setPublishId(Shop.getPublishId());
+        shopVO.setImgsUrl(Shop.getImgsUrl());
+        shopVO.setOutTime(Shop.getOutTime());
+        shopVO.setState(Shop.getState());
+        shopVO.setServiceArea(Shop.getServiceArea());
+        shopVO.setCharge(Shop.getCharge());
+        shopVO.setTravelTime(Shop.getTravelTime());
+        shopVO.setBoolClose(Shop.getBoolClose());
+
+        return shopVO;
     }
 }

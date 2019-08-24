@@ -59,16 +59,19 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password.toString())){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
-        }else if(money < price){
+        }
+        if(money < price){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
         }else {
             clubBuyMapper.insertSelective(clubBuy);
+            System.out.println(clubBuy.getId());
 
             //计算剩余金额
             User user = new User();

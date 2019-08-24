@@ -152,7 +152,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andPublishIdEqualTo(uid);
         List<Shop> result = shopMapper.selectByExample(shopExample);
-        if(result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("没有找到指定对象的Shop");
             return msg;
@@ -187,7 +187,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);
         List<Shop> result = shopMapper.selectByExample(shopExample);
-        if(result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("没有找到指定的Shop");
             return msg;

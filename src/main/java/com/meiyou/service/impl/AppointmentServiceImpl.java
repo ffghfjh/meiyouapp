@@ -6,6 +6,7 @@ import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
@@ -13,6 +14,7 @@ import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     private UserMapper userMapper;
     @Autowired
     private AppointmentUtil appointmentUtil;
+    @Autowired
+    private RootMessageService rootMessageService;
 
     /**
      * @Description: 发布约会
@@ -104,11 +108,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
             coordinate.setKey(appointment.getId().toString());
-            RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
-            return Msg.success();
-        } else {
-            return Msg.fail();
+            Long aLong = RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
+            if (aLong == 1){
+                return Msg.success();
+            }
         }
+        return Msg.fail();
     }
 
     /**
@@ -664,5 +669,61 @@ public class AppointmentServiceImpl implements AppointmentService {
             return Msg.success();
         }
         return Msg.fail();
+    }
+
+    /**
+    * @Description: 查看热门约会
+    * @Author: JK
+    * @Date: 2019/8/24
+    */
+    @Override
+    public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            Msg noLogin = Msg.noLogin();
+            msg.add("noLogin", noLogin);
+            return msg;
+        }
+
+        //范围半径
+        String range = rootMessageService.getMessageByName("range");
+        double radius = Double.parseDouble(range);
+        //从Redis获取附近的所有用户的动态
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(uid);
+        coordinate.setLongitude(longitude);
+        coordinate.setLatitude(latitude);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryService(coordinate,radius);
+        //判断附近是否有热门约会
+        if (responseList == null || responseList.size() == 0) {
+            return Msg.fail();
+        }
+
+        for (GeoRadiusResponse response : responseList) {
+            //获取缓存中的key
+            String memberByString = response.getMemberByString();
+            if (memberByString != null){
+                return Msg.fail();
+            }
+            //距离我多远
+            Double dis = response.getDistance();
+            String distance = "0.00";
+            if (dis != null) {
+                distance = Double.toString(dis);
+            }
+            //设置缓存中key的初始值
+            int primaryKey = 0;
+
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(primaryKey);
+            Integer state = appointment.getState();
+            if (state == 1 || state == 2){
+                msg.add("appointment",appointment);
+            }
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
     }
 }

@@ -141,6 +141,7 @@ public class MqttComsumer {
                     //解析消息
                     MqttMessageModel mqttMessage = JSON.parseObject(msg,MqttMessageModel.class);
                     System.out.println(mqttMessage.getReceiver());
+                    //来电
                     if(mqttMessage.getMsgType()== MqttConstants.CALL){
                         String sender = mqttMessage.getSender();//发送者
                         //检测余额
@@ -156,6 +157,7 @@ public class MqttComsumer {
                             //mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
                             aliMQConfig.getProducter().sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.CALL,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getReceiver(),null);
                         }
+                        return;
                     }
                 }
                 @Override

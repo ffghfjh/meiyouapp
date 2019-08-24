@@ -2,7 +2,6 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
-import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
@@ -11,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -111,7 +108,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
-        clubBuy.setState(1);
+        clubBuy.setState(2);
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
@@ -155,11 +152,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             return msg;
         }
 
-        //Todo 人数
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("clubBuy",result);
-
-        msg.setExtend(map);
+        msg.add("clubBuy",result);
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;

@@ -69,14 +69,14 @@ public class ShopController {
     }
 
     @GetMapping("/get")
-    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "查找")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "返回为ClubVO类,nums为报名人数")
     public Msg getClubByUid(@RequestParam("uid") Integer uid,
                             @RequestParam("token") String token){
         return shopService.selectByUid(uid,token);
     }
 
     @GetMapping("/find")
-    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "查找")
+    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("sid") Integer sid){

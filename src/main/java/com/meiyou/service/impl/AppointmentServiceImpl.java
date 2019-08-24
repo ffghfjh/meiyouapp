@@ -695,7 +695,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         coordinate.setKey(uid);
         coordinate.setLongitude(longitude);
         coordinate.setLatitude(latitude);
-        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryService(coordinate,radius);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryAppointment(coordinate,radius);
         //判断附近是否有热门约会
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
@@ -704,26 +704,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
-            if (memberByString != null){
+            if (memberByString == null){
                 return Msg.fail();
             }
-            //距离我多远
-            Double dis = response.getDistance();
-            String distance = "0.00";
-            if (dis != null) {
-                distance = Double.toString(dis);
-            }
-            //设置缓存中key的初始值
-            int primaryKey = 0;
-
-            Appointment appointment = appointmentMapper.selectByPrimaryKey(primaryKey);
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
+            appointment.getId();
+            appointment.getReward();
             Integer state = appointment.getState();
             if (state == 1 || state == 2){
+                msg.setCode(100);
+                msg.setMsg("获取附近热门约会成功");
                 msg.add("appointment",appointment);
             }
+            return msg;
         }
         Msg fail = Msg.fail();
         msg.add("fail",fail);
         return msg;
     }
+
 }

@@ -49,7 +49,6 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
             ActivityLikeExample.Criteria criteria1 = example01.createCriteria();
             criteria1.andActivityIdEqualTo(aid);
             int count = activityLikeMapper.countByExample(example01);
-            //在activity表中点赞数减1
             Activity activity = activityMapper.selectByPrimaryKey(aid);
             Activity activity1 = new Activity();
             activity1.setId(aid);

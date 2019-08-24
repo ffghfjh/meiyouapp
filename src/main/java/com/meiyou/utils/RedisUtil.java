@@ -137,7 +137,7 @@ public class RedisUtil {
      * @param radius
      * @return
      */
-    public static List<GeoRadiusResponse> geoQueryService(Coordinate coordinate,double radius) {
+    public static List<GeoRadiusResponse> geoQueryAppointment(Coordinate coordinate,double radius) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();

@@ -704,26 +704,24 @@ public class AppointmentServiceImpl implements AppointmentService {
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
-            if (memberByString != null){
+            if (memberByString == null){
                 return Msg.fail();
             }
-            //距离我多远
-            Double dis = response.getDistance();
-            String distance = "0.00";
-            if (dis != null) {
-                distance = Double.toString(dis);
-            }
-            //设置缓存中key的初始值
-            int primaryKey = 0;
-
-            Appointment appointment = appointmentMapper.selectByPrimaryKey(primaryKey);
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
+            appointment.getId();
+            appointment.getReward();
             Integer state = appointment.getState();
             if (state == 1 || state == 2){
+                Msg success = Msg.success();
+                msg.add("success",success);
                 msg.add("appointment",appointment);
+
             }
+            return msg;
         }
         Msg fail = Msg.fail();
         msg.add("fail",fail);
         return msg;
     }
+
 }

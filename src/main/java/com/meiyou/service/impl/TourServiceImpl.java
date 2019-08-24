@@ -109,8 +109,7 @@ public class TourServiceImpl implements TourService {
             if (aLong == 1){
                 return Msg.success();
             }
-        }else {
-            return Msg.fail();
         }
+            return Msg.fail();
     }
 }

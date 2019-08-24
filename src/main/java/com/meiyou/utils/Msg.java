@@ -1,5 +1,6 @@
 package com.meiyou.utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import java.util.Map;
  * 通用的返回类
  *
  */
-public class Msg {
+public class Msg implements Serializable {
 	
 	@Override
 	public String toString() {

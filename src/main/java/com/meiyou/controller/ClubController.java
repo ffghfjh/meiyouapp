@@ -2,6 +2,7 @@ package com.meiyou.controller;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.Club;
 import com.meiyou.service.ClubService;
 import com.meiyou.utils.FileUploadUtil;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @description: 推拿会所控制器
@@ -78,7 +80,17 @@ public class ClubController {
     @ApiOperation(value = "通过用户id查找指定用户id的全部推拿会所",notes = "返回为ClubVO类,nums为报名人数")
     public Msg getClubByUid(@RequestParam("uid") Integer uid,
                             @RequestParam("token") String token){
-        return clubService.selectByUid(uid, token);
+        Msg msg = new Msg();
+        List<ClubVO> result = clubService.selectByUid(uid, token);
+        if(result.isEmpty()){
+            msg.setCode(404);
+            msg.setMsg("没找到对应的");
+            return msg;
+        }
+        msg.add("clubVO",result);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
     }
 
     @GetMapping("/find")

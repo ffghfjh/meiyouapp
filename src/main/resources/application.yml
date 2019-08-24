@@ -48,10 +48,10 @@ spring:
   #Redis缓存名
   cache:
     cache-names: MeiyouCache
-  rabbitmq:
-    addresses: 192.168.0.130
-    username: guest
-    password: guest
+#  rabbitmq:
+#    addresses: 192.168.0.130
+#    username: guest
+#    password: guest
 
 mybatis:
   config-location: classpath:mybatis-config.xml

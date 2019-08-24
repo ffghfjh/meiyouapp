@@ -2,7 +2,6 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
-import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;

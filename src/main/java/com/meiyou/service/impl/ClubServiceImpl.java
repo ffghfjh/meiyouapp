@@ -19,7 +19,6 @@ import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -154,8 +153,8 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    @Cacheable()
-    public Msg selectByUid(Integer uid,String token) {
+    @Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
+    public List<ClubVO> selectByUid(Integer uid,String token) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -165,22 +164,18 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubExample clubExample = new ClubExample();
         clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
+
+        List<ClubVO> clubVOS = new ArrayList<>();
+
         if(result == null){
-            msg.setMsg("没有找到对应的Club");
-            msg.setCode(404);
-            return msg;
+            return clubVOS;
         }
 
-        ArrayList<ClubVO> clubVOS = new ArrayList<>();
         for(Club club : result){
             //把每一个重新赋值的clubVO类加到新的集合中
             clubVOS.add(setClubToClubVO(club));
         }
-
-        msg.add("clubVO",clubVOS);
-        msg.setCode(100);
-        msg.setMsg("成功");
-        return msg;
+        return clubVOS;
     }
 
     /**
@@ -259,8 +254,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
             ClubVO clubVO = new ClubVO();
             clubVO.setId(club.getId());
-            clubVO.setCreateTime(club.getCreateTime());
-            clubVO.setUpdateTime(club.getUpdateTime());
             clubVO.setPublishId(club.getPublishId());
             clubVO.setImgsUrl(club.getImgsUrl());
             clubVO.setProjectName(club.getProjectName());
@@ -268,7 +261,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             clubVO.setProjectAddress(club.getProjectAddress());
             clubVO.setProjectPrice(club.getProjectPrice());
             clubVO.setMarketPrice(club.getMarketPrice());
-            clubVO.setOutTime(club.getOutTime());
             clubVO.setState(club.getState());
             clubVO.setDistance(dis);
 
@@ -299,8 +291,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubVO clubVO = new ClubVO();
         clubVO.setNums(nums);
         clubVO.setId(club.getId());
-        clubVO.setCreateTime(club.getCreateTime());
-        clubVO.setUpdateTime(club.getUpdateTime());
         clubVO.setPublishId(club.getPublishId());
         clubVO.setImgsUrl(club.getImgsUrl());
         clubVO.setProjectName(club.getProjectName());
@@ -308,7 +298,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         clubVO.setProjectAddress(club.getProjectAddress());
         clubVO.setProjectPrice(club.getProjectPrice());
         clubVO.setMarketPrice(club.getMarketPrice());
-        clubVO.setOutTime(club.getOutTime());
         clubVO.setState(club.getState());
 
         return clubVO;

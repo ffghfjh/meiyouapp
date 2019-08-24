@@ -23,6 +23,7 @@ public class ShopVO implements Serializable {
     private Integer nums;
     //查附近的club的时候需要用到的 距离
     private Double distance;
+    private String header;
 
     @Override
     public String toString() {

@@ -4,6 +4,7 @@ import com.meiyou.service.CommentLikeService;
 import com.meiyou.service.CommentService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ public class CommentLikeController {
     @Autowired
     CommentLikeService commentLikeService;
 
+    @ApiOperation(value = "评论点赞接口", notes = "type为0时取消点赞，为1时点赞", httpMethod = "POST")
     @PostMapping(value = "/like")
     public Msg like(int uid, int cid, int type) {
         return commentLikeService.like(uid, cid, type);

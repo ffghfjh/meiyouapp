@@ -165,9 +165,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         if (appointments != null && appointments.size() != 0) {
-            Msg success = Msg.success();
             msg.add("arrayList", arrayList);
-            msg.add("success", success);
+            msg.setCode(100);
+            msg.setMsg("约会对象和报名人数返回成功");
             return msg;
         }
         Msg fail = Msg.fail();
@@ -360,9 +360,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(example);
 
         if (appointAsks != null && appointAsks.size() != 0) {
-            Msg success = Msg.success();
             msg.add("appointAsks", appointAsks);
-            msg.add("success", success);
+            msg.setCode(100);
+            msg.setMsg("约会报名对象返回成功");
             return msg;
         }
         Msg fail = Msg.fail();

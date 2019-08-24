@@ -34,8 +34,8 @@ public class CommentController {
      */
     @ApiOperation(value = "发布评论", notes = "aid为动态id, uid为发布人id", httpMethod = "POST")
     @PostMapping("/postComment")
-    public Msg postComment(int aid, int uid, String content) {
-        return commentService.postComment(aid, uid, content);
+    public Msg postComment(int uid, int aid, String content) {
+        return commentService.postComment(uid, aid, content);
     }
 
     @ApiOperation(value = "拉取所有评论", notes = "uid为用户id, aid为动态id", httpMethod = "POST")

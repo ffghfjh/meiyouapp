@@ -710,11 +710,13 @@ public class AppointmentServiceImpl implements AppointmentService {
             Appointment appointment = appointmentMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
             appointment.getId();
             appointment.getReward();
+            ArrayList<Appointment> list = new ArrayList<>();
             Integer state = appointment.getState();
             if (state == 1 || state == 2){
                 msg.setCode(100);
                 msg.setMsg("获取附近热门约会成功");
-                msg.add("appointment",appointment);
+                list.add(appointment);
+                msg.add("list",list);
             }
             return msg;
         }

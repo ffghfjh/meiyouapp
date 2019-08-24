@@ -112,4 +112,59 @@ public class TourServiceImpl implements TourService {
         }
             return Msg.fail();
     }
+
+    @Override
+    public Msg selectTourList(String uid, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg deletePublish(Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg startEnrollment(String uid, String password, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg endEnrollment(String uid, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg selectTourAskList(String uid, Integer appointId, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg confirmUserId(String uid, Integer askerId, Integer appointId, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg endTour(String uid, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg againRelease(String uid, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg confirmTour(String uid, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg confirmArrive(String uid, Integer id, String token) {
+        return null;
+    }
+
+    @Override
+    public Msg selectHotTour(String uid, String token, double latitude, double longitude) {
+        return null;
+    }
 }

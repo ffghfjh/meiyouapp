@@ -16,7 +16,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @program: meiyouapp
@@ -43,16 +42,6 @@ public class RootMessageServiceImpl implements RootMessageService {
         List<RootMessage> list = rootMessageMapper.selectByExample(rootMessageExample);
         return list;
     }
-
-    /**
-     * @author ：huangzhaoyang
-     * @date ：Created in 2019/8/22 16:47
-     * @description：系统参数服务实现层
-     * @modified By：huangzhaoyang
-     * @version: 1.0.0
-     */
-
-
 
     @Override
     public Msg saveMessage(String name, String value) {

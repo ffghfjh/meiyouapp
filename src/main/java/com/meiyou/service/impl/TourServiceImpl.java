@@ -98,14 +98,14 @@ public class TourServiceImpl implements TourService {
         //更新用户账户余额
         userMapper.updateByExample(user,userExample);
 
-        //获取发布时定位
-        Coordinate coordinate = new Coordinate();
-        coordinate.setLatitude(latitude);
-        coordinate.setLongitude(longitude);
-        RedisUtil.addReo(coordinate, Constants.GEO_TOUR);
-
         int i = tourMapper.insertSelective(tour);
         if (i == 1){
+            //获取发布时定位
+            Coordinate coordinate = new Coordinate();
+            coordinate.setLatitude(latitude);
+            coordinate.setLongitude(longitude);
+            coordinate.setKey(tour.getId().toString());
+            RedisUtil.addReo(coordinate, Constants.GEO_TOUR);
             return Msg.success();
         }else {
             return Msg.fail();

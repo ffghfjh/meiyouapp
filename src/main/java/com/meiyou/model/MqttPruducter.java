@@ -176,7 +176,7 @@ public class MqttPruducter {
      * @param info
      */
     public void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
-        System.out.println("消费者发送消息");
+        System.out.println("生产者发送消息");
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());

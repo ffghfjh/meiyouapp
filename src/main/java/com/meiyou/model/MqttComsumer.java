@@ -131,6 +131,7 @@ public class MqttComsumer {
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     System.out.println("收到mqtt消息");
                     String msg = message.getPayload().toString();
+                    System.out.println(msg);
                     //解析消息
                     MqttMessageModel mqttMessage = JSON.parseObject(msg,MqttMessageModel.class);
                     System.out.println(mqttMessage.getReceiver());
@@ -207,7 +208,7 @@ public class MqttComsumer {
      * @param topic
      * @param info
      */
-    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, AliRtcAuthInfo info){
+    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());

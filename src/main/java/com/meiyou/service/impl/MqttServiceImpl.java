@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
-import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.model.MqttMessageModel;
-import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
@@ -15,11 +13,9 @@ import com.meiyou.utils.ConnectionOptionWrapper;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.MqttConstants;
 import com.meiyou.utils.MqttMessageFactory;
-import org.apache.tomcat.util.bcel.Const;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -196,7 +192,7 @@ public class MqttServiceImpl implements MqttService {
     }
 
 
-    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, AliRtcAuthInfo info){
+    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());

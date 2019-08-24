@@ -1,6 +1,7 @@
 package com.meiyou.config;
 
 import com.meiyou.model.MqttComsumer;
+import com.meiyou.model.MqttPruducter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,11 @@ public class AliMQConfig {
     public String onsAddr;
 
     @Bean(initMethod = "start", destroyMethod = "destroy")
-    public MqttComsumer getProducer() {
+    public MqttComsumer getComsumer() {
         return new MqttComsumer();
+    }
+    @Bean(initMethod = "start", destroyMethod = "destroy")
+    public MqttPruducter getProducter(){
+        return new MqttPruducter();
     }
 }

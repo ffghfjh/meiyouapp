@@ -78,7 +78,7 @@ public class MqttPruducter {
 
     @PostConstruct
     public void start(){
-        System.out.println("消费者启动");
+        System.out.println("生产者启动");
         /**
          * QoS参数代表传输质量，可选0，1，2，根据实际需求合理设置，具体参考 https://help.aliyun.com/document_detail/42420.html?spm=a2c4g.11186623.6.544.1ea529cfAO5zV3
          */
@@ -150,12 +150,10 @@ public class MqttPruducter {
      * @return
      */
     public boolean authSenderMoey(String sender){
-
         RootMessageExample example = new RootMessageExample();
         RootMessageExample.Criteria criteriaRoot = example.createCriteria();
         criteriaRoot.andNameEqualTo("video_money");
         float videoMoney = Float.parseFloat(rootMessageMapper.selectByExample(example).get(0).getValue());
-
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
         criteria.andAccountEqualTo(sender);
@@ -177,22 +175,17 @@ public class MqttPruducter {
      * @param topic
      * @param info
      */
-    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
+    public void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
+        System.out.println("消费者发送消息");
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("发送消息");
-                    mqttClient.publish(topic,toClientMessage);
-                } catch (MqttException e) {
-                    System.out.println("发送消息异常");
-                    e.printStackTrace();
-                }
-            }
-        });
+
+        try {
+            mqttClient.publish(topic,toClientMessage);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
     }
 
 }

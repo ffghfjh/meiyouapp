@@ -2,6 +2,7 @@ package com.meiyou.model;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.meiyou.config.AliMQConfig;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.RootMessageExample;
@@ -37,6 +38,9 @@ public class MqttComsumer {
     UserMapper userMapper;
     @Autowired
     RootMessageMapper rootMessageMapper;
+    @Autowired
+    AliMQConfig aliMQConfig;
+
     /**
             * MQ4IOT 实例 ID，购买后控制台获取
      */
@@ -143,14 +147,14 @@ public class MqttComsumer {
                         if(!authSenderMoey(sender)){
                             System.out.println("余额不足通话");
                             //mqttClient.publish(parentTopic+"/"+mqttMessage.getReceiver(),message);
-                            sendMessage(mqttMessage.getChatType(),mqttMessage.getMsgType(),mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getSender(),mqttMessage.getAuthInfo());
+                            aliMQConfig.getProducter().sendMessage(mqttMessage.getChatType(),MqttConstants.MONEYLACK,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getSender(),mqttMessage.getAuthInfo());
                         }else{
                             MqttMessageFactory factory = new MqttMessageFactory(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getSender(),null);
                             MqttMessage message1 = new MqttMessage();
                             message1.setQos(1);
                             message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
                             //mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
-                            sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),p2pClient+mqttMessage.getReceiver(),null);
+                            aliMQConfig.getProducter().sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.CALL,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getReceiver(),null);
                         }
                     }
                 }

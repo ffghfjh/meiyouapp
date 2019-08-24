@@ -154,7 +154,7 @@ public class MqttComsumer {
 
                 }
             });
-    
+
             //连接mqtt服务
             mqttClient.connect(connectionOptionWrapper.getMqttConnectOptions());
 

@@ -12,6 +12,15 @@ public class Constants {
     public static String SIGNATURE = "该用户很懒，什么都没有";//用户默认签名
 
 
+
+    /**
+     * 音视频通讯
+     */
+    public static String VIDEOAPPID = "txz2zhcn";
+    public static String VIDEOACCESSKEYID = "LTAIvKcmvWQ80zRM";
+    public static String VIDEOACCESSKEYSECRET = "09bBSKCP1j6Aer2fjRo3w5uDBMEmO0";
+    public static String[] GSLB = new String[]{"https://rgslb.rtc.aliyuncs.com"};
+
     /**
      * 腾讯云
      */

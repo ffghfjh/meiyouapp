@@ -1,12 +1,12 @@
 package com.meiyou.service.impl;
 
-import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.TourMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Tour;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.service.TourService;
 import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Constants;
@@ -15,6 +15,11 @@ import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.GeoRadiusResponse;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -28,7 +33,7 @@ public class TourServiceImpl implements TourService {
     private UserMapper userMapper;
 
     @Autowired
-    private RootMessageMapper rootMessageMapper;
+    private RootMessageService rootMessageService;
 
     @Autowired
     private TourMapper tourMapper;
@@ -163,8 +168,87 @@ public class TourServiceImpl implements TourService {
         return null;
     }
 
+    /**
+    * @Description: 查看热门旅游
+    * @Author: JK
+    * @Date: 2019/8/24
+    */
+    @Transactional
     @Override
     public Msg selectHotTour(String uid, String token, double latitude, double longitude) {
-        return null;
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            Msg noLogin = Msg.noLogin();
+            msg.add("noLogin", noLogin);
+            return msg;
+        }
+
+        //范围半径
+        String range = rootMessageService.getMessageByName("range");
+        double radius = Double.parseDouble(range);
+        //从Redis获取附近的所有用户的动态
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(uid);
+        coordinate.setLongitude(longitude);
+        coordinate.setLatitude(latitude);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryTour(coordinate,radius);
+        //判断附近是否有热门旅游
+        if (responseList == null || responseList.size() == 0) {
+            return Msg.fail();
+        }
+        for (GeoRadiusResponse response : responseList) {
+            //获取缓存中的key
+            String memberByString = response.getMemberByString();
+            if (memberByString == null){
+                return Msg.fail();
+            }
+            Tour tour = tourMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
+            Integer state = tour.getState();
+            //获取用户id
+            Integer publisherId = tour.getPublishId();
+            User user = userMapper.selectByPrimaryKey(publisherId);
+            HashMap<String, Object> map = new HashMap<>();
+            ArrayList<Object> list = new ArrayList<>();
+            if (state == 1 || state == 2){
+                String nickname = user.getNickname();
+                String header = user.getHeader();
+                String birthday = user.getBirthday();
+                String goMessage = tour.getGoMessage();
+                String startAddress = tour.getStartAddress();
+                String endAddress = tour.getEndAddress();
+                String goTime = tour.getGoTime();
+                Integer needNum = tour.getNeedNum();
+                Integer reward = tour.getReward();
+                Integer payType = tour.getPayType();
+                Integer confirmId = tour.getConfirmId();
+                if (tour.getPayType() == 1){
+                    //获取诚意金
+                    String sincerityMoneyName = "sincerity_money";
+                    int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+                    map.put("sincerityMoneyValue",sincerityMoneyValue);
+                }
+                map.put("nickname",nickname);
+                map.put("header",header);
+                map.put("birthday",birthday);
+                map.put("goMessage",goMessage);
+                map.put("startAddress",startAddress);
+                map.put("endAddress",endAddress);
+                map.put("goTime",goTime);
+                map.put("needNum",needNum);
+                map.put("reward",reward);
+                map.put("payType",payType);
+                map.put("confirmId",confirmId);
+                list.add(map);
+
+            }
+            msg.setCode(100);
+            msg.setMsg("获取附近热门旅游成功");
+            return msg.add("list",list);
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
     }
 }

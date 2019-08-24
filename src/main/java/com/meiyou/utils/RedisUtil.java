@@ -154,6 +154,28 @@ public class RedisUtil {
     }
 
     /**
+     * 查询附近热门旅游
+     * @param coordinate
+     * @param radius
+     * @return
+     */
+    public static List<GeoRadiusResponse> geoQueryTour(Coordinate coordinate,double radius) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            //200F GeoUnit.KM表示km
+            return jedis.georadius(Constants.GEO_TOUR,coordinate.getLongitude(),coordinate.getLatitude()
+                    ,radius,GeoUnit.KM, GeoRadiusParam.geoRadiusParam().withDist());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        } finally {
+            if (null != jedis)
+                jedis.close();
+        }
+    }
+
+    /**
      * 查询附近的club
      * @param coordinate
      * @param radius

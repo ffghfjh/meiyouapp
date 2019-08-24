@@ -1,6 +1,8 @@
 package com.meiyou.model;
 
-public class Coordinate {
+import java.io.Serializable;
+
+public class Coordinate implements Serializable {
 
 	
 	private double latitude; //维度

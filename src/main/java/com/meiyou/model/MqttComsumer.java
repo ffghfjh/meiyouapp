@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author: dengshilin
  * @create: 2019-08-24 09:14
  **/
-public class MqttComsumer {
+public class MqttComsumer implements Serializable {
 
 
     @Autowired

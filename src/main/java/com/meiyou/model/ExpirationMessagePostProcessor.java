@@ -4,6 +4,8 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 
+import java.io.Serializable;
+
 /**
  * 设置消息的Header以及消息的属性
  * @program: meiyou
@@ -11,7 +13,7 @@ import org.springframework.amqp.core.MessagePostProcessor;
  * @author: dengshilin
  * @create: 2019-08-23 19:21
  **/
-public class ExpirationMessagePostProcessor implements MessagePostProcessor {
+public class ExpirationMessagePostProcessor implements MessagePostProcessor, Serializable {
 
     private final Long ttl; // 毫秒
 

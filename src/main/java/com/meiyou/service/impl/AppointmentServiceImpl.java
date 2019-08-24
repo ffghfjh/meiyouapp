@@ -712,10 +712,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.getReward();
             Integer state = appointment.getState();
             if (state == 1 || state == 2){
-                Msg success = Msg.success();
-                msg.add("success",success);
+                msg.setCode(100);
+                msg.setMsg("获取附近热门约会成功");
                 msg.add("appointment",appointment);
-
             }
             return msg;
         }

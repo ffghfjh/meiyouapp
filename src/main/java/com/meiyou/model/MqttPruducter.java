@@ -28,17 +28,16 @@ import java.util.concurrent.TimeUnit;
  * @program: meiyou
  * @description:
  * @author: dengshilin
- * @create: 2019-08-24 09:14
+ * @create: 2019-08-24 14:37
  **/
-public class MqttComsumer {
-
+public class MqttPruducter {
 
     @Autowired
     UserMapper userMapper;
     @Autowired
     RootMessageMapper rootMessageMapper;
     /**
-            * MQ4IOT 实例 ID，购买后控制台获取
+     * MQ4IOT 实例 ID，购买后控制台获取
      */
     String instanceId = "post-cn-45915r0fw1h";
     /**
@@ -57,7 +56,7 @@ public class MqttComsumer {
      * MQ4IOT clientId，由业务系统分配，需要保证每个 tcp 连接都不一样，保证全局唯一，如果不同的客户端对象（tcp 连接）使用了相同的 clientId 会导致连接异常断开。
      * clientId 由两部分组成，格式为 GroupID@@@DeviceId，其中 groupId 在 MQ4IOT 控制台申请，DeviceId 由业务方自己设置，clientId 总长度不得超过64个字符。
      */
-    String clientId = "GID_video_group@@@server_manager";
+    String clientId = "GID_video_group@@@producter";
     String p2pClient = "rtc/p2p/GID_video_group@@@";
     /**
      * MQ4IOT 消息的一级 topic，需要在控制台申请才能使用。
@@ -75,6 +74,7 @@ public class MqttComsumer {
      * 如果使用了没有申请或者没有被授权的 topic 会导致鉴权失败，服务端会断开客户端连接。
      */
     MqttClient mqttClient;
+
 
     @PostConstruct
     public void start(){
@@ -106,20 +106,6 @@ public class MqttComsumer {
                      * 客户端连接成功后就需要尽快订阅需要的 topic
                      */
                     System.out.println("mqtt服务连接成功");
-                    executorService.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            final String topicFilter[] = {topic};
-                            final int[] qos = {qosLevel};
-                            try {
-                                mqttClient.subscribe(topicFilter, qos);
-                                System.out.println("订阅话题成功");
-                            } catch (MqttException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
                 }
 
                 @Override
@@ -130,29 +116,9 @@ public class MqttComsumer {
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    System.out.println("收到mqtt消息");
 
-                    String msg = new String(message.getPayload());
-                    System.out.println(msg);
-                    //解析消息
-                    MqttMessageModel mqttMessage = JSON.parseObject(msg,MqttMessageModel.class);
-                    System.out.println(mqttMessage.getReceiver());
-                    if(mqttMessage.getMsgType()== MqttConstants.CALL){
-                        String sender = mqttMessage.getSender();//发送者
-                        //检测余额
-                        if(!authSenderMoey(sender)){
-                            System.out.println("余额不足通话");
-                            //mqttClient.publish(parentTopic+"/"+mqttMessage.getReceiver(),message);
-                            sendMessage(mqttMessage.getChatType(),mqttMessage.getMsgType(),mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getSender(),mqttMessage.getAuthInfo());
-                        }else{
-                            MqttMessageFactory factory = new MqttMessageFactory(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getSender(),null);
-                            MqttMessage message1 = new MqttMessage();
-                            message1.setQos(1);
-                            message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
-                            //mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
-                            sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),p2pClient+mqttMessage.getReceiver(),null);
-                        }
-                    }
+
+
                 }
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
@@ -228,4 +194,5 @@ public class MqttComsumer {
             }
         });
     }
+
 }

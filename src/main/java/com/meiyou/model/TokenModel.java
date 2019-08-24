@@ -1,12 +1,14 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
+
 /**
  * @program: meiyou
  * @description:
  * @author: dengshilin
  * @create: 2019-08-21 14:50
  **/
-public class TokenModel {
+public class TokenModel implements Serializable {
     //用户id
     private long userId;
 

@@ -14,11 +14,12 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 @Component
-public class ProcessReceiver implements ChannelAwareMessageListener {
+public class ProcessReceiver implements ChannelAwareMessageListener, Serializable {
     public static CountDownLatch latch;
     private static Logger logger = LoggerFactory.getLogger(ProcessReceiver.class);
 

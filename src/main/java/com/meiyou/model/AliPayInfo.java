@@ -1,9 +1,11 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
+
 /**
  * 支付宝信息实体类
  */
-public class AliPayInfo {
+public class AliPayInfo implements Serializable {
 	
 		
 	private String userId;//用户支付宝唯一id

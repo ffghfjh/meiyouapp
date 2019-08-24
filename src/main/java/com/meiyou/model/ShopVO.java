@@ -1,5 +1,6 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  * @author: Mr.Z
  * @create: 2019-08-24 11:09
  **/
-public class ShopVO {
+public class ShopVO implements Serializable {
     private Integer id;
     private Date createTime;
     private Date updateTime;

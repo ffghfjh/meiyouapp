@@ -1,12 +1,14 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
+
 /**
  * @program: meiyou
  * @description:
  * @author: dengshilin
  * @create: 2019-08-22 15:49
  **/
-public class MqttMessageModel {
+public class MqttMessageModel implements Serializable {
 
     /**
      * chatType : 1

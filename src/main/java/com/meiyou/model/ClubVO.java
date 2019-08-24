@@ -1,5 +1,6 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  * @author: Mr.Z
  * @create: 2019-08-24 10:35
  **/
-public class ClubVO {
+public class ClubVO implements Serializable {
 
     //nums 为查询报名了这个club的人数
     private Integer id;

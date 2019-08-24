@@ -199,4 +199,17 @@ public class AppointmentController {
     public Msg confirmArrive(String uid, Integer id, String token) {
         return appointmentService.confirmArrive(uid,id,token);
     }
+
+    /**
+     * @Description: 查看热门约会
+     * @Author: JK
+     * @Date: 2019/8/24
+     */
+    @ApiOperation(value = "查看热门约会", notes = "查看热门约会", httpMethod = "POST")
+    @GetMapping(value = "/selectHotAppointment")
+    public Map<String, Object> selectHotAppointment(String uid, String token,double latitude, double longitude) {
+        Msg msg = appointmentService.selectHotAppointment(uid, token, latitude, longitude);
+        Map<String, Object> extend = msg.getExtend();
+        return extend;
+    }
 }

@@ -65,4 +65,9 @@ public interface AppointmentService {
      * 确认报名人已到达
      */
     Msg confirmArrive(String uid,Integer id,String token);
+
+    /**
+     * 查看热门约会
+     */
+    Msg selectHotAppointment(String uid,String token,double latitude, double longitude);
 }

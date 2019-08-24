@@ -92,12 +92,6 @@ public class Activity {
      */
     private List<ActivityLike> likeList;
 
-    /**
-     * hzy
-     * 阅读数
-     */
-    private List<Read> readList;
-
 
     public User getUser() {
         return user;
@@ -115,29 +109,6 @@ public class Activity {
         this.likeList = likeList;
     }
 
-    public List<Read> getReadList() {
-        return readList;
-    }
-
-    public void setReadList(List<Read> readList) {
-        this.readList = readList;
-    }
-
-    public Activity(Integer id, Date createTime, Date updateTime, Integer publishId, String imgsUrl, String content, Integer readNum, Integer likeNum, Integer commontNum, Boolean boolClose, User user, List<ActivityLike> likeList, List<Read> readList) {
-        this.id = id;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-        this.publishId = publishId;
-        this.imgsUrl = imgsUrl;
-        this.content = content;
-        this.readNum = readNum;
-        this.likeNum = likeNum;
-        this.commontNum = commontNum;
-        this.boolClose = boolClose;
-        this.user = user;
-        this.likeList = likeList;
-        this.readList = readList;
-    }
 
     public Activity() {
     }

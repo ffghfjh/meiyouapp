@@ -44,7 +44,7 @@
 <!--        <table tableName="club" domainObjectName="Club"></table>-->
 <!--        <table tableName="club_buy" domainObjectName="ClubBuy"></table>-->
 <!--        <table tableName="comment" domainObjectName="Comment"></table>-->
-<!--        <table tableName="read" domainObjectName="Read"></table>-->
+        <table tableName="activity_read" domainObjectName="ActivityRead"></table>
 <!--        <table tableName="recharge" domainObjectName="Recharge"></table>-->
 <!--        <table tableName="red_packet" domainObjectName="RedPacket"></table>-->
 <!--        <table tableName="root_message" domainObjectName="RootMessage"></table>-->
@@ -56,6 +56,6 @@
 <!--        <table tableName="user" domainObjectName="User"></table>-->
 <!--        <table tableName="club_star" domainObjectName="ClubStar"></table>-->
 <!--        <table tableName="shop_star" domainObjectName="ShopStar"></table>-->
-        <table tableName="comment" domainObjectName="Comment"></table>
+<!--        <table tableName="comment" domainObjectName="Comment"></table>-->
     </context>
 </generatorConfiguration>

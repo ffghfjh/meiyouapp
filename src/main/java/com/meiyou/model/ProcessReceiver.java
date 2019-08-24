@@ -49,6 +49,7 @@ public class ProcessReceiver implements ChannelAwareMessageListener {
     public void processMessage(Message message) throws Exception {
         String realMessage = new String(message.getBody());
         logger.info("Received <" + realMessage + ">");
+        System.out.println("收到消息");
         if (Objects.equals(realMessage, FAIL_MESSAGE)) {
             throw new Exception("Some exception happened");
         }

@@ -105,8 +105,10 @@ public class TourServiceImpl implements TourService {
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
             coordinate.setKey(tour.getId().toString());
-            RedisUtil.addReo(coordinate, Constants.GEO_TOUR);
-            return Msg.success();
+            Long aLong = RedisUtil.addReo(coordinate, Constants.GEO_TOUR);
+            if (aLong == 1){
+                return Msg.success();
+            }
         }else {
             return Msg.fail();
         }

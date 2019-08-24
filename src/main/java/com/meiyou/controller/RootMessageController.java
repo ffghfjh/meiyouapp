@@ -60,4 +60,42 @@ public class RootMessageController {
         msg.setMsg("成功");
         return msg;
     }
+
+
+    @ApiOperation(value = "添加系统参数", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/saveMessage")
+    public Msg saveMessage(String name, String value) {
+        return rootMessageService.saveMessage(name, value);
+    }
+
+    @ApiOperation(value = "删除系统参数", notes = "mid: 参数主键", httpMethod = "POST")
+    @PostMapping(value = "/removeMessage")
+    public Msg removeMessage(int mid) {
+        return rootMessageService.removeMessage(mid);
+    }
+
+    @ApiOperation(value = "根据主键修改参数或参数值", notes = "mid: 参数主键，name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/updateMessageById")
+    public Msg updateMessageById(int mid, String name, String value){
+        return rootMessageService.updateMessageById(mid, name, value);
+    }
+
+    @ApiOperation(value = "根据参数名修改参数值", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/updateMessageByName")
+    public Msg updateMessageByName(String name, String value){
+        return rootMessageService.updateMessageByName(name, value);
+    }
+
+    @ApiOperation(value = "根据参数名获取参数值", notes = "name：系统参数名, value:系统参数值", httpMethod = "POST")
+    @PostMapping(value = "/getMessageByName")
+    public String getMessageByName(String name) {
+        return rootMessageService.getMessageByName(name);
+    }
+
+    @ApiOperation(value = "拉取所有系统参数", notes = "无参数，直接try out!", httpMethod = "POST")
+    @PostMapping(value = "/listMessage")
+    public Msg listMessage() {
+        return rootMessageService.listMessage();
+    }
+
 }

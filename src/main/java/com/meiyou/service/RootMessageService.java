@@ -28,14 +28,22 @@ public interface RootMessageService {
      */
 
     //添加参数
-    int saveMessage(String name, String value);
+    Msg saveMessage(String name, String value);
+
 
     //删除参数
-    int removeMessage(int mid);
+    Msg removeMessage(int mid);
 
-    //修改参数
-    int updateMessage(int mid, String name, String value);
+    //根据主键修改参数或参数值
+    Msg updateMessageById(int mid, String name, String value);
 
-    //查找参数
+    //根据参数名修改参数值
+    Msg updateMessageByName(String name, String value);
+
+    //根据参数名查找值
     String getMessageByName(String name);
+
+    //拉取所有系统参数
+    Msg listMessage();
+
 }

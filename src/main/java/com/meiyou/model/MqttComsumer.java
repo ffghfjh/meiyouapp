@@ -124,6 +124,7 @@ public class MqttComsumer {
                 @Override
                 public void connectionLost(Throwable cause) {
                     System.out.println("连接断开");
+                    cause.printStackTrace();
                 }
 
                 @Override

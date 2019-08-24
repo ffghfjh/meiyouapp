@@ -110,6 +110,7 @@ public class MqttServiceImpl implements MqttService {
                     @Override
                     public void connectionLost(Throwable cause) {
                         System.out.println("mqtt服务连接失败");
+                        cause.printStackTrace();
                     }
 
                     @Override

@@ -4,6 +4,7 @@ import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.pojo.RootMessage;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.service.RootMessageService;
+import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,9 +89,9 @@ public class RootMessageServiceImpl implements RootMessageService {
         RootMessageExample.Criteria criteria = example.createCriteria();
         criteria.andNameEqualTo(name);
         List<RootMessage> messages = rootMessageMapper.selectByExample(example);
-        if (messages.size() > 0 && messages != null) {
-            return messages.get(0).getValue();
+        if (messages.size() == 0) {
+            return null;
         }
-        return null;
+        return messages.get(0).getValue();
     }
 }

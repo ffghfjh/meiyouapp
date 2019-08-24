@@ -5,7 +5,7 @@ import com.meiyou.service.RootMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class RootMessageController {
     * @Date: 2019/8/22
     */
     @ApiOperation(value = "获取诚意金", notes = "获取诚意金", httpMethod = "POST")
-    @PostMapping(value = "/selectRootMessage")
+    @GetMapping(value = "/selectRootMessage")
     public Map<String,Object> selectRootMessage(){
         HashMap<String, Object> map = new HashMap<>();
         List<RootMessage> list = rootMessageService.select();

@@ -7,6 +7,7 @@ import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -137,7 +138,8 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid,String token) {
+    @Cacheable(cacheNames = "buy")
+    public List<ClubBuy> selectByUid(Integer uid,String token) {
 //        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -149,16 +151,8 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-        if(result.size() == 0){
-            msg.setMsg("没有找到对应的ClubBuy记录");
-            msg.setCode(404);
-            return msg;
-        }
 
-        msg.add("clubBuy",result);
-        msg.setCode(100);
-        msg.setMsg("成功");
-        return msg;
+        return result;
     }
 
     /**

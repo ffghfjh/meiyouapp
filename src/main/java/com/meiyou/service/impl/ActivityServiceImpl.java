@@ -7,6 +7,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
+import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
 import com.meiyou.pojo.ActivityExample;
@@ -51,6 +52,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserMapper userMapper;
 
     @Autowired
     RootMessageService rootMessageService;
@@ -233,6 +237,7 @@ public class ActivityServiceImpl implements ActivityService {
             return Msg.fail();
         }
         for (GeoRadiusResponse response : responseList) {
+            //在Redis缓存中拿到动态id
             String memberByString = response.getMemberByString();
             //距离我多远
             Double dis = response.getDistance();
@@ -263,7 +268,22 @@ public class ActivityServiceImpl implements ActivityService {
                 hashMap.put("aid", nbhAid);
                 list.add(hashMap);
             }
-            //如果activity存在
+            User user1 = userMapper.selectByPrimaryKey(activity.getPublishId());
+            boolean boolUser = (user1 == null || user1.getId()==0 || user1.getNickname().equals("找不到任何用户"));
+            if (boolUser) {
+                continue;
+            }
+            //判断这条动态的主人是不是被屏蔽
+            if (user1.getBoolClose()) {
+                //如果被屏蔽就直接走下一条动态
+                continue;
+            }
+            //===============如果activity存在==============
+            //判断这条动态是否被屏蔽了
+            if (activity.getBoolClose()) {
+                //如果这条动态被屏蔽的话，直接走下一条附近动态
+                continue;
+            }
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //获得该动态的用户信息
             User user = userService.getUserById(activity.getPublishId());

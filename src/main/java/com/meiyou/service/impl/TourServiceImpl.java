@@ -1,23 +1,23 @@
 package com.meiyou.service.impl;
 
+import com.meiyou.mapper.TourAskMapper;
 import com.meiyou.mapper.TourMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
-import com.meiyou.pojo.Tour;
-import com.meiyou.pojo.User;
-import com.meiyou.pojo.UserExample;
+import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.TourService;
-import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +39,10 @@ public class TourServiceImpl implements TourService {
     private TourMapper tourMapper;
 
     @Autowired
-    private AppointmentUtil appointmentUtil;
+    private RootMessageUtil rootMessageUtil;
+
+    @Autowired
+    private TourAskMapper tourAskMapper;
 
     /**
     * @Description: 发布旅游
@@ -63,7 +66,7 @@ public class TourServiceImpl implements TourService {
 
         //获取发布金
         String publishMoneyName = "publish_money";
-        int publishMoneyValue = appointmentUtil.getRootMessage(publishMoneyName);
+        int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
@@ -74,7 +77,7 @@ public class TourServiceImpl implements TourService {
 
         //获取诚意金
         String sincerityMoneyName = "sincerity_money";
-        int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+        int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
 
         //选择平台担保扣款后剩余余额
         float balance = money-(publishMoneyValue + tour.getReward());
@@ -118,54 +121,574 @@ public class TourServiceImpl implements TourService {
             return Msg.fail();
     }
 
+    /**
+    * @Description: 查询我的发布列表
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
     @Override
     public Msg selectTourList(String uid, String token) {
-        return null;
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andPublishIdEqualTo(Integer.parseInt(uid));
+        List<Tour> tours = tourMapper.selectByExample(tourExample);
+        ArrayList<Object> arrayList = new ArrayList<>();
+        for (Tour tour : tours) {
+            TourAskExample tourAskExample = new TourAskExample();
+            tourAskExample.createCriteria().andAskState0EqualTo(1).andAppointIdEqualTo(tour.getId());
+            List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+            HashMap<String, Object> map = new HashMap<>();
+            int size = 0;
+            Integer state = tour.getState();
+            if (tour.getState() == 2){
+                ArrayList<Object> arrayList1 = new ArrayList<>();
+                for (TourAsk tourAsk : tourAsks) {
+                    Integer askerId = tourAsk.getAskerId();
+                    User user = userMapper.selectByPrimaryKey(askerId);
+                    String askerHeader = user.getHeader();
+                    arrayList1.add(askerHeader);
+                    map.put("arrayList1",arrayList1);
+                }
+                //获取报名的总人数
+                size = tourAsks.size();
+                map.put("size", size);
+                state = tour.getState();
+                map.put("state",state);
+            }
+            //获取用户id
+            Integer publisherId = tour.getPublishId();
+            User user = userMapper.selectByPrimaryKey(publisherId);
+
+            String nickname = user.getNickname();
+            String header = user.getHeader();
+            String birthday = user.getBirthday();
+            String signature = user.getSignature();
+            String goMessage = tour.getGoMessage();
+            String startAddress = tour.getStartAddress();
+            String endAddress = tour.getEndAddress();
+            String goTime = tour.getGoTime();
+            String askerHeader = null;
+
+
+            map.put("nickname",nickname);
+            map.put("header",header);
+            map.put("birthday",birthday);
+            map.put("goMessage",goMessage);
+            map.put("startAddress",startAddress);
+            map.put("endAddress",endAddress);
+            map.put("goTime",goTime);
+            map.put("signature",signature);
+            map.put("size",size);
+            map.put("askerHeader",askerHeader);
+            map.put("state",state);
+            arrayList.add(map);
+        }
+
+        if (tours != null && tours.size() != 0) {
+            msg.add("arrayList", arrayList);
+            msg.setCode(100);
+            msg.setMsg("我的旅游发布列表返回成功");
+            return msg;
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail", fail);
+        return msg;
     }
 
+    /**
+    * @Description: 取消发布旅游订单
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
-    public Msg deletePublish(Integer id, String token) {
-        return null;
+    public Msg deleteTourPublish(Integer id, String token) {
+        Tour tour = tourMapper.selectByPrimaryKey(id);
+        boolean authToken = RedisUtil.authToken(tour.getPublishId().toString(), token);
+        Msg msg = new Msg();
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        //获取当前订单状态
+        Integer state = tour.getState();
+        int i = 0;
+        if (state == 1) {
+            TourExample tourExample = new TourExample();
+            tourExample.createCriteria().andIdEqualTo(id);
+            tour.setState(5);
+            tour.setUpdateTime(new Date());
+            i = tourMapper.updateByExample(tour, tourExample);
+            if (i == 1) {
+                return Msg.success();
+            }
+            return Msg.fail();
+        }
+        msg.setCode(1005);
+        msg.setMsg("不能取消订单");
+        return msg;
     }
 
+    /**
+    * @Description: 从多个旅游订单中选择一个进行报名
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
-    public Msg startEnrollment(String uid, String password, Integer id, String token) {
-        return null;
+    public Msg tourAsk(String uid, String password, Integer id, String token) {
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        //根据报名者id查询出他所有信息
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        //获取报名者账户余额
+        Float money = user.getMoney();
+
+        //获取报名金的金额
+        String askMoneyName = "ask_money";
+        int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+
+
+        //判断用户输入密码是否正确
+        if (!password.equals(user.getPayWord())) {
+            msg.setCode(1001);
+            msg.setMsg("支付密码错误");
+            return msg;
+        }
+        //报名扣款后剩余余额
+        float balance = money - askMoneyValue;
+
+        if (balance < 0) {
+            msg.setCode(1002);
+            msg.setMsg("余额不足");
+            return msg;
+        }
+        user.setMoney(balance);
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
+        //更新报名者账户余额
+        userMapper.updateByExample(user, userExample);
+
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskerId(Integer.parseInt(uid));
+        tourAsk.setAppointId(id);
+        tourAsk.setAskState0(1);
+        tourAsk.setCreateTime(new Date());
+        tourAsk.setUpdateTime(new Date());
+        //旅游记录表中增加一条记录
+        tourAskMapper.insertSelective(tourAsk);
+        //根据旅游订单表id查出该订单所有信息
+        Tour tour = tourMapper.selectByPrimaryKey(id);
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(id);
+        tour.setState(2);
+        tour.setUpdateTime(new Date());
+        //更改该订单状态
+        int i = tourMapper.updateByExample(tour,tourExample);
+        if (i == 1) {
+            return Msg.success();
+        } else {
+            return Msg.fail();
+        }
     }
 
+    /**
+    * @Description: 取消报名, 退还美金
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
-    public Msg endEnrollment(String uid, Integer id, String token) {
-        return null;
+    public Msg endTourAsk(String uid, Integer id, String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAppointIdEqualTo(id)
+                .andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskState0EqualTo(1);
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskState0(0);
+        tourAsk.setUpdateTime(new Date());
+
+        //将报名人员从报名态改为未报名态
+        int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
+        TourAskExample tourAskExample1 = new TourAskExample();
+        tourAskExample1.createCriteria().andAppointIdEqualTo(id)
+                .andAskState0EqualTo(1);
+        //获取当前旅游订单报名人数
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample1);
+        //当前旅游订单报名人数为空并且为0，则修改该约会订单状态为1
+        if (tourAsks == null || tourAsks.size() == 0) {
+            TourExample tourExample = new TourExample();
+            tourExample.createCriteria().andIdEqualTo(id);
+            Tour tour = new Tour();
+            tour.setState(1);
+            tour.setUpdateTime(new Date());
+            tourMapper.updateByExampleSelective(tour, tourExample);
+        }
+
+        //根据报名者id查询出他所有信息
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        //获取发布者账户余额
+        Float money = user.getMoney();
+        //获取报名金的金额
+        String askMoneyName = "ask_money";
+        int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+        //金额退还后账户余额
+        float balance = money + askMoneyValue;
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
+        User user1 = new User();
+        user1.setMoney(balance);
+        int i1 = userMapper.updateByExampleSelective(user1, userExample);
+
+        int i2 = i + i1;
+        if (i2 == 2) {
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
+    /**
+    * @Description: 查询所有报名某个约会旅游的人员信息
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
     @Override
     public Msg selectTourAskList(String uid, Integer appointId, String token) {
-        return null;
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAppointIdEqualTo(appointId);
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+
+        if (tourAsks != null && tourAsks.size() != 0) {
+            msg.add("appointAsks", tourAsks);
+            msg.setCode(100);
+            msg.setMsg("旅游报名对象返回成功");
+            return msg;
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail", fail);
+        return msg;
     }
 
+    /**
+    * @Description: 从所有报名某个旅游的人员信息中选择一个进行确认,
+     *没有被选中的人退还报名金
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
-    public Msg confirmUserId(String uid, Integer askerId, Integer appointId, String token) {
-        return null;
+    public Msg confirmTourist(String uid, Integer askerId, Integer appointId, String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        Tour tour = tourMapper.selectByPrimaryKey(appointId);
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(appointId);
+        tour.setConfirmId(askerId);
+        //在旅游表中3是选中人员等待赴约状态
+        tour.setState(3);
+        tour.setUpdateTime(new Date());
+        int i = tourMapper.updateByExample(tour, tourExample);
+
+        TourAsk tourAsk = new TourAsk();
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskerIdEqualTo(askerId)
+                .andAskState0EqualTo(1);
+
+        //旅游报名表中2是被选中状态
+        tourAsk.setAskState0(2);
+        tourAsk.setUpdateTime(new Date());
+        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
+
+        TourAskExample tourAskExample1 = new TourAskExample();
+        tourAskExample1.createCriteria().andAskState0EqualTo(1)
+                .andAskerIdNotEqualTo(askerId);
+
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        int i2 = 0;
+        int i3 = 0;
+        if (tourAsks != null && tourAsks.size() != 0) {
+            for (TourAsk ask : tourAsks) {
+                TourAsk tourAsk1 = new TourAsk();
+                //获取申请人ID
+                Integer askerId1 = ask.getAskerId();
+                //根据报名者id查询出他所有信息
+                User user = userMapper.selectByPrimaryKey(askerId1);
+                //获取发布者账户余额
+                Float money = user.getMoney();
+                //获取报名金的金额
+                String askMoneyName = "ask_money";
+                int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+                //金额退还后账户余额
+                float balance = money + askMoneyValue;
+
+                //没有被选中状态改为3
+                tourAsk1.setAskState0(3);
+                tourAsk1.setUpdateTime(new Date());
+                i2 = tourAskMapper.updateByExampleSelective(tourAsk1, tourAskExample1);
+                if (i2 != 1){
+                    return Msg.fail();
+                }
+
+                User user1 = new User();
+                UserExample userExample = new UserExample();
+                userExample.createCriteria().andIdEqualTo(askerId1);
+                user1.setMoney(balance);
+                user1.setUpdateTime(new Date());
+                i3 = userMapper.updateByExampleSelective(user1, userExample);
+                if (i3 != 1){
+                    return Msg.fail();
+                }
+            }
+        }
+
+        int i4 = i + i1 + i2 + i3;
+        if (i4 == 4) {
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
+    /**
+    * @Description: 对方取消赴约，重新发布，不退还报名金
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
     public Msg endTour(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAppointIdEqualTo(id)
+                .andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskState0EqualTo(2);
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskState0(5);
+        tourAsk.setUpdateTime(new Date());
+
+
+        //将报名人员从被选中状态改为取消赴约状态
+        int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+        Tour tour = new Tour();
+        tour.setState(1);
+        tour.setConfirmId(0);
+        tour.setUpdateTime(new Date());
+        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
+
+        int i2 = i + i1;
+        if (i2 == 2) {
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
+    /**
+    * @Description: 由于发布者自己原因重新发布，退还报名金
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
-    public Msg againRelease(String uid, Integer id, String token) {
-        return null;
+    public Msg againReleaseTour(String uid, Integer id, String token) {
+        Tour tour = tourMapper.selectByPrimaryKey(id);
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        //获取当前订单状态
+        Integer state = tour.getState();
+        //如果是有人报名等待选中状态，则退还所有报名者的报名金
+        int i1 = 0;
+        int i2 = 0;
+        if (state == 2) {
+            TourAskExample tourAskExample = new TourAskExample();
+            tourAskExample.createCriteria().andAskState0EqualTo(1)
+                    .andAppointIdEqualTo(id);
+
+            List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+            for (TourAsk tourAsk : tourAsks) {
+                //获取申请人ID
+                Integer askerId = tourAsk.getAskerId();
+                //根据报名者id查询出他所有信息
+                User user = userMapper.selectByPrimaryKey(askerId);
+                //获取发布者账户余额
+                Float money = user.getMoney();
+                //获取报名金的金额
+                String askMoneyName = "ask_money";
+                int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+                //金额退还后账户余额
+                float balance = money + askMoneyValue;
+
+                User user1 = new User();
+                UserExample userExample = new UserExample();
+                userExample.createCriteria().andIdEqualTo(askerId);
+                user1.setMoney(balance);
+                user1.setUpdateTime(new Date());
+                i1 = userMapper.updateByExampleSelective(user1, userExample);
+                if (i1 != 1){
+                    return Msg.fail();
+                }
+
+                TourAskExample tourAskExample1 = new TourAskExample();
+                tourAskExample1.createCriteria().andAskState0EqualTo(1)
+                        .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
+                TourAsk tourAsk1 = new TourAsk();
+                //退还报名金后，报名者状态从1变成0
+                tourAsk1.setAskState0(0);
+                tourAsk1.setUpdateTime(new Date());
+                i2 = tourAskMapper.updateByExampleSelective(tourAsk1, tourAskExample1);
+                if (i2 != 1){
+                    return Msg.fail();
+                }
+            }
+            TourExample tourExample = new TourExample();
+            tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(2);
+            tour.setState(1);
+            tour.setUpdateTime(new Date());
+            int i3 = tourMapper.updateByExampleSelective(tour, tourExample);
+            int i = i1 + i2 + i3;
+            if (i == 3) {
+                return Msg.success();
+            }
+        }
+
+        if (state == 3) {
+            Integer confirmId = tour.getConfirmId();
+            //根据报名者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(confirmId);
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取报名金的金额
+            String askMoneyName = "ask_money";
+            int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+            //金额退还后账户余额
+            float balance = money + askMoneyValue;
+
+            User user1 = new User();
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(confirmId);
+            user1.setMoney(balance);
+            user1.setUpdateTime(new Date());
+            //修改金额
+            i1 = userMapper.updateByExampleSelective(user1, userExample);
+
+            TourAskExample tourAskExample = new TourAskExample();
+            tourAskExample.createCriteria().andAskState0EqualTo(2)
+                    .andAppointIdEqualTo(id);
+            TourAsk tourAsk = new TourAsk();
+            //退还报名金后，报名者状态从2变成0
+            tourAsk.setAskState0(0);
+            tourAsk.setUpdateTime(new Date());
+            i2 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
+            TourExample tourExample = new TourExample();
+            tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+            tour.setState(1);
+            tour.setUpdateTime(new Date());
+            int i3 = tourMapper.updateByExampleSelective(tour, tourExample);
+
+            int i = i1 + i2 + i3;
+            if (i == 3) {
+                return Msg.success();
+            }
+        }
+        return Msg.fail();
     }
 
+    /**
+    * @Description: 报名人确认赴约
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
     public Msg confirmTour(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(2)
+                .andAppointIdEqualTo(id);
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskState0(6);
+        tourAsk.setUpdateTime(new Date());
+        //更改报名者状态为6，确认赴约
+        int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
+        Tour tour = new Tour();
+        tour.setState(4);
+        tour.setUpdateTime(new Date());
+        //更改发布者状态为4，报名者确定赴约
+        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
+
+        int i2 = i + i1;
+        if (i2 == 2){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
+    /**
+    * @Description: 确认报名人已到达
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Transactional
     @Override
     public Msg confirmArrive(String uid, Integer id, String token) {
-        return null;
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+        Tour tour = new Tour();
+        tour.setState(5);
+        tour.setUpdateTime(new Date());
+        //更改发布者状态为5，报名者已到达，订单完成
+        int i = tourMapper.updateByExampleSelective(tour, tourExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 
     /**
@@ -228,7 +751,7 @@ public class TourServiceImpl implements TourService {
                 if (tour.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
-                    int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+                    int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
                     map.put("sincerityMoneyValue",sincerityMoneyValue);
                 }
                 map.put("nickname",nickname);

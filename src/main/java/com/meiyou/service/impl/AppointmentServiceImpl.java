@@ -7,7 +7,7 @@ import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.service.RootMessageService;
-import com.meiyou.utils.AppointmentUtil;
+import com.meiyou.utils.RootMessageUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
@@ -36,7 +36,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private AppointmentUtil appointmentUtil;
+    private RootMessageUtil rootMessageUtil;
     @Autowired
     private RootMessageService rootMessageService;
 
@@ -61,7 +61,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Float money = user.getMoney();
         //获取发布金
         String publishMoneyName = "publish_money";
-        int publishMoneyValue = appointmentUtil.getRootMessage(publishMoneyName);
+        int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
 
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())) {
@@ -72,7 +72,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         //获取诚意金
         String sincerityMoneyName = "sincerity_money";
-        int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+        int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
 
         //选择平台担保扣款后剩余余额
         float balance = money - (publishMoneyValue + appointment.getReward());
@@ -127,9 +127,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            Msg noLogin = Msg.noLogin();
-            msg.add("noLogin", noLogin);
-            return msg;
+            return Msg.noLogin();
         }
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
@@ -188,7 +186,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointments != null && appointments.size() != 0) {
             msg.add("arrayList", arrayList);
             msg.setCode(100);
-            msg.setMsg("发布约会列表返回成功");
+            msg.setMsg("我的约会发布列表返回成功");
             return msg;
         }
         Msg fail = Msg.fail();
@@ -203,7 +201,7 @@ public class AppointmentServiceImpl implements AppointmentService {
      */
     @Transactional
     @Override
-    public Msg deletePublish(Integer id, String token) {
+    public Msg deleteAppointmentPublish(Integer id, String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
         boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
         Msg msg = new Msg();
@@ -237,7 +235,7 @@ public class AppointmentServiceImpl implements AppointmentService {
      */
     @Transactional
     @Override
-    public Msg startEnrollment(String uid, String password, Integer id, String token) {
+    public Msg appointmentAsk(String uid, String password, Integer id, String token) {
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
@@ -251,7 +249,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         //获取报名金的金额
         String askMoneyName = "ask_money";
-        int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+        int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
 
         //判断用户输入密码是否正确
@@ -303,8 +301,9 @@ public class AppointmentServiceImpl implements AppointmentService {
      * @Author: JK
      * @Date: 2019/8/23
      */
+    @Transactional
     @Override
-    public Msg endEnrollment(String uid, Integer id, String token) {
+    public Msg endAppointmentAsk(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
@@ -344,7 +343,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Float money = user.getMoney();
         //获取报名金的金额
         String askMoneyName = "ask_money";
-        int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+        int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
         //金额退还后账户余额
         float balance = money + askMoneyValue;
 
@@ -372,9 +371,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            Msg noLogin = Msg.noLogin();
-            msg.add("noLogin", noLogin);
-            return msg;
+            return Msg.noLogin();
         }
         AppointAskExample example = new AppointAskExample();
         example.createCriteria().andAppointIdEqualTo(appointId);
@@ -399,7 +396,7 @@ public class AppointmentServiceImpl implements AppointmentService {
      */
     @Transactional
     @Override
-    public Msg confirmUserId(String uid, Integer askerId, Integer appointId, String token) {
+    public Msg confirmAppointmentUserId(String uid, Integer askerId, Integer appointId, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
@@ -443,7 +440,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Float money = user.getMoney();
                 //获取报名金的金额
                 String askMoneyName = "ask_money";
-                int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+                int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
                 //金额退还后账户余额
                 float balance = money + askMoneyValue;
 
@@ -521,7 +518,7 @@ public class AppointmentServiceImpl implements AppointmentService {
      */
     @Transactional
     @Override
-    public Msg againRelease(String uid, Integer id, String token) {
+    public Msg againReleaseAppointment(String uid, Integer id, String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
@@ -549,7 +546,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Float money = user.getMoney();
                 //获取报名金的金额
                 String askMoneyName = "ask_money";
-                int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+                int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
                 //金额退还后账户余额
                 float balance = money + askMoneyValue;
 
@@ -593,7 +590,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             Float money = user.getMoney();
             //获取报名金的金额
             String askMoneyName = "ask_money";
-            int askMoneyValue = appointmentUtil.getRootMessage(askMoneyName);
+            int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
             //金额退还后账户余额
             float balance = money + askMoneyValue;
 
@@ -752,7 +749,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 if (appointment.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
-                    int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+                    int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
                     map.put("sincerityMoneyValue",sincerityMoneyValue);
                 }
                 map.put("nickname",nickname);

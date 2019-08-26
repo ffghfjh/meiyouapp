@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * @program: meiyou
- * @description:
+ * @description: 我的发布实现类
  * @author: JK
  * @create: 2019-08-26 15:03
  **/

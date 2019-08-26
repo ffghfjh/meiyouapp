@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @program: meiyou
- * @description:
+ * @description: 我的发布控制层
  * @author: JK
  * @create: 2019-08-26 15:04
  **/

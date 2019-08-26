@@ -600,12 +600,26 @@ public class TourServiceImpl implements TourService {
             return Msg.noLogin();
         }
         TourExample tourExample = new TourExample();
-        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+        tourExample.createCriteria().andIdEqualTo(id)
+                .andStateEqualTo(4)
+                .andPublishIdEqualTo(Integer.parseInt(uid));
         Tour tour = new Tour();
         tour.setState(5);
         tour.setUpdateTime(new Date());
         //更改发布者状态为5，报名者已到达，订单完成
         int i = tourMapper.updateByExampleSelective(tour, tourExample);
+
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(6)
+                .andAppointIdEqualTo(id);
+        TourAsk tourAsk = new TourAsk();
+        if (i == 1){
+            tourAsk.setAskState0(7);
+        }
+        tourAsk.setAskState0(6);
+        //更改报名者状态为7，报名者已到达，订单完成
+        int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+        int i2 = i + i1;
         if (i == 1){
             return Msg.success();
         }
@@ -624,9 +638,7 @@ public class TourServiceImpl implements TourService {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            Msg noLogin = Msg.noLogin();
-            msg.add("noLogin", noLogin);
-            return msg;
+            return Msg.noLogin();
         }
 
         //范围半径

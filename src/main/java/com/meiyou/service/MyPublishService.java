@@ -4,7 +4,7 @@ import com.meiyou.utils.Msg;
 
 /**
  * @program: meiyou
- * @description:
+ * @description: 我的发布接口
  * @author: JK
  * @create: 2019-08-26 15:03
  **/

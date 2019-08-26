@@ -96,10 +96,10 @@ public class AppointmentController {
      * @Date: 2019/8/22
      */
     @ApiOperation(value = "取消发布约会订单", notes = "取消发布约会订单", httpMethod = "POST")
-    @PostMapping(value = "/deletePublish")
-    public Msg deletePublish(@RequestParam(value = "id", required = false) Integer id,
+    @PostMapping(value = "/deleteAppointmentPublish")
+    public Msg deleteAppointmentPublish(@RequestParam(value = "id", required = false) Integer id,
                              @RequestParam(value = "token", required = false) String token) {
-        return appointmentService.deletePublish(id, token);
+        return appointmentService.deleteAppointmentPublish(id, token);
 
     }
 
@@ -121,12 +121,12 @@ public class AppointmentController {
      * @Date: 2019/8/22
      */
     @ApiOperation(value = "从多个约会订单中选择一个进行报名", notes = "从多个约会订单中选择一个进行报名", httpMethod = "POST")
-    @PostMapping(value = "/startEnrollment")
-    public Msg startEnrollment(@RequestParam(value = "uid", required = false) String uid,
+    @PostMapping(value = "/appointmentAsk")
+    public Msg appointmentAsk(@RequestParam(value = "uid", required = false) String uid,
                                @RequestParam(value = "id", required = false) Integer id,
                                @RequestParam(value = "password", required = false) String password,
                                @RequestParam(value = "token", required = false) String token) {
-        return appointmentService.startEnrollment(uid, password, id, token);
+        return appointmentService.appointmentAsk(uid, password, id, token);
     }
 
     /**
@@ -135,9 +135,9 @@ public class AppointmentController {
      * @Date: 2019/8/23
      */
     @ApiOperation(value = "取消报名", notes = "取消报名, 退还美金", httpMethod = "POST")
-    @PostMapping(value = "/endEnrollment")
-    public Msg endEnrollment(String uid, Integer id, String token){
-        return appointmentService.endEnrollment(uid,id,token);
+    @PostMapping(value = "/endAppointmentAsk")
+    public Msg endAppointmentAsk(String uid, Integer id, String token){
+        return appointmentService.endAppointmentAsk(uid,id,token);
     }
 
     /**
@@ -147,9 +147,9 @@ public class AppointmentController {
      * @Date: 2019/8/22
      */
     @ApiOperation(value = "确定约会人选", notes = "从所有报名某个约会的人员信息中选择一个进行确认，没有被选中的人退还报名金", httpMethod = "POST")
-    @PostMapping(value = "/confirmUserId")
-    public Msg confirmUserId(String uid,Integer askerId,Integer appointId,String token) {
-        return appointmentService.confirmUserId(uid,askerId, appointId,token);
+    @PostMapping(value = "/confirmAppointmentUserId")
+    public Msg confirmAppointmentUserId(String uid,Integer askerId,Integer appointId,String token) {
+        return appointmentService.confirmAppointmentUserId(uid,askerId, appointId,token);
     }
 
 
@@ -170,9 +170,9 @@ public class AppointmentController {
      * @Date: 2019/8/24
      */
     @ApiOperation(value = "重新发布", notes = "由于发布者自己原因重新发布，退还报名金", httpMethod = "POST")
-    @PostMapping(value = "/againRelease")
-    public Msg againRelease(String uid, Integer id, String token) {
-        return appointmentService.againRelease(uid,id,token);
+    @PostMapping(value = "/againReleaseAppointment")
+    public Msg againReleaseAppointment(String uid, Integer id, String token) {
+        return appointmentService.againReleaseAppointment(uid,id,token);
     }
 
     /**

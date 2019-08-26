@@ -143,7 +143,7 @@ public class CommentServiceImpl implements CommentService {
         Msg msg = new Msg();
         //获取我发布的所有动态
         ActivityExample example = new ActivityExample();
-        example.setOrderByClause("create_time desc");
+        example.setOrderByClause("id desc");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
         List<Activity> activities = activityMapper.selectByExample(example);
@@ -156,7 +156,8 @@ public class CommentServiceImpl implements CommentService {
         for (Activity activity : activities) {
             //查询对此条动态的所有评论
             CommentExample example1 = new CommentExample();
-            example1.setOrderByClause("create_time desc");
+            //根据更新时间升序排序，使得每次新评论都在最前面
+            example1.setOrderByClause("id desc");
             CommentExample.Criteria criteria1 = example1.createCriteria();
             criteria1.andActivityIdEqualTo(activity.getId());
             List<Comment> comments = commentMapper.selectByExample(example1);
@@ -190,16 +191,16 @@ public class CommentServiceImpl implements CommentService {
                 HashMap<String, Object> hashMap = new HashMap<String, Object>();
                 hashMap.put("header", user.getHeader());
                 hashMap.put("nickname", user.getNickname());
-                //动态id
-                hashMap.put("aid", activity.getId());
-                hashMap.put("ActivityTime", DateUtil.formatDateTime(activity.getCreateTime()));
-                hashMap.put("AcitivityContent", activity.getContent());
                 //装载评论id
                 hashMap.put("cid", comment.getId());
                 //装载评论时间
                 hashMap.put("comTime", DateUtil.formatDateTime(comment.getCreateTime()));
                 //装载评论内容
                 hashMap.put("content", comment.getContent());
+                //动态id
+                hashMap.put("aid", activity.getId());
+                hashMap.put("ActivityTime", DateUtil.formatDateTime(activity.getCreateTime()));
+                hashMap.put("AcitivityContent", activity.getContent());
                 list.add(hashMap);
             }
         }

@@ -237,8 +237,6 @@ public class CommentServiceImpl implements CommentService {
             if (comments.isEmpty()) {
                 continue;
             }
-            count += comments.size();
-            //剔除不存在的用户评论数
             for (Comment comment : comments) {
                 User user = userService.getUserById(comment.getPersonId());
                 boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
@@ -248,8 +246,9 @@ public class CommentServiceImpl implements CommentService {
                 //如果是30天前的评论不要提醒我
                 long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
                 if (between > 30 ) {
-                    count --;
+                    continue;
                 }
+                count++;
             }
         }
         msg.setCode(100);

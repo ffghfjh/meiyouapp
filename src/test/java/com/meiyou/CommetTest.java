@@ -33,9 +33,6 @@ public class CommetTest {
         System.out.println("评论的条数为：" + comments.size());
         for (Comment comment : comments) {
             System.out.println("hzy---评论内容为： " + comment.getContent());
-            System.out.println("hzy---用户昵称为： " + comment.getUser().getNickname());
-            System.out.println("hzy--动态id为：" + comment.getActivity().getId());
-            System.out.println("hzy---动态内容为： " + comment.getActivity().getContent());
         }
     }
 

@@ -161,6 +161,14 @@ public class BaseServiceImpl {
 
         shopVO.setStar(starNums);
 
+        //把发布者的信息传入ShopVO类中
+        User user = getUserByUid(shop.getPublishId());
+        shopVO.setPublishIdNickname(user.getNickname());
+        shopVO.setPublishIdBirthday(user.getBirthday());
+        shopVO.setPublishIdHeader(user.getHeader());
+        shopVO.setPublishIdSex(user.getSex());
+        shopVO.setPublishIdSignature(user.getSignature());
+
         return shopVO;
     }
 

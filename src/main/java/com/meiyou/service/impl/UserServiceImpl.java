@@ -19,7 +19,6 @@ import com.meiyou.utils.*;
 import com.tls.tls_sigature.tls_sigature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -393,6 +392,23 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+
+    /**
+    * @Description: 查询用户余额
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Override
+    public String selectUserMoney(String uid,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return "登陆失败";
+        }
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        Float money = user.getMoney();
+        return String.valueOf(money);
     }
 
 

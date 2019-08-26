@@ -63,4 +63,10 @@ public interface UserService {
      */
     Msg getRedPackage(int id);
 
+    /**
+    * @Description: 查询用户余额
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    String selectUserMoney(String uid,String password);
 }

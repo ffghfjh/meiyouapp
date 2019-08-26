@@ -136,7 +136,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         int i = 0;
         if (state == 1) {
             AppointmentExample example = new AppointmentExample();
-            example.createCriteria().andIdEqualTo(id);
+            example.createCriteria().andIdEqualTo(id)
+                        .andPublisherIdEqualTo(appointment.getPublisherId());
             appointment.setState(5);
             appointment.setUpdateTime(new Date());
             i = appointmentMapper.updateByExample(appointment, example);
@@ -245,7 +246,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         AppointAskExample appointAskExample1 = new AppointAskExample();
         appointAskExample1.createCriteria().andAppointIdEqualTo(id)
-                .andAskStateEqualTo(1);
+                .andAskStateEqualTo(1)
+                .andAskerIdEqualTo(Integer.parseInt(uid));
         //获取当前约会订单报名人数
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample1);
         //当前约会订单报名人数为空并且为0，则修改该约会订单状态为1
@@ -326,7 +328,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
         AppointmentExample example = new AppointmentExample();
-        example.createCriteria().andIdEqualTo(appointId);
+        example.createCriteria().andIdEqualTo(appointId)
+                    .andPublisherIdEqualTo(Integer.parseInt(uid));
         appointment.setConfirmId(askerId);
         //在约会表中3是选中人员等待赴约状态
         appointment.setState(3);
@@ -599,13 +602,27 @@ public class AppointmentServiceImpl implements AppointmentService {
             return Msg.noLogin();
         }
         AppointmentExample appointmentExample = new AppointmentExample();
-        appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+        appointmentExample.createCriteria().andIdEqualTo(id)
+                .andStateEqualTo(4)
+                .andPublisherIdEqualTo(Integer.parseInt(uid));
         Appointment appointment = new Appointment();
         appointment.setState(5);
         appointment.setUpdateTime(new Date());
         //更改发布者状态为5，报名者已到达，订单完成
         int i = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskStateEqualTo(6)
+                .andAppointIdEqualTo(id);
+        AppointAsk appointAsk = new AppointAsk();
         if (i == 1){
+            appointAsk.setAskState(7);
+        }
+        appointAsk.setAskState(6);
+        //更改报名者状态为7，报名者已到达，订单完成
+        int i1 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+        int i2 = i + i1;
+        if (i2 == 2){
             return Msg.success();
         }
         return Msg.fail();
@@ -622,9 +639,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            Msg noLogin = Msg.noLogin();
-            msg.add("noLogin", noLogin);
-            return msg;
+            return Msg.noLogin();
         }
 
         //范围半径

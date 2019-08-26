@@ -141,7 +141,8 @@ public class TourServiceImpl implements TourService {
         int i = 0;
         if (state == 1) {
             TourExample tourExample = new TourExample();
-            tourExample.createCriteria().andIdEqualTo(id);
+            tourExample.createCriteria().andIdEqualTo(id)
+                        .andPublishIdEqualTo(tour.getPublishId());
             tour.setState(5);
             tour.setUpdateTime(new Date());
             i = tourMapper.updateByExample(tour, tourExample);
@@ -249,7 +250,8 @@ public class TourServiceImpl implements TourService {
 
         TourAskExample tourAskExample1 = new TourAskExample();
         tourAskExample1.createCriteria().andAppointIdEqualTo(id)
-                .andAskState0EqualTo(1);
+                .andAskState0EqualTo(1)
+                .andAskerIdEqualTo(Integer.parseInt(uid));
         //获取当前旅游订单报名人数
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample1);
         //当前旅游订单报名人数为空并且为0，则修改该约会订单状态为1
@@ -329,7 +331,8 @@ public class TourServiceImpl implements TourService {
         }
         Tour tour = tourMapper.selectByPrimaryKey(appointId);
         TourExample tourExample = new TourExample();
-        tourExample.createCriteria().andIdEqualTo(appointId);
+        tourExample.createCriteria().andIdEqualTo(appointId)
+                .andPublishIdEqualTo(Integer.parseInt(uid));
         tour.setConfirmId(askerId);
         //在旅游表中3是选中人员等待赴约状态
         tour.setState(3);
@@ -600,12 +603,26 @@ public class TourServiceImpl implements TourService {
             return Msg.noLogin();
         }
         TourExample tourExample = new TourExample();
-        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+        tourExample.createCriteria().andIdEqualTo(id)
+                .andStateEqualTo(4)
+                .andPublishIdEqualTo(Integer.parseInt(uid));
         Tour tour = new Tour();
         tour.setState(5);
         tour.setUpdateTime(new Date());
         //更改发布者状态为5，报名者已到达，订单完成
         int i = tourMapper.updateByExampleSelective(tour, tourExample);
+
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(6)
+                .andAppointIdEqualTo(id);
+        TourAsk tourAsk = new TourAsk();
+        if (i == 1){
+            tourAsk.setAskState0(7);
+        }
+        tourAsk.setAskState0(6);
+        //更改报名者状态为7，报名者已到达，订单完成
+        int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+        int i2 = i + i1;
         if (i == 1){
             return Msg.success();
         }
@@ -624,9 +641,7 @@ public class TourServiceImpl implements TourService {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            Msg noLogin = Msg.noLogin();
-            msg.add("noLogin", noLogin);
-            return msg;
+            return Msg.noLogin();
         }
 
         //范围半径

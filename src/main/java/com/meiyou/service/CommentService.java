@@ -27,4 +27,28 @@ public interface CommentService {
      */
     Msg listCommentByUidAid(int uid, int aid);
 
+
+    /**
+     * 获取用户对我特定动态的评论
+     * @param uid
+     * @return
+     */
+    Msg listUserCommentForMyActivity(int uid);
+
+    /**
+     *
+     * @param uid
+     * @return
+     */
+    Msg getNotSeenComment(int uid);
+
+
+    /**
+     * 修改评论为已读状态
+     * @param cid
+     * @return
+     */
+    int updateCommentSeen(int cid);
+
+
 }

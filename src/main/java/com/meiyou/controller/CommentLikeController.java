@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "CommentLikeController", tags = {"评论点赞控制层"})
+@Api(value = "CommentLikeController", tags = {"动态评论点赞控制层"})
 @RequestMapping("/CommentLike")
 @RestController
 public class CommentLikeController {

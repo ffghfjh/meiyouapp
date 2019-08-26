@@ -445,16 +445,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Msg getRedPackage(int id) {
+    public Msg getRedPackage(int id,int uid) {
         RedPacket redPacket = redPacketMapper.selectByPrimaryKey(id);
         if(redPacket.getState()==0){
             redPacket.setState(1);
             Date date = new Date();
             redPacket.setUpdateTime(date);
             if(redPacketMapper.updateByPrimaryKey(redPacket)==1){
-                if(addMoney(redPacket.getReceiveId(),redPacket.getMoney())){
-                    return Msg.success();
-                }
+
+                    if(addMoney(redPacket.getReceiveId(),redPacket.getMoney())){
+                        return Msg.success();
+                    }
+                   
             }
 
         }

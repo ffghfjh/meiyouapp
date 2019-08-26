@@ -61,6 +61,6 @@ public interface UserService {
      * @param id
      * @return
      */
-    Msg getRedPackage(int id);
+    Msg getRedPackage(int id,int uid);
 
 }

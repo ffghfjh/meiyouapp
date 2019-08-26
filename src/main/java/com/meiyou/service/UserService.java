@@ -49,4 +49,11 @@ public interface UserService {
      */
     Msg sendMoney(int id,String text,int money,String toAccount);
 
+    /**
+     * 查询红包
+     * @param id
+     * @return
+     */
+    Msg selRedPackage(int id);
+
 }

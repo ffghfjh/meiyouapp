@@ -146,4 +146,9 @@ public class UserController {
         }
         return Msg.noLogin();
     }
+    @RequestMapping(value="selRedPackage",method = RequestMethod.GET)
+    @ApiOperation("查询红包状态")
+    public Msg selRedPackage(int id){
+        return userService.selRedPackage(id);
+    }
 }

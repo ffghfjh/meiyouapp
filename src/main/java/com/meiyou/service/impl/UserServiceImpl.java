@@ -435,4 +435,10 @@ public class UserServiceImpl implements UserService {
         }
         return Msg.fail();
     }
+
+    @Override
+    public Msg selRedPackage(int id) {
+        int state = redPacketMapper.selectByPrimaryKey(id).getState();
+        return Msg.success().add("state",state);
+    }
 }

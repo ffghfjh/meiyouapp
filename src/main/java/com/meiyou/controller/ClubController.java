@@ -91,13 +91,6 @@ public class ClubController {
         return clubService.updateClub(uid, token, cid);
     }
 
-    @GetMapping("/get")
-    @ApiOperation(value = "通过用户id查找指定用户id的全部推拿会所",notes = "返回为ClubVO类,nums为报名人数")
-    public Msg getClubByUid(@RequestParam("uid") Integer uid,
-                            @RequestParam("token") String token){
-       return clubService.selectByUid(uid, token);
-    }
-
     @GetMapping("/find")
     @ApiOperation(value = "通过会所id查找对应的会所",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,

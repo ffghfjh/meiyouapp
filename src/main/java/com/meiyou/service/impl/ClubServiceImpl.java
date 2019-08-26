@@ -151,39 +151,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
-    /**
-     * 查找指定用户发布的有效按摩会所
-     * @param uid
-     * @return
-     */
-    @Override
-    @Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-    public Msg selectByUid(Integer uid,String token) {
-//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
 
-        Msg msg = new Msg();
-        //查找发布出去的有效按摩会所
-        ClubExample clubExample = new ClubExample();
-        clubExample.createCriteria().andPublishIdEqualTo(uid);
-        List<Club> result = clubMapper.selectByExample(clubExample);
-
-        List<ClubVO> clubVOS = new ArrayList<>();
-        if(result == null && result.size() == 0){
-            return Msg.fail();
-        }
-
-        for(Club club : result){
-            //把每一个重新赋值的clubVO类加到新的集合中
-            clubVOS.add(setClubToClubVO(club));
-        }
-        msg.add("clubVOS",clubVOS);
-        msg.setCode(100);
-        msg.setMsg("成功");
-
-        return msg;
-    }
 
     /**
      * 查看指定的按摩会所
@@ -274,72 +242,5 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return msg;
     }
 
-    /**
-     * 把Club对象中的值转移到ClubVO对象中
-     * @param club
-     * @return
-     */
-    public ClubVO setClubToClubVO(Club club){
 
-        //查找报名每个会所的人数
-        ClubBuyExample example = new ClubBuyExample();
-        example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
-        List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
-        List<String> list = new ArrayList<>();
-
-        //通过查询出来的Club,报名人头像,Club星级赋值给ClubVO
-        Integer nums = clubBuys.size();
-
-        //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
-        for(ClubBuy c : clubBuys){
-            list.add(getUserByUid(c.getBuyerId()).getHeader());
-        }
-
-        ClubVO clubVO = new ClubVO();
-        clubVO.setNums(nums);
-        clubVO.setId(club.getId());
-        clubVO.setPublishId(club.getPublishId());
-        clubVO.setImgsUrl(club.getImgsUrl());
-        clubVO.setProjectName(club.getProjectName());
-        clubVO.setProjectDesc(club.getProjectDesc());
-        clubVO.setProjectAddress(club.getProjectAddress());
-        clubVO.setProjectPrice(club.getProjectPrice());
-        clubVO.setMarketPrice(club.getMarketPrice());
-        clubVO.setHeader(list);
-        clubVO.setState(club.getState());
-
-        //查找此club的星级
-        Integer starNums = getStarNumsByClubId(club.getId());
-
-        clubVO.setStar(starNums);
-
-        return clubVO;
-    }
-
-    /**
-     * 通过club_id查找此club的星级
-     * @param cid
-     * @return
-     */
-    public Integer getStarNumsByClubId(Integer cid){
-        //查询这个club的星级(每一个clubStar的和除以评论人)
-        ClubStarExample clubStarExample = new ClubStarExample();
-        clubStarExample.createCriteria().andClubIdEqualTo(cid);
-        List<ClubStar> clubStars = clubStarMapper.selectByExample(clubStarExample);
-
-        //没有人评论，默认为5星
-        if(clubStars.size() == 0 && clubStars ==null){
-            return 5;
-        }
-
-        //有人评星则进行计算
-        int starNums = 0;
-        for(ClubStar clubStar: clubStars){
-            starNums = starNums + clubStar.getStar();
-        }
-
-        //求平均星个数
-        starNums = starNums/clubStars.size();
-        return starNums;
-    }
 }

@@ -1,11 +1,14 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyPublishService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,12 +17,12 @@ import java.util.List;
 
 /**
  * @program: meiyou
- * @description:
+ * @description: 我的发布
  * @author: JK
  * @create: 2019-08-26 15:03
  **/
 @Service
-public class MyPublishServiceImpl implements MyPublishService {
+public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -30,6 +33,12 @@ public class MyPublishServiceImpl implements MyPublishService {
     private TourMapper tourMapper;
     @Autowired
     private TourAskMapper tourAskMapper;
+
+    @Autowired
+    ClubMapper clubMapper;
+
+    @Autowired
+    ShopMapper shopMapper;
 
     /**
      * @Description: 查询我的约会发布列表
@@ -188,4 +197,77 @@ public class MyPublishServiceImpl implements MyPublishService {
         msg.add("fail", fail);
         return msg;
     }
+
+
+    /**
+     * 查找指定用户发布的有效按摩会所
+     * @param uid
+     * @return
+     */
+    @Override
+    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
+    public Msg selectClubByUid(Integer uid,String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Msg msg = new Msg();
+        //查找发布出去的有效按摩会所
+        ClubExample clubExample = new ClubExample();
+        clubExample.createCriteria().andPublishIdEqualTo(uid);
+        List<Club> result = clubMapper.selectByExample(clubExample);
+
+        List<ClubVO> clubVOS = new ArrayList<>();
+        if(result == null && result.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("没有找到指定对象的Shop");
+            return msg;
+        }
+
+        for(Club club : result){
+            //把每一个重新赋值的clubVO类加到新的集合中
+            clubVOS.add(setClubToClubVO(club));
+        }
+        msg.add("clubVOS",clubVOS);
+        msg.setCode(100);
+        msg.setMsg("成功");
+
+        return msg;
+    }
+
+    /**
+     * 查找用户发布的景点商家shop
+     * @param uid
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg selectShopByUid(Integer uid, String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
+        ShopExample shopExample = new ShopExample();
+        shopExample.createCriteria().andPublishIdEqualTo(uid);
+        List<Shop> result = shopMapper.selectByExample(shopExample);
+
+        if(result == null && result.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("没有找到指定对象的Shop");
+            return msg;
+        }
+
+        //添加人数到VO类中
+        List<ShopVO> shopVOS = new ArrayList<>();
+        for(Shop shop : result){
+            //把每一个重新赋值的shopVOS类加到新的集合中
+            shopVOS.add(setShopToShopVO(shop));
+        }
+
+        msg.add("shopVOS",shopVOS);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
+
 }

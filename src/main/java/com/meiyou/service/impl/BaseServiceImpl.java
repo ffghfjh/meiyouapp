@@ -1,15 +1,18 @@
 package com.meiyou.service.impl;
 
-import com.meiyou.mapper.RootMessageMapper;
-import com.meiyou.mapper.UserMapper;
+import com.meiyou.mapper.*;
+import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
-import com.meiyou.pojo.RootMessageExample;
-import com.meiyou.pojo.User;
+import com.meiyou.model.ShopVO;
+import com.meiyou.pojo.*;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 重复写的一些方法，进行了简单封装，可以一起用
@@ -23,6 +26,18 @@ public class BaseServiceImpl {
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    ClubBuyMapper clubBuyMapper;
+
+    @Autowired
+    ClubStarMapper clubStarMapper;
+
+    @Autowired
+    ShopBuyMapper shopBuyMapper;
+
+    @Autowired
+    ShopStarMapper shopStarMapper;
 
     /**
      * 获取系统数据表数据
@@ -64,5 +79,150 @@ public class BaseServiceImpl {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 把Club对象中的值转移到ClubVO对象中
+     * @param club
+     * @return
+     */
+    public ClubVO setClubToClubVO(Club club){
+
+        //查找报名每个会所的人数
+        ClubBuyExample example = new ClubBuyExample();
+        example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
+        List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
+        List<String> list = new ArrayList<>();
+
+        //通过查询出来的Club,报名人头像,Club星级赋值给ClubVO
+        Integer nums = clubBuys.size();
+
+        //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
+        for(ClubBuy c : clubBuys){
+            list.add(getUserByUid(c.getBuyerId()).getHeader());
+        }
+
+        ClubVO clubVO = new ClubVO();
+        clubVO.setNums(nums);
+        clubVO.setId(club.getId());
+        clubVO.setPublishId(club.getPublishId());
+        clubVO.setImgsUrl(club.getImgsUrl());
+        clubVO.setProjectName(club.getProjectName());
+        clubVO.setProjectDesc(club.getProjectDesc());
+        clubVO.setProjectAddress(club.getProjectAddress());
+        clubVO.setProjectPrice(club.getProjectPrice());
+        clubVO.setMarketPrice(club.getMarketPrice());
+        clubVO.setHeader(list);
+        clubVO.setState(club.getState());
+
+        //查找此club的星级
+        Integer starNums = getStarNumsByClubId(club.getId());
+
+        clubVO.setStar(starNums);
+
+        return clubVO;
+    }
+
+    /**
+     * 把Shop对象中的值转移到ShopVO对象中
+     * @param shop
+     * @return
+     */
+    public ShopVO setShopToShopVO(Shop shop){
+
+        //查找报名每个会所的人数
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(shop.getId());
+        List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
+        List<String> list = new ArrayList<>();
+
+        //通过查询出来的Shop,报名人头像,Shop星级赋值给ShopVO
+        Integer nums = shopBuys.size();
+
+        //查询每一个发布的Shop中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
+        for(ShopBuy s : shopBuys){
+            list.add(getUserByUid(s.getBuyerId()).getHeader());
+        }
+
+        ShopVO shopVO = new ShopVO();
+        shopVO.setNums(nums);
+        shopVO.setId(shop.getId());
+        shopVO.setPublishId(shop.getPublishId());
+        shopVO.setImgsUrl(shop.getImgsUrl());
+        shopVO.setServiceArea(shop.getServiceArea());
+        shopVO.setTravelTime(shop.getTravelTime());
+        shopVO.setCharge(shop.getCharge());
+        shopVO.setBoolClose(shop.getBoolClose());
+        shopVO.setHeader(list);
+        shopVO.setState(shop.getState());
+
+        //查找此Shop的星级
+        Integer starNums = getStarNumsByGuideId(shop.getId());
+
+        shopVO.setStar(starNums);
+
+        return shopVO;
+    }
+
+    /**
+     * 通过club_id查找此club的星级
+     * @param cid
+     * @return
+     */
+    public Integer getStarNumsByClubId(Integer cid){
+        //查询这个club的星级(每一个clubStar的和除以评论人)
+        ClubStarExample clubStarExample = new ClubStarExample();
+        clubStarExample.createCriteria().andClubIdEqualTo(cid);
+        List<ClubStar> clubStars = clubStarMapper.selectByExample(clubStarExample);
+
+        //没有人评论，默认为5星
+        if(clubStars.size() == 0 && clubStars ==null){
+            return 5;
+        }
+
+        //有人评星则进行计算
+        int starNums = 0;
+        for(ClubStar clubStar: clubStars){
+            starNums = starNums + clubStar.getStar();
+        }
+
+        //求平均星个数
+        int size = clubStars.size();
+        if(size == 0){
+            return 5;
+        }
+        starNums = starNums/size;
+        return starNums;
+    }
+
+    /**
+     * 通过guide_id查找此的星级
+     * @param gid
+     * @return
+     */
+    public Integer getStarNumsByGuideId(Integer gid){
+        //查询这个shop的星级(每一个shopStar的和除以评论人)
+        ShopStarExample example = new ShopStarExample();
+        example.createCriteria().andGuideIdEqualTo(gid);
+        List<ShopStar> shopStars = shopStarMapper.selectByExample(example);
+
+        //没有人评论，默认为5星
+        if(shopStars.size() == 0 && shopStars ==null){
+            return 5;
+        }
+
+        //有人评星则进行计算
+        int starNums = 0;
+        for(ShopStar shopStar: shopStars){
+            starNums = starNums + shopStar.getStart();
+        }
+
+        //求平均星个数
+        int size = shopStars.size();
+        if(size == 0){
+            return 5;
+        }
+        starNums = starNums/size;
+        return starNums;
     }
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.model.MqttMessageModel;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
@@ -192,7 +193,7 @@ public class MqttServiceImpl implements MqttService {
     }
 
 
-    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, MqttMessageModel.AliRtcAuthInfo info){
+    private void sendMessage(int chatType, int msgType, String sender, String reiver, String topic, AliRtcAuthInfo info){
         MqttMessageFactory factory = new MqttMessageFactory(chatType,msgType,sender,reiver,info);
         JSONObject object = factory.getJsonObject();
         final MqttMessage toClientMessage = new MqttMessage(object.toJSONString().getBytes());

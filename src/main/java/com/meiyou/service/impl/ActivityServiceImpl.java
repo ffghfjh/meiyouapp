@@ -16,10 +16,7 @@ import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.ActivityService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
-import com.meiyou.utils.Constants;
-import com.meiyou.utils.FileUploadUtil;
-import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.*;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -310,6 +307,10 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
+        for (HashMap<String, Object> hashMap : list) {
+
+        }
+        Collections.sort(list, new MyComparator());
         Msg msg = new Msg();
         msg.setCode(100);
         msg.setMsg("查找动态成功");

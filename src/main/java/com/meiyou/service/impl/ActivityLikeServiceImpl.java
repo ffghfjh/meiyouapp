@@ -98,6 +98,7 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         Msg msg = new Msg();
         //获取我自己的所有动态
         ActivityExample example = new ActivityExample();
+        example.setOrderByClause("create_time desc");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
         List<Activity> activities = activityMapper.selectByExample(example);
@@ -111,10 +112,10 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         for (Activity activity : activities) {
             //获取对我这条动态的点赞记录
             ActivityLikeExample example1 = new ActivityLikeExample();
+            example1.setOrderByClause("create_time desc");
             ActivityLikeExample.Criteria criteria1 = example1.createCriteria();
             criteria1.andActivityIdEqualTo(activity.getId());
             List<ActivityLike> activityLikes = activityLikeMapper.selectByExample(example1);
-            //判断这条动态是否有被点赞过
             if (activityLikes == null || activityLikes.isEmpty()) {
                 continue;
             }
@@ -145,7 +146,11 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
                 HashMap<String, Object> hashMap = new HashMap<String, Object>();
                 hashMap.put("header", user.getHeader());
                 hashMap.put("nickname", user.getNickname());
+                //装载点赞时间
+                hashMap.put("likeTime", DateUtil.formatDateTime(activityLike.getCreateTime()));
                 hashMap.put("ActivityContent", activity.getContent());
+                //转载动态时间
+                hashMap.put("ActivityTime", DateUtil.formatDateTime(activity.getCreateTime()));
                 hashMap.put("aid", activity.getId());
                 list.add(hashMap);
             }

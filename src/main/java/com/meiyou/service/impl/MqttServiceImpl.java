@@ -6,7 +6,6 @@ import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliRtcAuthInfo;
 import com.meiyou.model.MqttMessageModel;
-import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.RootMessageExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
@@ -15,11 +14,9 @@ import com.meiyou.utils.ConnectionOptionWrapper;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.MqttConstants;
 import com.meiyou.utils.MqttMessageFactory;
-import org.apache.tomcat.util.bcel.Const;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +31,6 @@ import java.util.concurrent.TimeUnit;
  * @author: dengshilin
  * @create: 2019-08-21 22:07
  **/
-@Service
 public class MqttServiceImpl implements MqttService {
 
     @Autowired
@@ -79,7 +75,6 @@ public class MqttServiceImpl implements MqttService {
 
 
 
-    final MemoryPersistence memoryPersistence = new MemoryPersistence();
 
     public MqttServiceImpl(){
         System.out.println("mqtt服务启动");
@@ -88,7 +83,7 @@ public class MqttServiceImpl implements MqttService {
                 /**
                  * QoS参数代表传输质量，可选0，1，2，根据实际需求合理设置，具体参考 https://help.aliyun.com/document_detail/42420.html?spm=a2c4g.11186623.6.544.1ea529cfAO5zV3
                  */
-                final int qosLevel = 2;
+                final int qosLevel = 1;
                 final ConnectionOptionWrapper connectionOptionWrapper = new ConnectionOptionWrapper(instanceId, accessKey, secretKey, clientId);
                 final MemoryPersistence memoryPersistence = new MemoryPersistence();
 
@@ -104,7 +99,7 @@ public class MqttServiceImpl implements MqttService {
                 mqttClient.setTimeToWait(20000);
                 final ExecutorService executorService = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
                         new LinkedBlockingQueue<Runnable>());
-                /**
+                        /**
                  * 客户端设置连接回调
                  */
                 mqttClient.setCallback(new MqttCallbackExtended() {
@@ -112,6 +107,7 @@ public class MqttServiceImpl implements MqttService {
                     @Override
                     public void connectionLost(Throwable cause) {
                         System.out.println("mqtt服务连接失败");
+                        cause.printStackTrace();
                     }
 
                     @Override
@@ -129,14 +125,12 @@ public class MqttServiceImpl implements MqttService {
                             }else{
                                 MqttMessageFactory factory = new MqttMessageFactory(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getSender(),null);
                                 MqttMessage message1 = new MqttMessage();
-                                message1.setQos(2);
+                                message1.setQos(1);
                                 message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
                                 mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
-                                sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),parentTopic+"/"+mqttMessage.getSender(),null);
+//                                sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),parentTopic+"/"+mqttMessage.getSender(),null);
                             }
                         }
-
-
                     }
 
                     @Override
@@ -166,8 +160,6 @@ public class MqttServiceImpl implements MqttService {
                 });
                 //连接mqtt服务
                 mqttClient.connect(connectionOptionWrapper.getMqttConnectOptions());
-
-
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (InvalidKeyException e) {
@@ -177,7 +169,6 @@ public class MqttServiceImpl implements MqttService {
             }
         }
     }
-
     /**
      * 查询发送者余额
      * @param sender

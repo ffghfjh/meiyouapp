@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @program: meiyouapp
@@ -84,12 +83,11 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "POST")
+    @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "GET")
     @GetMapping(value = "/selectAppointmentList")
-    public Map<String, Object> selectAppointmentList(String uid,String token) {
+    public Msg selectAppointmentList(String uid,String token) {
         Msg msg = appointmentService.selectAppointmentList(uid, token);
-        Map<String, Object> extend = msg.getExtend();
-        return extend;
+        return msg;
     }
 
     /**
@@ -110,12 +108,11 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "POST")
+    @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "GET")
     @GetMapping(value = "/selectAppointAskList")
-    public Map<String, Object> selectAppointAskList(String uid,Integer appointId,String token) {
+    public Msg selectAppointAskList(String uid,Integer appointId,String token) {
         Msg msg = appointmentService.selectAppointAskList(uid,appointId,token);
-        Map<String, Object> extend = msg.getExtend();
-        return extend;
+        return msg;
     }
 
     /**
@@ -198,5 +195,17 @@ public class AppointmentController {
     @PostMapping(value = "/confirmArrive")
     public Msg confirmArrive(String uid, Integer id, String token) {
         return appointmentService.confirmArrive(uid,id,token);
+    }
+
+    /**
+     * @Description: 查看热门约会
+     * @Author: JK
+     * @Date: 2019/8/24
+     */
+    @ApiOperation(value = "查看热门约会", notes = "查看热门约会", httpMethod = "GET")
+    @GetMapping(value = "/selectHotAppointment")
+    public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
+        Msg msg = appointmentService.selectHotAppointment(uid, token, latitude, longitude);
+        return msg;
     }
 }

@@ -48,7 +48,13 @@ spring:
   #Redis缓存名
   cache:
     cache-names: MeiyouCache
+#  rabbitmq:
+#    addresses: 47.103.24.19
+#    username: guest
+#    password: guest
 
 mybatis:
+  config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.meiyou.pojo
+

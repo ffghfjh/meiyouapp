@@ -166,6 +166,21 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+
+        <!-- 音视频通讯 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-rtc</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>

@@ -61,11 +61,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password.toString())){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
-        }else if(money < charge){
+        }
+        if(money < charge){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
@@ -106,12 +108,15 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //获取每小时收费和聘请时间
         Integer projectPrice = shopMapper.selectByPrimaryKey(sid).getCharge();
-        Integer time = shopBuyMapper.selectByPrimaryKey(sid).getTime();
+
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
+        Integer time = shopBuyMapper.selectByExample(example).get(0).getTime();
         Integer money = time * projectPrice;
 
-        //修改聘用表状态-->取消状态-1
+        //修改聘用表状态-->取消状态-2
         ShopBuy shopBuy = new ShopBuy();
-        shopBuy.setState(1);
+        shopBuy.setState(2);
         shopBuy.setUpdateTime(new Date());
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
@@ -148,12 +153,11 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 
         Msg msg = new Msg();
-        if(result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到用户所购买的聘请记录");
         }
 
-        //Todo 人数
         msg.add("shopBuy",result);
         msg.setMsg("成功");
         msg.setCode(100);
@@ -177,7 +181,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuyExample.createCriteria().andIdEqualTo(sid).andBuyerIdEqualTo(uid);
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
         Msg msg = new Msg();
-        if(result.size() ==0 ){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("没找到指定的聘请的导游记录");
             return msg;

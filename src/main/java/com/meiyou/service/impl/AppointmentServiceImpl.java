@@ -6,6 +6,7 @@ import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
+import com.meiyou.service.RootMessageService;
 import com.meiyou.utils.AppointmentUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
@@ -13,6 +14,7 @@ import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     private UserMapper userMapper;
     @Autowired
     private AppointmentUtil appointmentUtil;
+    @Autowired
+    private RootMessageService rootMessageService;
 
     /**
      * @Description: 发布约会
@@ -104,11 +108,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             coordinate.setLatitude(latitude);
             coordinate.setLongitude(longitude);
             coordinate.setKey(appointment.getId().toString());
-            RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
-            return Msg.success();
-        } else {
-            return Msg.fail();
+            Long aLong = RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
+            if (aLong == 1){
+                return Msg.success();
+            }
         }
+        return Msg.fail();
     }
 
     /**
@@ -129,40 +134,61 @@ public class AppointmentServiceImpl implements AppointmentService {
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
-
         ArrayList<Object> arrayList = new ArrayList<>();
-
-        int size = 0;
         for (Appointment appointment : appointments) {
-            HashMap<String, Object> map = new HashMap<>();
+
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1).andAppointIdEqualTo(appointment.getId());
-            List<AppointAsk> list = appointAskMapper.selectByExample(appointAskExample);
-            //获取报名的总人数
-            size = list.size();
-            map.put("size", size);
-            appointment.getId();
-            appointment.getPublisherId();
-            appointment.getAppointAddress();
-            appointment.getAppointTime();
-            appointment.getAppointContext();
-            appointment.getNeedNumber();
-            appointment.getPayType();
-            appointment.getAppointImgs();
-            appointment.getReward();
-            appointment.getState();
-            appointment.getConfirmId();
-            appointment.getCreateTime();
-            appointment.getUpdateTime();
+            List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+            HashMap<String, Object> map = new HashMap<>();
+            int size = 0;
+            Integer state = appointment.getState();
+            if (appointment.getState() == 2){
+                ArrayList<Object> arrayList1 = new ArrayList<>();
+                for (AppointAsk appointAsk : appointAsks) {
+                    Integer askerId = appointAsk.getAskerId();
+                    User user = userMapper.selectByPrimaryKey(askerId);
+                    String askerHeader = user.getHeader();
+                    arrayList1.add(askerHeader);
+                    map.put("arrayList1",arrayList1);
+            }
+                //获取报名的总人数
+                size = appointAsks.size();
+                map.put("size", size);
+                state = appointment.getState();
+                map.put("state",state);
+            }
+            //获取用户id
+            Integer publisherId = appointment.getPublisherId();
+            User user = userMapper.selectByPrimaryKey(publisherId);
 
-            map.put("appointment", appointment);
+            String nickname = user.getNickname();
+            String header = user.getHeader();
+            String birthday = user.getBirthday();
+            String signature = user.getSignature();
+            String appointContext = appointment.getAppointContext();
+            String appointTime = appointment.getAppointTime();
+            String appointAddress = appointment.getAppointAddress();
+            String askerHeader = null;
+
+
+            map.put("nickname",nickname);
+            map.put("header",header);
+            map.put("birthday",birthday);
+            map.put("appointContext",appointContext);
+            map.put("appointTime",appointTime);
+            map.put("appointAddress",appointAddress);
+            map.put("signature",signature);
+            map.put("size",size);
+            map.put("askerHeader",askerHeader);
+            map.put("state",state);
             arrayList.add(map);
         }
 
         if (appointments != null && appointments.size() != 0) {
-            Msg success = Msg.success();
             msg.add("arrayList", arrayList);
-            msg.add("success", success);
+            msg.setCode(100);
+            msg.setMsg("发布约会列表返回成功");
             return msg;
         }
         Msg fail = Msg.fail();
@@ -355,9 +381,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(example);
 
         if (appointAsks != null && appointAsks.size() != 0) {
-            Msg success = Msg.success();
             msg.add("appointAsks", appointAsks);
-            msg.add("success", success);
+            msg.setCode(100);
+            msg.setMsg("约会报名对象返回成功");
             return msg;
         }
         Msg fail = Msg.fail();
@@ -665,4 +691,93 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         return Msg.fail();
     }
+
+    /**
+    * @Description: 查看热门约会
+    * @Author: JK
+    * @Date: 2019/8/24
+    */
+    @Override
+    public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
+        Msg msg = new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            Msg noLogin = Msg.noLogin();
+            msg.add("noLogin", noLogin);
+            return msg;
+        }
+
+        //范围半径
+        String range = rootMessageService.getMessageByName("range");
+        double radius = Double.parseDouble(range);
+        //从Redis获取附近的所有用户的动态
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(uid);
+        coordinate.setLongitude(longitude);
+        coordinate.setLatitude(latitude);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryAppointment(coordinate,radius);
+        //判断附近是否有热门约会
+        if (responseList == null || responseList.size() == 0) {
+            return Msg.fail();
+        }
+        for (GeoRadiusResponse response : responseList) {
+            //获取缓存中的key
+            String memberByString = response.getMemberByString();
+            if (memberByString == null){
+                return Msg.fail();
+            }
+
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
+            Integer state = appointment.getState();
+            //获取用户id
+            Integer publisherId = appointment.getPublisherId();
+            User user = userMapper.selectByPrimaryKey(publisherId);
+            HashMap<String, Object> map = new HashMap<>();
+            ArrayList<Object> list = new ArrayList<>();
+            if (state == 1 || state == 2){
+                String nickname = user.getNickname();
+                String header = user.getHeader();
+                String birthday = user.getBirthday();
+                Boolean sex = user.getSex();
+                String appointContext = appointment.getAppointContext();
+                String appointTime = appointment.getAppointTime();
+                String appointAddress = appointment.getAppointAddress();
+                String appointImgs = appointment.getAppointImgs();
+                Integer needNumber = appointment.getNeedNumber();
+                Integer reward = appointment.getReward();
+                Integer payType = appointment.getPayType();
+                Integer confirmId = appointment.getConfirmId();
+                Integer state1 = appointment.getState();
+                if (appointment.getPayType() == 1){
+                    //获取诚意金
+                    String sincerityMoneyName = "sincerity_money";
+                    int sincerityMoneyValue = appointmentUtil.getRootMessage(sincerityMoneyName);
+                    map.put("sincerityMoneyValue",sincerityMoneyValue);
+                }
+                map.put("nickname",nickname);
+                map.put("header",header);
+                map.put("birthday",birthday);
+                map.put("sex",sex);
+                map.put("appointContext",appointContext);
+                map.put("appointTime",appointTime);
+                map.put("appointAddress",appointAddress);
+                map.put("appointImgs",appointImgs);
+                map.put("needNumber",needNumber);
+                map.put("reward",reward);
+                map.put("payType",payType);
+                map.put("confirmId",confirmId);
+                map.put("state1",state1);
+                list.add(map);
+
+            }
+            msg.setCode(100);
+            msg.setMsg("获取附近热门约会成功");
+            return msg.add("list",list);
+        }
+        Msg fail = Msg.fail();
+        msg.add("fail",fail);
+        return msg;
+    }
+
 }

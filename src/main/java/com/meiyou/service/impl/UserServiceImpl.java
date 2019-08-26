@@ -177,7 +177,6 @@ public class UserServiceImpl implements UserService {
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
-
         return Msg.fail();
     }
 

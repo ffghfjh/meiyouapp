@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @description: 购买推拿会所控制器
  * @author: Mr.Z
@@ -45,7 +47,17 @@ public class ClubBuyController {
     @ApiOperation(value = "通过用户id查找指定用户id的全部购买的推拿会所",notes = "查找")
     public Msg getClubBuyByUid(@RequestParam("uid") Integer uid,
                                @RequestParam("token") String token){
-        return clubBuyService.selectByUid(uid,token);
+        Msg msg = new Msg();
+        List<ClubBuy> result = clubBuyService.selectByUid(uid, token);
+        if(result == null){
+            msg.setMsg("没有找到对应的ClubBuy记录");
+            msg.setCode(404);
+            return msg;
+        }
+        msg.add("clubBuy",result);
+        msg.setCode(100);
+        msg.setMsg("成功");
+        return msg;
     }
 
     @GetMapping("/find")

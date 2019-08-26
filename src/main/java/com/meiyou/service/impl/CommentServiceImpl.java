@@ -68,17 +68,22 @@ public class CommentServiceImpl implements CommentService {
         comment.setLikeNum(0);
         int insert = commentMapper.insertSelective(comment);
         if (insert == 0) {
+            System.out.println("commentMapper插入失败");
             return Msg.fail();
         }
         CommentExample example = new CommentExample();
         CommentExample.Criteria criteria = example.createCriteria();
         criteria.andActivityIdEqualTo(aid);
         int count = commentMapper.countByExample(example);
+        System.out.println("获取到的count：" + count);
         Activity activity = new Activity();
         activity.setId(aid);
+        System.out.println("aid: " + aid);
         activity.setCommontNum(count);
+        System.out.println("要存储的count" + count);
         int i = activityMapper.updateByPrimaryKeySelective(activity);
         if (i == 0) {
+            System.out.println("activityMapper更新失败");
             return Msg.fail();
         }
         return Msg.success();

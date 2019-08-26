@@ -1,7 +1,10 @@
 package com.meiyou.service;
 
+import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.utils.Msg;
+
+import java.util.List;
 
 
 /**
@@ -28,7 +31,7 @@ public interface ClubBuyService {
      * @param uid
      * @return
      */
-    Msg selectByUid(Integer uid,String token);
+    List<ClubBuy> selectByUid(Integer uid, String token);
 
     /**
      * 查找指定的会所购买记录
@@ -38,5 +41,7 @@ public interface ClubBuyService {
      * @return
      */
     Msg selectByCid(Integer uid,Integer cid,String token);
+
+    //void addClubStar(Integer uid,String token);
 
 }

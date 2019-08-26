@@ -53,7 +53,7 @@ public class BaseServiceImpl {
      * @param value
      * @return
      */
-    public String setPosition(Double latitude, Double longitude, Integer key, String value){
+    public Boolean setPosition(Double latitude, Double longitude, Integer key, String value){
         //添加地理位置和aid到Redis缓存中
         Coordinate coordinate = new Coordinate();
         coordinate.setLatitude(latitude);
@@ -61,8 +61,8 @@ public class BaseServiceImpl {
         coordinate.setKey(Integer.toString(key));
         Long reo = RedisUtil.addReo(coordinate, value);
         if (reo == null) {
-            return "获取地理位置失败";
+            return false;
         }
-        return "获取地理位置成功";
+        return true;
     }
 }

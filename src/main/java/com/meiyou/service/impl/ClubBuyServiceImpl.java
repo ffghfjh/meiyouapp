@@ -2,18 +2,16 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
-import com.meiyou.mapper.RootMessageMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -62,16 +60,19 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password.toString())){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
-        }else if(money < price){
+        }
+        if(money < price){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
         }else {
             clubBuyMapper.insertSelective(clubBuy);
+            System.out.println(clubBuy.getId());
 
             //计算剩余金额
             User user = new User();
@@ -111,7 +112,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
-        clubBuy.setState(1);
+        clubBuy.setState(2);
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
@@ -137,7 +138,8 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      * @return
      */
     @Override
-    public Msg selectByUid(Integer uid,String token) {
+    @Cacheable(cacheNames = "buy")
+    public List<ClubBuy> selectByUid(Integer uid,String token) {
 //        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -149,20 +151,8 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-        if(result.size() == 0){
-            msg.setMsg("没有找到对应的ClubBuy记录");
-            msg.setCode(404);
-            return msg;
-        }
 
-        //Todo 人数
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("clubBuy",result);
-
-        msg.setExtend(map);
-        msg.setCode(100);
-        msg.setMsg("成功");
-        return msg;
+        return result;
     }
 
     /**

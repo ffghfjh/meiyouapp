@@ -36,24 +36,24 @@ public class ShopController {
                        @RequestParam("charge") Integer charge,
                        @RequestParam("time") Integer time,
                        @RequestParam("password") String password,
-                       @RequestParam("files") MultipartFile[] files,
+                       /*@RequestParam("files") MultipartFile[] files,*/
                        Double latitude, Double longitude,HttpServletRequest request){
 
-        //使用Hutool进行json操作
-        JSONArray array = JSONUtil.createArray();
-        for (MultipartFile file : files) {
-            Msg msg = FileUploadUtil.uploadUtil(file, "shop", request);
-            if (msg.getCode() == 100) {
-                array.add(msg.getExtend().get("path"));
-            }
-        }
-        if (array.size() == 0) {
-            return Msg.fail();
-        }
+//        //使用Hutool进行json操作
+//        JSONArray array = JSONUtil.createArray();
+//        for (MultipartFile file : files) {
+//            Msg msg = FileUploadUtil.uploadUtil(file, "shop", request);
+//            if (msg.getCode() == 100) {
+//                array.add(msg.getExtend().get("path"));
+//            }
+//        }
+//        if (array.size() == 0) {
+//            return Msg.fail();
+//        }
 
         Shop shop = new Shop();
         shop.setPublishId(publishId);
-        shop.setImgsUrl(array.toString());////以json数组的形式存图片
+        //shop.setImgsUrl(array.toString());////以json数组的形式存图片
         shop.setServiceArea(service_area);
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
@@ -69,14 +69,14 @@ public class ShopController {
     }
 
     @GetMapping("/get")
-    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "查找")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部同城导游",notes = "返回为ClubVO类,nums为报名人数")
     public Msg getClubByUid(@RequestParam("uid") Integer uid,
                             @RequestParam("token") String token){
         return shopService.selectByUid(uid,token);
     }
 
     @GetMapping("/find")
-    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "查找")
+    @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("sid") Integer sid){

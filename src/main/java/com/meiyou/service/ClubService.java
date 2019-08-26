@@ -1,5 +1,6 @@
 package com.meiyou.service;
 
+import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.Club;
 import com.meiyou.utils.Msg;
 
@@ -21,12 +22,11 @@ public interface ClubService {
     Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude);
 
     /**
-     * 通过会所id删除指定的会所
+     * 通过会所id取消发布指定的会所
      * @param uid
      * @param cid
      * @return
      */
-    //Todo
     Msg updateClub(Integer uid,String token,Integer cid);
 
     /**
@@ -34,15 +34,13 @@ public interface ClubService {
      * @param uid
      * @return
      */
-    //Todo
-    Msg selectByUid(Integer uid,String token);
+    List<ClubVO> selectByUid(Integer uid, String token);
 
     /**
      * 通过会所id查找会所信息
      * @param cid
      * @return
      */
-    //Todo
     Msg selectByCid(Integer uid,String token,Integer cid);
 
     /**
@@ -51,5 +49,5 @@ public interface ClubService {
      * @param latitude
      * @return
      */
-    List<Club> selectClub(float longitude, float latitude);
+    Msg selectClubByPosition(Integer uid,String token,Double longitude, Double latitude);
 }

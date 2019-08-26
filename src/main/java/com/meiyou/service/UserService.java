@@ -16,6 +16,7 @@ public interface UserService {
    //获取腾讯云IM鉴权Sig
     public Msg getSig(int uid,String token);
 
+
     /**
      * hzy
      * 根据id获取用户信息

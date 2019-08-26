@@ -27,6 +27,15 @@ public interface ClubBuyService {
     Msg updateBuyClub(Integer uid,Integer cid,String token);
 
     /**
+     * 修改为已完成状态
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    Msg updateClubBuy(Integer uid,Integer cid,String token);
+
+    /**
      * 查找指定用户uid下所有的会所购买记录
      * @param uid
      * @return

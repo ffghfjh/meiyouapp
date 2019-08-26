@@ -136,6 +136,11 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return Msg.success();
     }
 
+    @Override
+    public Msg updateClubBuy(Integer uid, Integer cid, String token) {
+        return null;
+    }
+
     /**
      * 查找指定用户的会所购买记录
      * @param uid

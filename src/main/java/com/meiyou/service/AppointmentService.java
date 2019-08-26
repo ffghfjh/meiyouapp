@@ -23,17 +23,17 @@ public interface AppointmentService {
     /**
      * 取消发布
      */
-    Msg deletePublish(Integer id,String token);
+    Msg deleteAppointmentPublish(Integer id,String token);
 
     /**
      * 开始报名
      */
-    Msg startEnrollment(String uid,String password,Integer id,String token);
+    Msg appointmentAsk(String uid,String password,Integer id,String token);
 
     /**
      * 取消报名
      */
-    Msg endEnrollment(String uid,Integer id,String token);
+    Msg endAppointmentAsk(String uid,Integer id,String token);
 
     /**
      * 查询所有报名某个约会的人员信息
@@ -44,7 +44,7 @@ public interface AppointmentService {
      * 从所有报名某个约会的人员信息中选择一个进行确认，
      * 没有被选中的人退还报名金
      */
-    Msg confirmUserId(String uid,Integer askerId,Integer appointId,String token);
+    Msg confirmAppointmentUserId(String uid,Integer askerId,Integer appointId,String token);
 
     /**
      * 对方取消赴约，重新发布，不退还报名金
@@ -54,7 +54,7 @@ public interface AppointmentService {
     /**
      * 自己重新发布，退还报名金
      */
-    Msg againRelease(String uid,Integer id,String token);
+    Msg againReleaseAppointment(String uid,Integer id,String token);
 
     /**
      * 报名人确认赴约

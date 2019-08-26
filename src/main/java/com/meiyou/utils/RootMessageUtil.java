@@ -15,7 +15,7 @@ import java.util.List;
  * @create: 2019-08-23 08:42
  **/
 @Component
-public class AppointmentUtil {
+public class RootMessageUtil {
     @Autowired
     private RootMessageMapper rootMessageMapper;
 

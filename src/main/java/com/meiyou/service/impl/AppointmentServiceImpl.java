@@ -148,8 +148,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 for (AppointAsk appointAsk : appointAsks) {
                     Integer askerId = appointAsk.getAskerId();
                     User user = userMapper.selectByPrimaryKey(askerId);
-                    String Askerheader = user.getHeader();
-                    arrayList1.add(Askerheader);
+                    String askerHeader = user.getHeader();
+                    arrayList1.add(askerHeader);
                     map.put("arrayList1",arrayList1);
             }
                 //获取报名的总人数
@@ -169,7 +169,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             String appointContext = appointment.getAppointContext();
             String appointTime = appointment.getAppointTime();
             String appointAddress = appointment.getAppointAddress();
-            String Askerheader = null;
+            String askerHeader = null;
 
 
             map.put("nickname",nickname);
@@ -180,7 +180,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             map.put("appointAddress",appointAddress);
             map.put("signature",signature);
             map.put("size",size);
-            map.put("Askerheader",Askerheader);
+            map.put("askerHeader",askerHeader);
             map.put("state",state);
             arrayList.add(map);
         }
@@ -747,6 +747,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Integer reward = appointment.getReward();
                 Integer payType = appointment.getPayType();
                 Integer confirmId = appointment.getConfirmId();
+                Integer state1 = appointment.getState();
                 if (appointment.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
@@ -764,6 +765,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 map.put("reward",reward);
                 map.put("payType",payType);
                 map.put("confirmId",confirmId);
+                map.put("state1",state1);
                 list.add(map);
 
             }

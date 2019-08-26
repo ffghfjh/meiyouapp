@@ -34,7 +34,7 @@ public interface ClubService {
      * @param uid
      * @return
      */
-    List<ClubVO> selectByUid(Integer uid, String token);
+    Msg selectByUid(Integer uid, String token);
 
     /**
      * 通过会所id查找会所信息

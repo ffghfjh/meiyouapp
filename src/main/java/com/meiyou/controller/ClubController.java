@@ -4,6 +4,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.Club;
+import com.meiyou.service.ClubBuyService;
 import com.meiyou.service.ClubService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
@@ -28,6 +29,9 @@ public class ClubController {
 
     @Autowired
     ClubService clubService;
+
+    @Autowired
+    ClubBuyService clubBuyService;
 
     @PostMapping("/add")
     @ApiOperation(value = "发布推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
@@ -68,6 +72,17 @@ public class ClubController {
         return clubService.addClub(club,token,time,password,latitude,longitude);
     }
 
+
+    @PostMapping("/addClubStar")
+    @ApiOperation(value = "添加推拿会所的评星",notes = "添加评星")
+    public Msg addClubStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("cid") Integer cid,
+                           @RequestParam("star") Integer star){
+        return clubBuyService.addClubStar(uid,token,cid,star);
+    }
+
+
     @PutMapping("/update")
     @ApiOperation(value = "取消发布推拿会所",notes = "取消即更发布状态，实际数据不删除")
     public Msg deleteClub(@RequestParam("uid") Integer uid,
@@ -80,17 +95,7 @@ public class ClubController {
     @ApiOperation(value = "通过用户id查找指定用户id的全部推拿会所",notes = "返回为ClubVO类,nums为报名人数")
     public Msg getClubByUid(@RequestParam("uid") Integer uid,
                             @RequestParam("token") String token){
-        Msg msg = new Msg();
-        List<ClubVO> result = clubService.selectByUid(uid, token);
-        if(result.isEmpty()){
-            msg.setCode(404);
-            msg.setMsg("没找到对应的");
-            return msg;
-        }
-        msg.add("clubVO",result);
-        msg.setMsg("成功");
-        msg.setCode(100);
-        return msg;
+       return clubService.selectByUid(uid, token);
     }
 
     @GetMapping("/find")

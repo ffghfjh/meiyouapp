@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
+import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
@@ -35,6 +36,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
     @Autowired
     ClubBuyMapper clubBuyMapper;
+
+    @Autowired
+    ClubStarMapper clubStarMapper;
 
     /**
      * 发布按摩会所
@@ -154,7 +158,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      */
     @Override
     @Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-    public List<ClubVO> selectByUid(Integer uid,String token) {
+    public Msg selectByUid(Integer uid,String token) {
 //        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -166,16 +170,19 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         List<Club> result = clubMapper.selectByExample(clubExample);
 
         List<ClubVO> clubVOS = new ArrayList<>();
-
-        if(result == null){
-            return clubVOS;
+        if(result == null && result.size() == 0){
+            return Msg.fail();
         }
 
         for(Club club : result){
             //把每一个重新赋值的clubVO类加到新的集合中
             clubVOS.add(setClubToClubVO(club));
         }
-        return clubVOS;
+        msg.add("clubVOS",clubVOS);
+        msg.setCode(100);
+        msg.setMsg("成功");
+
+        return msg;
     }
 
     /**
@@ -194,7 +201,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubExample example = new ClubExample();
         example.createCriteria().andIdEqualTo(cid);
         List<Club> result = clubMapper.selectByExample(example);
-        if(result == null){
+        if(result == null && result.size() == 0){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
@@ -224,6 +231,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
+        Msg msg = new Msg();
         String range = getRootMessage("range");
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
@@ -235,7 +243,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             return Msg.fail();
         }
 
-        ArrayList<ClubVO> clubVOS = new ArrayList<>();
+        List<ClubVO> clubVOS = new ArrayList<>();
         for(GeoRadiusResponse result : geoRadiusResponses){
             //获取id
             String member = result.getMemberByString();
@@ -247,27 +255,18 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             }
             Integer id = Integer.valueOf(member);
 
-            //Todo 需要判断该club是否失效
+            //通过id查找club
             ClubExample example = new ClubExample();
             example.createCriteria().andIdEqualTo(id);
             Club club = clubMapper.selectByExample(example).get(0);
 
-            ClubVO clubVO = new ClubVO();
-            clubVO.setId(club.getId());
-            clubVO.setPublishId(club.getPublishId());
-            clubVO.setImgsUrl(club.getImgsUrl());
-            clubVO.setProjectName(club.getProjectName());
-            clubVO.setProjectDesc(club.getProjectDesc());
-            clubVO.setProjectAddress(club.getProjectAddress());
-            clubVO.setProjectPrice(club.getProjectPrice());
-            clubVO.setMarketPrice(club.getMarketPrice());
-            clubVO.setState(club.getState());
+            //把club的值转换到ClubVO中
+            ClubVO clubVO = setClubToClubVO(club);
             clubVO.setDistance(dis);
 
             clubVOS.add(clubVO);
         }
 
-        Msg msg = new Msg();
         msg.add("clubVOS",clubVOS);
         msg.setMsg("成功");
         msg.setCode(100);
@@ -288,13 +287,13 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 
+        //通过查询出来的Club,报名人头像,Club星级赋值给ClubVO
+        Integer nums = clubBuys.size();
+
         //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
         for(ClubBuy c : clubBuys){
-           list.add(getUserByUid(c.getBuyerId()).getHeader());
+            list.add(getUserByUid(c.getBuyerId()).getHeader());
         }
-
-        //通过查询出来的
-        Integer nums = clubBuys.size();
 
         ClubVO clubVO = new ClubVO();
         clubVO.setNums(nums);
@@ -306,9 +305,41 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         clubVO.setProjectAddress(club.getProjectAddress());
         clubVO.setProjectPrice(club.getProjectPrice());
         clubVO.setMarketPrice(club.getMarketPrice());
-        clubVO.setState(club.getState());
         clubVO.setHeader(list);
+        clubVO.setState(club.getState());
+
+        //查找此club的星级
+        Integer starNums = getStarNumsByClubId(club.getId());
+
+        clubVO.setStar(starNums);
 
         return clubVO;
+    }
+
+    /**
+     * 通过club_id查找此club的星级
+     * @param cid
+     * @return
+     */
+    public Integer getStarNumsByClubId(Integer cid){
+        //查询这个club的星级(每一个clubStar的和除以评论人)
+        ClubStarExample clubStarExample = new ClubStarExample();
+        clubStarExample.createCriteria().andClubIdEqualTo(cid);
+        List<ClubStar> clubStars = clubStarMapper.selectByExample(clubStarExample);
+
+        //没有人评论，默认为5星
+        if(clubStars.size() == 0 && clubStars ==null){
+            return 5;
+        }
+
+        //有人评星则进行计算
+        int starNums = 0;
+        for(ClubStar clubStar: clubStars){
+            starNums = starNums + clubStar.getStar();
+        }
+
+        //求平均星个数
+        starNums = starNums/clubStars.size();
+        return starNums;
     }
 }

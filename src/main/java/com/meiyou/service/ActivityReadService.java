@@ -18,4 +18,7 @@ public interface ActivityReadService {
      * @return
      */
     Msg addReadNum(int uid, int aid);
+
+    //谁看过我的动态
+    Msg whoHasSeenMe(int uid);
 }

@@ -142,11 +142,11 @@ public class ActivityServiceImpl implements ActivityService {
         ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         //根据uid获取用户动态
         List<Activity> activities = listActivityByUid(uid);
-        HashMap<String, Object> hashMapNo = new HashMap<>();
         User user = userService.getUserById(uid);
+        boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
         boolean flag = (activities ==null && activities.size()==0);
         //用户或动态不存在的话，返回默认信息，防止空指针异常
-        if (user == null || flag) {
+        if (boolUser|| flag) {
             return Msg.fail();
         }
         for (Activity activity : activities) {
@@ -294,6 +294,28 @@ public class ActivityServiceImpl implements ActivityService {
         msg.setMsg("查找动态成功");
         msg.add("activityList",list);
         return msg;
+    }
+
+    /**
+     * 获得我自己的所有动态
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<Activity> listMyActvityByUid(int uid) {
+        List<Activity> list = new ArrayList<Activity>();
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activities = activityMapper.selectByExample(example);
+        if (activities == null || activities.isEmpty()) {
+            Activity activity = new Activity();
+            activity.setId(0);
+            activity.setContent("动态不存在");
+            list.add(activity);
+            return list;
+        }
+        return activities;
     }
 
 }

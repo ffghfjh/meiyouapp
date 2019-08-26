@@ -51,5 +51,8 @@ public interface ActivityService {
     //通过uid和经纬度获取所有动态
     Msg listNeighborActivity(int uid, double latitude, double longitude);
 
+    //获得我自己的所有动态
+    List<Activity> listMyActvityByUid(int uid);
+
 
 }

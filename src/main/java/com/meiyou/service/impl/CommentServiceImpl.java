@@ -1,13 +1,12 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.CommentLikeMapper;
 import com.meiyou.mapper.CommentMapper;
-import com.meiyou.pojo.Activity;
-import com.meiyou.pojo.Comment;
-import com.meiyou.pojo.CommentExample;
-import com.meiyou.pojo.User;
+import com.meiyou.mapper.UserMapper;
+import com.meiyou.pojo.*;
 import com.meiyou.service.CommentLikeService;
 import com.meiyou.service.CommentService;
 import com.meiyou.service.UserService;
@@ -41,7 +40,12 @@ public class CommentServiceImpl implements CommentService {
     UserService userService;
 
     @Autowired
+    UserMapper userMapper;
+
+    @Autowired
     CommentLikeService commentLikeService;
+
+
 
 
     /**
@@ -124,6 +128,146 @@ public class CommentServiceImpl implements CommentService {
         msg.setMsg("拉取所有评论成功");
         msg.add("commentList", list);
         return msg;
+    }
+
+    /**
+     * 获取用户对我特定动态的评论
+     * @param uid
+     * @return
+     * @ToDo 目前没有连表User, Activity, Comment操作，需要优化
+     * @Todo 待添加Redis缓存处理
+     */
+    @Override
+    public Msg listUserCommentForMyActivity(int uid) {
+        List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        Msg msg = new Msg();
+        //获取我发布的所有动态
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activities = activityMapper.selectByExample(example);
+        if (activities.isEmpty()) {
+            msg.setCode(200);
+            msg.setMsg("我没有发布任何动态");
+            msg.add("黄朝阳", 666);
+            return msg;
+        }
+        for (Activity activity : activities) {
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            //查询对此条动态的所有评论
+            CommentExample example1 = new CommentExample();
+            CommentExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andActivityIdEqualTo(activity.getId());
+            List<Comment> comments = commentMapper.selectByExample(example1);
+            if (comments.isEmpty()) {
+                //如果这条动态没有评论的话，直接走下一条动态
+                continue;
+            }
+            //遍历此条动态的所有评论
+            for (Comment comment : comments) {
+                //查询此条评论对应的用户
+                User user = userService.getUserById(comment.getPersonId());
+                //判断这个大佬是否存在
+                boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
+                if (boolUser) {
+                    //如果这个大哥不存在，就直接走下一个评论
+                    continue;
+                }
+                //判读这条评论是否是30天前的，如果是，直接走下一个评论
+                long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
+                if (between > 30) {
+                    continue;
+                }
+                //修改评论为看过的状态
+                Comment comment1 = new Comment();
+                comment1.setId(comment.getId());
+                comment1.setBoolSee(true);
+                int i = commentMapper.updateByPrimaryKeySelective(comment1);
+                if (i == 0) {
+                    System.out.println("hzy----更改评论为已读状态失败...");
+                }
+                //如果用户存在
+                hashMap.put("header", user.getHeader());
+                hashMap.put("nickname", user.getNickname());
+                //装载评论内容
+                hashMap.put("content", comment.getContent());
+                //装载评论id
+                hashMap.put("cid", comment.getId());
+                hashMap.put("AcitivityContent", activity.getContent());
+                hashMap.put("aid", activity.getId());
+                list.add(hashMap);
+            }
+        }
+        msg.setCode(100);
+        msg.setMsg("拉取我动态下的所有评论成功！");
+        msg.add("commentList", list);
+        msg.add("commNum", list.size());
+        return msg;
+    }
+
+    /**
+     * 获得我还没读的评论数
+     * @param uid
+     * @return
+     */
+    @Override
+    public Msg getNotSeenComment(int uid) {
+        Msg msg = new Msg();
+        //未看评论总条数
+        int count = 0;
+        //先获得我自己所有的动态
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activities = activityMapper.selectByExample(example);
+        if (activities.isEmpty()) {
+            msg.setCode(200);
+            msg.setMsg("我没有发布过任何动态");
+            msg.add("comNum", 0);
+            return msg;
+        }
+        //遍历所有动态
+        for (Activity activity : activities) {
+            //查询此条动态下的所有评论
+            CommentExample example1 = new CommentExample();
+            CommentExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andActivityIdEqualTo(activity.getId());
+            criteria1.andBoolSeeEqualTo(false);
+            List<Comment> comments = commentMapper.selectByExample(example1);
+            if (comments.isEmpty()) {
+                continue;
+            }
+            count += comments.size();
+            //剔除不存在的用户评论数
+            for (Comment comment : comments) {
+                User user = userService.getUserById(comment.getPersonId());
+                boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
+                if (boolUser) {
+                    continue;
+                }
+                //如果是30天前的评论不要提醒我
+                long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
+                if (between > 30 ) {
+                    count --;
+                }
+            }
+        }
+        msg.setCode(100);
+        msg.setMsg("获取我动态下30天未读的评论数成功！");
+        msg.add("comNum", count);
+        return msg;
+    }
+
+
+    /**
+     * 修改评论为已读状态
+     *
+     * @param cid
+     * @return
+     */
+    @Override
+    public int updateCommentSeen(int cid) {
+        return 0;
     }
 
 }

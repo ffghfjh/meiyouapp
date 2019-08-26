@@ -670,7 +670,7 @@ public class AppointmentServiceImpl implements AppointmentService {
      */
     @Transactional
     @Override
-    public Msg confirmArrive(String uid, Integer id, String token) {
+    public Msg confirmAppointmentArrive(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {

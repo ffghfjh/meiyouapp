@@ -286,6 +286,14 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubBuyExample example = new ClubBuyExample();
         example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
         List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
+        List<String> list = new ArrayList<>();
+
+        //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
+        for(ClubBuy c : clubBuys){
+           list.add(getUserByUid(c.getBuyerId()).getHeader());
+        }
+
+        //通过查询出来的
         Integer nums = clubBuys.size();
 
         ClubVO clubVO = new ClubVO();
@@ -299,6 +307,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         clubVO.setProjectPrice(club.getProjectPrice());
         clubVO.setMarketPrice(club.getMarketPrice());
         clubVO.setState(club.getState());
+        clubVO.setHeader(list);
 
         return clubVO;
     }

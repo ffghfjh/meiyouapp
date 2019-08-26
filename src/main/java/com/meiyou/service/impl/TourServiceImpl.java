@@ -215,6 +215,7 @@ public class TourServiceImpl implements TourService {
                 String nickname = user.getNickname();
                 String header = user.getHeader();
                 String birthday = user.getBirthday();
+                Boolean sex = user.getSex();
                 String goMessage = tour.getGoMessage();
                 String startAddress = tour.getStartAddress();
                 String endAddress = tour.getEndAddress();
@@ -223,6 +224,7 @@ public class TourServiceImpl implements TourService {
                 Integer reward = tour.getReward();
                 Integer payType = tour.getPayType();
                 Integer confirmId = tour.getConfirmId();
+                Integer state1 = tour.getState();
                 if (tour.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
@@ -232,6 +234,7 @@ public class TourServiceImpl implements TourService {
                 map.put("nickname",nickname);
                 map.put("header",header);
                 map.put("birthday",birthday);
+                map.put("sex",sex);
                 map.put("goMessage",goMessage);
                 map.put("startAddress",startAddress);
                 map.put("endAddress",endAddress);
@@ -240,6 +243,7 @@ public class TourServiceImpl implements TourService {
                 map.put("reward",reward);
                 map.put("payType",payType);
                 map.put("confirmId",confirmId);
+                map.put("state1",state1);
                 list.add(map);
 
             }

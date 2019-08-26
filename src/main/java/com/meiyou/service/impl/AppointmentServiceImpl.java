@@ -739,6 +739,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 String nickname = user.getNickname();
                 String header = user.getHeader();
                 String birthday = user.getBirthday();
+                Boolean sex = user.getSex();
                 String appointContext = appointment.getAppointContext();
                 String appointTime = appointment.getAppointTime();
                 String appointAddress = appointment.getAppointAddress();
@@ -757,6 +758,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 map.put("nickname",nickname);
                 map.put("header",header);
                 map.put("birthday",birthday);
+                map.put("sex",sex);
                 map.put("appointContext",appointContext);
                 map.put("appointTime",appointTime);
                 map.put("appointAddress",appointAddress);

@@ -128,7 +128,7 @@ public class MqttServiceImpl implements MqttService {
                                 message1.setQos(1);
                                 message1.setPayload(factory.getJsonObject().toJSONString().getBytes());
                                 mqttClient.publish(parentTopic+"/"+mqttMessage.getSender(),message1);
-                                sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),parentTopic+"/"+mqttMessage.getSender(),null);
+//                                sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.MONEYLACK,"videoChat",mqttMessage.getReceiver(),parentTopic+"/"+mqttMessage.getSender(),null);
                             }
                         }
                     }

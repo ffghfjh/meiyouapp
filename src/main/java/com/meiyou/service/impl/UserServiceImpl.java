@@ -8,6 +8,7 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.mapper.AuthorizationMapper;
+import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
@@ -45,6 +46,8 @@ public class UserServiceImpl implements UserService {
     RootMessageService rootMessageService;
     @Autowired
     ShareMapper shareMapper;
+    @Autowired
+    RedPacketMapper redPacketMapper;
 
 
     // 支付宝调用接口之前的初始化
@@ -356,7 +359,7 @@ public class UserServiceImpl implements UserService {
      * @param uid
      * @return
      */
-    @Cacheable //缓存到Redis中(待确定是否添加缓存处理)
+   // @Cacheable //缓存到Redis中(待确定是否添加缓存处理)
     @Override
     public User getUserById(int uid) {
         User user = userMapper.selectByPrimaryKey(uid);
@@ -395,5 +398,41 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public Msg sendMoney(int id,String text,int money, String toAccount) {
+        Msg msg;
+        User me = userMapper.selectByPrimaryKey(id);
+        float meMoney = me.getMoney();
 
+        //余额检测
+        if(meMoney<money){
+            msg = Msg.fail();
+            msg.setCode(1000);//余额不足
+            msg.setMsg("余额不足");
+            return msg;
+        }
+        me.setMoney(meMoney-money);
+        if(userMapper.updateByPrimaryKeySelective(me)==1){
+            UserExample example = new UserExample();
+            UserExample.Criteria criteria = example.createCriteria();
+            criteria.andAccountEqualTo(toAccount);
+            int toId = userMapper.selectByExample(example).get(0).getId();
+            RedPacket redPacket = new RedPacket();
+            redPacket.setContent(text);
+            redPacket.setMoney(money);
+            redPacket.setState(0);
+            redPacket.setReceiveId(toId);
+            redPacket.setSenderId(id);
+            Date date = new Date();
+            redPacket.setCreateTime(date);
+            redPacket.setUpdateTime(date);
+            if(redPacketMapper.insertSelective(redPacket)==1) {
+                msg = Msg.success();
+                msg.add("hId",redPacket.getId());
+                return msg;
+            }
+        }
+        return Msg.fail();
+    }
 }

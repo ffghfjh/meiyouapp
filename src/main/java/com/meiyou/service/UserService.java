@@ -41,4 +41,12 @@ public interface UserService {
      */
     boolean delMoney(int id,float money);
 
+    /**
+     * 发送红包
+     * @param id
+     * @param toAccount
+     * @return
+     */
+    Msg sendMoney(int id,String text,int money,String toAccount);
+
 }

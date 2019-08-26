@@ -137,4 +137,13 @@ public class UserController {
         }
         return false;
     }
+
+    @RequestMapping(value="sendMoney",method = RequestMethod.POST)
+    @ApiOperation("发红包")
+    public Msg sendMoney(int id,String token,String text,String toAccount,int money) {
+        if (RedisUtil.authToken(String.valueOf(id), token)) {
+            return userService.sendMoney(id,text,money,toAccount);
+        }
+        return Msg.noLogin();
+    }
 }

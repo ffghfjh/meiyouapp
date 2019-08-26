@@ -683,6 +683,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 Integer payType = appointment.getPayType();
                 Integer confirmId = appointment.getConfirmId();
                 Integer state1 = appointment.getState();
+                Integer id = appointment.getId();
                 if (appointment.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
@@ -702,6 +703,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 map.put("payType",payType);
                 map.put("confirmId",confirmId);
                 map.put("state1",state1);
+                map.put("id",id);
                 list.add(map);
 
             }

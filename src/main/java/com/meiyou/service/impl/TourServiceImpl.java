@@ -684,6 +684,7 @@ public class TourServiceImpl implements TourService {
                 Integer payType = tour.getPayType();
                 Integer confirmId = tour.getConfirmId();
                 Integer state1 = tour.getState();
+                Integer id = tour.getId();
                 if (tour.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
@@ -703,6 +704,7 @@ public class TourServiceImpl implements TourService {
                 map.put("payType",payType);
                 map.put("confirmId",confirmId);
                 map.put("state1",state1);
+                map.put("id",id);
                 list.add(map);
 
             }

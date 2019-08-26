@@ -1,7 +1,7 @@
 package com.meiyou.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
 /**
  * @description: 返回查询club的VO类
@@ -12,8 +12,6 @@ public class ClubVO implements Serializable {
 
     //nums 为查询报名了这个club的人数
     private Integer id;
-    private Date createTime;
-    private Date updateTime;
     private Integer publishId;
     private String imgsUrl;
     private String projectName;
@@ -21,18 +19,17 @@ public class ClubVO implements Serializable {
     private String projectAddress;
     private Integer projectPrice;
     private Integer marketPrice;
-    private Date outTime;
     private Integer state;
     private Integer nums;
     //查附近的club的时候需要用到的 距离
     private Double distance;
+    //报名者的头像
+    private List<String> header;
 
     @Override
     public String toString() {
         return "ClubVO{" +
                 "id=" + id +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
                 ", publishId=" + publishId +
                 ", imgsUrl='" + imgsUrl + '\'' +
                 ", projectName='" + projectName + '\'' +
@@ -40,10 +37,10 @@ public class ClubVO implements Serializable {
                 ", projectAddress='" + projectAddress + '\'' +
                 ", projectPrice=" + projectPrice +
                 ", marketPrice=" + marketPrice +
-                ", outTime=" + outTime +
                 ", state=" + state +
                 ", nums=" + nums +
                 ", distance=" + distance +
+                ", header=" + header +
                 '}';
     }
 
@@ -53,22 +50,6 @@ public class ClubVO implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     public Integer getPublishId() {
@@ -127,14 +108,6 @@ public class ClubVO implements Serializable {
         this.marketPrice = marketPrice;
     }
 
-    public Date getOutTime() {
-        return outTime;
-    }
-
-    public void setOutTime(Date outTime) {
-        this.outTime = outTime;
-    }
-
     public Integer getState() {
         return state;
     }
@@ -157,5 +130,13 @@ public class ClubVO implements Serializable {
 
     public void setDistance(Double distance) {
         this.distance = distance;
+    }
+
+    public List<String> getHeader() {
+        return header;
+    }
+
+    public void setHeader(List<String> header) {
+        this.header = header;
     }
 }

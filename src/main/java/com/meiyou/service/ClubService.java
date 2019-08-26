@@ -1,5 +1,6 @@
 package com.meiyou.service;
 
+import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.Club;
 import com.meiyou.utils.Msg;
 
@@ -33,7 +34,7 @@ public interface ClubService {
      * @param uid
      * @return
      */
-    Msg selectByUid(Integer uid,String token);
+    List<ClubVO> selectByUid(Integer uid, String token);
 
     /**
      * 通过会所id查找会所信息

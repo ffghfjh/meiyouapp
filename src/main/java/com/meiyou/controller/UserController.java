@@ -151,4 +151,14 @@ public class UserController {
     public Msg selRedPackage(int id){
         return userService.selRedPackage(id);
     }
+
+    @RequestMapping(value = "getRedPackage",method = RequestMethod.POST)
+    @ApiOperation("领取红包")
+    public Msg getRedPackage(int rid,int uid,String token){
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            return userService.getRedPackage(rid);
+        }else {
+            return Msg.noLogin();
+        }
+    }
 }

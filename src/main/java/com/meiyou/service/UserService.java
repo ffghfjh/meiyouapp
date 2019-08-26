@@ -56,4 +56,11 @@ public interface UserService {
      */
     Msg selRedPackage(int id);
 
+    /**
+     * 领取红包
+     * @param id
+     * @return
+     */
+    Msg getRedPackage(int id);
+
 }

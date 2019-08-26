@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.DatabaseMetaData;
 import java.util.*;
 
 @Service
@@ -440,5 +441,23 @@ public class UserServiceImpl implements UserService {
     public Msg selRedPackage(int id) {
         int state = redPacketMapper.selectByPrimaryKey(id).getState();
         return Msg.success().add("state",state);
+    }
+
+    @Override
+    @Transactional
+    public Msg getRedPackage(int id) {
+        RedPacket redPacket = redPacketMapper.selectByPrimaryKey(id);
+        if(redPacket.getState()==0){
+            redPacket.setState(1);
+            Date date = new Date();
+            redPacket.setUpdateTime(date);
+            if(redPacketMapper.updateByPrimaryKey(redPacket)==1){
+                if(addMoney(redPacket.getReceiveId(),redPacket.getMoney())){
+                    return Msg.success();
+                }
+            }
+
+        }
+        return Msg.fail();
     }
 }

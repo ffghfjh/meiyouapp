@@ -19,4 +19,19 @@ public interface MyPublishService {
      * 查询我的旅游发布
      */
     Msg selectTourList(String uid, String token);
+
+
+    /**
+     * 通过用户id查找全部发布的会所
+     * @param uid
+     * @return
+     */
+    Msg selectClubByUid(Integer uid, String token);
+
+    /**
+     * 查找指定用户所发布的景点商家(同城导游)
+     * @param uid
+     * @return
+     */
+    Msg selectShopByUid(Integer uid,String token);
 }

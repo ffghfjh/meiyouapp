@@ -1,10 +1,7 @@
 package com.meiyou.service;
 
-import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.Club;
 import com.meiyou.utils.Msg;
-
-import java.util.List;
 
 /**
  * @description: 会所接口
@@ -28,13 +25,6 @@ public interface ClubService {
      * @return
      */
     Msg updateClub(Integer uid,String token,Integer cid);
-
-    /**
-     * 通过用户id查找全部发布的会所
-     * @param uid
-     * @return
-     */
-    List<ClubVO> selectByUid(Integer uid, String token);
 
     /**
      * 通过会所id查找会所信息

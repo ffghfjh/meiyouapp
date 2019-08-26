@@ -23,6 +23,8 @@ public class ClubVO implements Serializable {
     private Integer nums;
     //查附近的club的时候需要用到的 距离
     private Double distance;
+    //club的星级
+    private Integer star;
     //报名者的头像
     private List<String> header;
 
@@ -40,6 +42,7 @@ public class ClubVO implements Serializable {
                 ", state=" + state +
                 ", nums=" + nums +
                 ", distance=" + distance +
+                ", star=" + star +
                 ", header=" + header +
                 '}';
     }
@@ -130,6 +133,14 @@ public class ClubVO implements Serializable {
 
     public void setDistance(Double distance) {
         this.distance = distance;
+    }
+
+    public Integer getStar() {
+        return star;
+    }
+
+    public void setStar(Integer star) {
+        this.star = star;
     }
 
     public List<String> getHeader() {

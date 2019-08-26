@@ -31,13 +31,6 @@ public interface ShopService {
     Msg updateShop(Integer uid,String token,Integer sid);
 
     /**
-     * 查找指定用户所发布的景点商家(同城导游)
-     * @param uid
-     * @return
-     */
-    Msg selectByUid(Integer uid,String token);
-
-    /**
      * 查找景点商家(同城导游)id的详细信息
      * @param sid
      * @return

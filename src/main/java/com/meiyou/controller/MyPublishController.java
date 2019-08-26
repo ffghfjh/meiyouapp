@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,5 +43,19 @@ public class MyPublishController {
     public Msg selectTourList(String uid,String token) {
         Msg msg = myPublishService.selectTourList(uid, token);
         return msg;
+    }
+
+    @GetMapping("/selectClubList")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部按摩会所",notes = "返回为ClubVO类,nums为报名人数")
+    public Msg getClubByUid(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token){
+        return myPublishService.selectClubByUid(uid,token);
+    }
+
+    @GetMapping("/selectShopList")
+    @ApiOperation(value = "通过用户id查找指定用户id发布的全部景点商家",notes = "返回为ShopVO类,nums为报名人数")
+    public Msg getShopByUid(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token){
+        return myPublishService.selectShopByUid(uid, token);
     }
 }

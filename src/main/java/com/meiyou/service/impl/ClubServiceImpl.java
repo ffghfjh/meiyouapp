@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
+import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
@@ -35,6 +36,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
     @Autowired
     ClubBuyMapper clubBuyMapper;
+
+    @Autowired
+    ClubStarMapper clubStarMapper;
 
     /**
      * 发布按摩会所
@@ -147,36 +151,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
-    /**
-     * 查找指定用户发布的有效按摩会所
-     * @param uid
-     * @return
-     */
-    @Override
-    @Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-    public List<ClubVO> selectByUid(Integer uid,String token) {
-//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
 
-        Msg msg = new Msg();
-        //查找发布出去的有效按摩会所
-        ClubExample clubExample = new ClubExample();
-        clubExample.createCriteria().andPublishIdEqualTo(uid);
-        List<Club> result = clubMapper.selectByExample(clubExample);
-
-        List<ClubVO> clubVOS = new ArrayList<>();
-
-        if(result == null){
-            return clubVOS;
-        }
-
-        for(Club club : result){
-            //把每一个重新赋值的clubVO类加到新的集合中
-            clubVOS.add(setClubToClubVO(club));
-        }
-        return clubVOS;
-    }
 
     /**
      * 查看指定的按摩会所
@@ -194,7 +169,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         ClubExample example = new ClubExample();
         example.createCriteria().andIdEqualTo(cid);
         List<Club> result = clubMapper.selectByExample(example);
-        if(result == null){
+        if(result == null && result.size() == 0){
             msg.setMsg("没有找到对应的Club");
             msg.setCode(404);
             return msg;
@@ -224,6 +199,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
+        Msg msg = new Msg();
         String range = getRootMessage("range");
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
@@ -235,7 +211,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             return Msg.fail();
         }
 
-        ArrayList<ClubVO> clubVOS = new ArrayList<>();
+        List<ClubVO> clubVOS = new ArrayList<>();
         for(GeoRadiusResponse result : geoRadiusResponses){
             //获取id
             String member = result.getMemberByString();
@@ -247,27 +223,18 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             }
             Integer id = Integer.valueOf(member);
 
-            //Todo 需要判断该club是否失效
+            //通过id查找club
             ClubExample example = new ClubExample();
             example.createCriteria().andIdEqualTo(id);
             Club club = clubMapper.selectByExample(example).get(0);
 
-            ClubVO clubVO = new ClubVO();
-            clubVO.setId(club.getId());
-            clubVO.setPublishId(club.getPublishId());
-            clubVO.setImgsUrl(club.getImgsUrl());
-            clubVO.setProjectName(club.getProjectName());
-            clubVO.setProjectDesc(club.getProjectDesc());
-            clubVO.setProjectAddress(club.getProjectAddress());
-            clubVO.setProjectPrice(club.getProjectPrice());
-            clubVO.setMarketPrice(club.getMarketPrice());
-            clubVO.setState(club.getState());
+            //把club的值转换到ClubVO中
+            ClubVO clubVO = setClubToClubVO(club);
             clubVO.setDistance(dis);
 
             clubVOS.add(clubVO);
         }
 
-        Msg msg = new Msg();
         msg.add("clubVOS",clubVOS);
         msg.setMsg("成功");
         msg.setCode(100);
@@ -275,40 +242,5 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return msg;
     }
 
-    /**
-     * 把Club对象中的值转移到ClubVO对象中
-     * @param club
-     * @return
-     */
-    public ClubVO setClubToClubVO(Club club){
 
-        //查找报名每个会所的人数
-        ClubBuyExample example = new ClubBuyExample();
-        example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
-        List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
-        List<String> list = new ArrayList<>();
-
-        //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
-        for(ClubBuy c : clubBuys){
-           list.add(getUserByUid(c.getBuyerId()).getHeader());
-        }
-
-        //通过查询出来的
-        Integer nums = clubBuys.size();
-
-        ClubVO clubVO = new ClubVO();
-        clubVO.setNums(nums);
-        clubVO.setId(club.getId());
-        clubVO.setPublishId(club.getPublishId());
-        clubVO.setImgsUrl(club.getImgsUrl());
-        clubVO.setProjectName(club.getProjectName());
-        clubVO.setProjectDesc(club.getProjectDesc());
-        clubVO.setProjectAddress(club.getProjectAddress());
-        clubVO.setProjectPrice(club.getProjectPrice());
-        clubVO.setMarketPrice(club.getMarketPrice());
-        clubVO.setState(club.getState());
-        clubVO.setHeader(list);
-
-        return clubVO;
-    }
 }

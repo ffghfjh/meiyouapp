@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@Api(value = "用户控制器",tags = "用户接口层")
+@Api(value = "用户控制器",tags = "用户主控制层")
 public class UserController {
 
 

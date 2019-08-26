@@ -1,17 +1,18 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
-import com.meiyou.pojo.Activity;
-import com.meiyou.pojo.ActivityExample;
-import com.meiyou.pojo.ActivityLike;
-import com.meiyou.pojo.ActivityLikeExample;
+import com.meiyou.pojo.*;
 import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.ActivityService;
+import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,129 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
     //注入动态表mapper
     @Autowired
     ActivityMapper activityMapper;
+
+    @Autowired
+    UserService userService;
+
+    //获得我所有动态下所有未读的点赞数
+    @Override
+    public Msg getNotSeenLikeNumForMyActvity(int uid) {
+        //我未看的点赞数
+        int count = 0;
+        Msg msg = new Msg();
+        //获得我自己的所有动态
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activities = activityMapper.selectByExample(example);
+        if (activities == null || activities.isEmpty()) {
+            msg.setCode(100);
+            msg.setMsg("我还没发布过任何动态");
+            msg.add("likeNum", count);
+            return msg;
+        }
+        //遍历所有此条动态下的所有未看的点赞记录
+        for (Activity activity : activities) {
+            ActivityLikeExample example1 = new ActivityLikeExample();
+            ActivityLikeExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andActivityIdEqualTo(activity.getId());
+            criteria1.andBoolSeeEqualTo(false);
+            List<ActivityLike> activityLikes = activityLikeMapper.selectByExample(example1);
+            if (activityLikes == null || activities.isEmpty()) {
+                //如果这条动态没有任何点赞，直接走下一条动态
+                continue;
+            }
+            for (ActivityLike activityLike : activityLikes) {
+                //判断点赞人是否还在
+                User user = userService.getUserById(activityLike.getLikeId());
+                boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
+                if (boolUser) {
+                    //如果用户不存在的话，直接走下一条点赞记录
+                    continue;
+                }
+                //判断这条点赞记录是否超过30天
+                long between = DateUtil.between(activityLike.getCreateTime(), new Date(), DateUnit.DAY);
+                if (between > 30) {
+                    continue;
+                }
+                count++;
+            }
+        }
+        msg.setCode(100);
+        msg.setMsg("获取我未读的动态点赞数成功");
+        msg.add("likeNum", count);
+        return msg;
+    }
+
+    /**
+     *获取用户对我动态的点赞列表
+     * @param uid 我自己的id
+     * @return
+     */
+    @Override
+    public Msg listUserLikeForMyActivity(int uid) {
+        List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        Msg msg = new Msg();
+        //获取我自己的所有动态
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activities = activityMapper.selectByExample(example);
+        if (activities == null || activities.isEmpty()) {
+            msg.setCode(100);
+            msg.setMsg("我还没发布任何动态");
+            msg.add("likeNum", 0);
+            return msg;
+        }
+        //遍历我所有动态
+        for (Activity activity : activities) {
+            //获取对我这条动态的点赞记录
+            ActivityLikeExample example1 = new ActivityLikeExample();
+            ActivityLikeExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andActivityIdEqualTo(activity.getId());
+            List<ActivityLike> activityLikes = activityLikeMapper.selectByExample(example1);
+            //判断这条动态是否有被点赞过
+            if (activityLikes == null || activityLikes.isEmpty()) {
+                continue;
+            }
+            //遍历这条动态下的点赞记录
+            for (ActivityLike activityLike : activityLikes) {
+                //获取这条动态的用户是否存在
+                User user = userService.getUserById(activityLike.getLikeId());
+                boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
+                if (boolUser) {
+                    //如果用户不存在，直接走下一条点赞记录
+                    continue;
+                }
+                //判断这条点赞记录是否超过30天
+                long between = DateUtil.between(activityLike.getCreateTime(), new Date(), DateUnit.DAY);
+                if (between > 30) {
+                    //如果超过30天的，直接走下一条点赞记录，因为30天外的点赞不显示
+                    continue;
+                }
+                //更新此条点赞记录为已读状态
+                ActivityLike activityLike1 = new ActivityLike();
+                activityLike1.setId(activityLike.getId());
+                activityLike1.setUpdateTime(new Date());
+                activityLike1.setBoolSee(true);
+                int i = activityLikeMapper.updateByPrimaryKeySelective(activityLike1);
+                if (i == 0) {
+                    System.out.println("更新点赞记录为已读状态失败");
+                }
+                HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                hashMap.put("header", user.getHeader());
+                hashMap.put("nickname", user.getNickname());
+                hashMap.put("ActivityContent", activity.getContent());
+                hashMap.put("aid", activity.getId());
+                list.add(hashMap);
+            }
+        }
+        msg.setCode(100);
+        msg.setMsg("拉取我动态的所有点赞记录成功");
+        msg.add("ActivityLike", list);
+        msg.add("likeNum", list.size());
+        return msg;
+    }
 
     @Override
     public Msg like(int aid, int uid, int type) {

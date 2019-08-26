@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "ReadController", tags ={"阅读量控制层"})
+@Api(value = "ReadController", tags ={"动态阅读控制层"})
 @RequestMapping(value = "/Read")
 @RestController
 public class ActivityReadController {
@@ -28,6 +28,12 @@ public class ActivityReadController {
     @PostMapping(value = "/addReadNum")
     public Msg addReadNum(int uid, int aid) {
         return readService.addReadNum(uid, aid);
+    }
+
+    @ApiOperation(value = "谁看过我", notes = "uid为我自己的id", httpMethod = "POST")
+    @PostMapping(value = "/whoHasSeenMe")
+    public Msg whoHasSeenMe(int uid) {
+        return readService.whoHasSeenMe(uid);
     }
 
 }

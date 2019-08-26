@@ -12,13 +12,19 @@ import java.util.List;
 public class ShopVO implements Serializable {
     private Integer id;
     private Integer publishId;
+    // 导游头像 导游昵称 导游性别 导游年龄 导游个性签名
+    private String publishIdHeader;
+    private String publishIdNickname;
+    private Boolean publishIdSex;
+    private String publishIdBirthday;
+    private String publishIdSignature;
+
     private String serviceArea;
     private String travelTime;
     private Integer charge;
     private String imgsUrl;
     private Integer state;
     private Boolean boolClose;
-    //Todo 导游头像 导游昵称 导游性别 导游年龄 导游个性签名
     //聘请该导游的人数
     private Integer nums;
     //查附近的club的时候需要用到的 距离
@@ -33,6 +39,11 @@ public class ShopVO implements Serializable {
         return "ShopVO{" +
                 "id=" + id +
                 ", publishId=" + publishId +
+                ", publishIdHeader='" + publishIdHeader + '\'' +
+                ", publishIdNickname='" + publishIdNickname + '\'' +
+                ", publishIdSex=" + publishIdSex +
+                ", publishIdBirthday='" + publishIdBirthday + '\'' +
+                ", publishIdSignature='" + publishIdSignature + '\'' +
                 ", serviceArea='" + serviceArea + '\'' +
                 ", travelTime='" + travelTime + '\'' +
                 ", charge=" + charge +
@@ -60,6 +71,46 @@ public class ShopVO implements Serializable {
 
     public void setPublishId(Integer publishId) {
         this.publishId = publishId;
+    }
+
+    public String getPublishIdHeader() {
+        return publishIdHeader;
+    }
+
+    public void setPublishIdHeader(String publishIdHeader) {
+        this.publishIdHeader = publishIdHeader;
+    }
+
+    public String getPublishIdNickname() {
+        return publishIdNickname;
+    }
+
+    public void setPublishIdNickname(String publishIdNickname) {
+        this.publishIdNickname = publishIdNickname;
+    }
+
+    public Boolean getPublishIdSex() {
+        return publishIdSex;
+    }
+
+    public void setPublishIdSex(Boolean publishIdSex) {
+        this.publishIdSex = publishIdSex;
+    }
+
+    public String getPublishIdBirthday() {
+        return publishIdBirthday;
+    }
+
+    public void setPublishIdBirthday(String publishIdBirthday) {
+        this.publishIdBirthday = publishIdBirthday;
+    }
+
+    public String getPublishIdSignature() {
+        return publishIdSignature;
+    }
+
+    public void setPublishIdSignature(String publishIdSignature) {
+        this.publishIdSignature = publishIdSignature;
     }
 
     public String getServiceArea() {

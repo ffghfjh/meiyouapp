@@ -151,8 +151,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
-
-
     /**
      * 查看指定的按摩会所
      * @param cid

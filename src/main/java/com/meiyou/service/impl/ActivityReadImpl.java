@@ -134,6 +134,7 @@ public class ActivityReadImpl implements ActivityReadService {
                 HashMap<String, Object> hashMap = new HashMap<String, Object>();
                 hashMap.put("header", user.getHeader());
                 hashMap.put("nickname", user.getNickname());
+                hashMap.put("uid", user.getId());
                 hashMap.put("time", DateUtil.formatDateTime(read.getCreateTime()));
                 hashMap.put("activityContent", activity.getContent());
                 hashMap.put("aid", activity.getId());

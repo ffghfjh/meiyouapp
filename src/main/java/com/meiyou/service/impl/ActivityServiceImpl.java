@@ -196,6 +196,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> listActivityByUid(int uid) {
         ActivityExample example = new ActivityExample();
+        example.setOrderByClause("id DESC");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
         return activityMapper.selectByExample(example);

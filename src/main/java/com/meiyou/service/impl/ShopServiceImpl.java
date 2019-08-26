@@ -137,40 +137,6 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     }
 
     /**
-     * 查找用户的shop
-     * @param uid
-     * @param token
-     * @return
-     */
-    @Override
-    public Msg selectByUid(Integer uid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-        Msg msg = new Msg();
-        ShopExample shopExample = new ShopExample();
-        shopExample.createCriteria().andPublishIdEqualTo(uid);
-        List<Shop> result = shopMapper.selectByExample(shopExample);
-        if(result == null){
-            msg.setCode(404);
-            msg.setMsg("没有找到指定对象的Shop");
-            return msg;
-        }
-
-        //添加人数到VO类中
-        ArrayList<ShopVO> shopVOS = new ArrayList<>();
-        for(Shop shop : result){
-            //把每一个重新赋值的shopVOS类加到新的集合中
-            shopVOS.add(setShopToShopVO(shop));
-        }
-
-        msg.add("shopVOS",shopVOS);
-        msg.setMsg("成功");
-        msg.setCode(100);
-        return msg;
-    }
-
-    /**
      * 查找指定的景点商家
      * @param uid
      * @param token
@@ -186,7 +152,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);
         List<Shop> result = shopMapper.selectByExample(shopExample);
-        if(result == null){
+        if(result == null && result.size() == 0){
             msg.setCode(404);
             msg.setMsg("没有找到指定的Shop");
             return msg;
@@ -212,27 +178,24 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @param Shop
      * @return
      */
-    public ShopVO setShopToShopVO(Shop Shop){
-
-        //查找报名每个会所的人数
-        ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(Shop.getId());
-        Integer nums = shopBuyMapper.selectByExample(example).size();
-
-        ShopVO shopVO = new ShopVO();
-        shopVO.setNums(nums);
-        shopVO.setId(Shop.getId());
-        shopVO.setCreateTime(Shop.getCreateTime());
-        shopVO.setUpdateTime(Shop.getUpdateTime());
-        shopVO.setPublishId(Shop.getPublishId());
-        shopVO.setImgsUrl(Shop.getImgsUrl());
-        shopVO.setOutTime(Shop.getOutTime());
-        shopVO.setState(Shop.getState());
-        shopVO.setServiceArea(Shop.getServiceArea());
-        shopVO.setCharge(Shop.getCharge());
-        shopVO.setTravelTime(Shop.getTravelTime());
-        shopVO.setBoolClose(Shop.getBoolClose());
-
-        return shopVO;
-    }
+//    public ShopVO setShopToShopVO(Shop Shop){
+//
+//        //查找报名每个会所的人数
+//        ShopBuyExample example = new ShopBuyExample();
+//        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(Shop.getId());
+//        Integer nums = shopBuyMapper.selectByExample(example).size();
+//
+//        ShopVO shopVO = new ShopVO();
+//        shopVO.setNums(nums);
+//        shopVO.setId(Shop.getId());
+//        shopVO.setPublishId(Shop.getPublishId());
+//        shopVO.setImgsUrl(Shop.getImgsUrl());
+//        shopVO.setState(Shop.getState());
+//        shopVO.setServiceArea(Shop.getServiceArea());
+//        shopVO.setCharge(Shop.getCharge());
+//        shopVO.setTravelTime(Shop.getTravelTime());
+//        shopVO.setBoolClose(Shop.getBoolClose());
+//
+//        return shopVO;
+//    }
 }

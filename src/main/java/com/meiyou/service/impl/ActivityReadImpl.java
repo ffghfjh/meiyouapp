@@ -1,16 +1,19 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.ActivityReadMapper;
-import com.meiyou.pojo.Activity;
-import com.meiyou.pojo.ActivityRead;
-import com.meiyou.pojo.ActivityReadExample;
+import com.meiyou.pojo.*;
 import com.meiyou.service.ActivityReadService;
+import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author ：huangzhaoyang
@@ -28,6 +31,9 @@ public class ActivityReadImpl implements ActivityReadService {
 
     @Autowired
     ActivityMapper activityMapper;
+
+    @Autowired
+    UserService userService;
 
     /**
      * 动态添加阅读量
@@ -78,6 +84,66 @@ public class ActivityReadImpl implements ActivityReadService {
         }
         msg.setCode(100);
         msg.setMsg("动态阅读量加1");
+        return msg;
+    }
+
+    /**
+     * 谁看过我的动态
+     * @param uid 为我自己的id
+     * @return
+     */
+    @Override
+    public Msg whoHasSeenMe(int uid) {
+        List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        Msg msg = new Msg();
+        //获得我自己的所有动态
+        ActivityExample example = new ActivityExample();
+        ActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andPublishIdEqualTo(uid);
+        List<Activity> activityList = activityMapper.selectByExample(example);
+        if (activityList == null || activityList.isEmpty()) {
+            msg.setCode(100);
+            msg.setMsg("我没有发布过任何动态");
+            return msg;
+        }
+        for (Activity activity : activityList) {
+            //遍历浏览记录
+            ActivityReadExample readExample = new ActivityReadExample();
+            readExample.setOrderByClause("create_time desc");
+            ActivityReadExample.Criteria criteria1 = readExample.createCriteria();
+            criteria1.andActivityIdEqualTo(activity.getId());
+            List<ActivityRead> reads = activityReadMapper.selectByExample(readExample);
+            if (reads == null || reads.isEmpty()) {
+                //如果这条动态没有被任何人看过，直接走下一个动态
+                continue;
+            }
+            //遍历阅读记录
+            for (ActivityRead read : reads) {
+                //如果阅读记录为自己本人，直接走下一条阅读记录
+                if (read.getReaderId() == uid) {
+                    continue;
+                }
+                //查找阅读人
+                User user = userService.getUserById(read.getReaderId());
+                boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
+                if (boolUser) {
+                    //如果用户不存在，忽略不计
+                    continue;
+                }
+                //hashMap对象的创建放在最后
+                HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                hashMap.put("header", user.getHeader());
+                hashMap.put("nickname", user.getNickname());
+                hashMap.put("time", DateUtil.formatDateTime(read.getCreateTime()));
+                hashMap.put("activityContent", activity.getContent());
+                hashMap.put("aid", activity.getId());
+                list.add(hashMap);
+            }
+        }
+        msg.setCode(100);
+        msg.setMsg("获取谁看过我成功");
+        msg.add("readList", list);
+        msg.add("readNum", list.size());
         return msg;
     }
 }

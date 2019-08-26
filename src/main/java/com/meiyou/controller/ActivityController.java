@@ -37,7 +37,7 @@ import java.util.List;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "ActivityController", tags = {"动态控制层"})
+@Api(value = "ActivityController", tags = {"动态主控制层"})
 @RestController
 @RequestMapping(value = "/Activity")
 public class ActivityController {

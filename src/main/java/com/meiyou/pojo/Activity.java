@@ -84,30 +84,8 @@ public class Activity {
      */
     private Boolean boolClose;
 
-    private User user;
-
-    /**
-     * hzy
-     * 点赞数
-     */
-    private List<ActivityLike> likeList;
 
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<ActivityLike> getLikeList() {
-        return likeList;
-    }
-
-    public void setLikeList(List<ActivityLike> likeList) {
-        this.likeList = likeList;
-    }
 
 
     public Activity() {

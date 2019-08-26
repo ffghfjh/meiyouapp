@@ -20,7 +20,7 @@ import java.util.Map;
  * @author: JK
  * @create: 2019-08-22 19:11
  **/
-@Api(value = "系统动态数据控制层", tags = "系统动态数据控制层")
+@Api(value = "RootMessageController", tags = "系统参数控制层")
 @RestController
 public class RootMessageController {
     @Autowired

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @modified By：huangzhaoyang
  * @version: 1.0.0
  */
-@Api(value = "CommentController", tags = {"评论控制层"})
+@Api(value = "CommentController", tags = {"动态评论控制层"})
 @RestController
 @RequestMapping(value = "/Comment")
 public class CommentController {
@@ -43,6 +43,24 @@ public class CommentController {
     public Msg listCommentByUidAid(int uid, int aid){
         return commentService.listCommentByUidAid(uid, aid);
     }
+
+    @ApiOperation(value = "拉取所有对我动态下30天内的评论", notes = "uid为我自己的uid", httpMethod = "POST")
+    @PostMapping("/listUserCommentForMyActivity")
+    public Msg listUserCommentForMyActivity(int uid){
+        return commentService.listUserCommentForMyActivity(uid);
+    }
+
+    @ApiOperation(value = "获得我动态下30天内未看的评论数", notes = "uid为我自己的uid", httpMethod = "POST")
+    @PostMapping("/getNotSeenComment")
+    public Msg getNotSeenComment(int uid) {
+        return commentService.getNotSeenComment(uid);
+    }
+
+//    @ApiOperation(value = "删除我动态下30天之前的评论", notes = "uid为我自己的uid", httpMethod = "POST")
+//    @PostMapping("/getNotSeenComment")
+//    public Msg getNotSeenComment(int uid) {
+//        return commentService.getNotSeenComment(uid);
+//    }
 
 
 }

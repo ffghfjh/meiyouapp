@@ -12,6 +12,12 @@ import com.meiyou.utils.Msg;
  */
 public interface ActivityLikeService {
 
+    //获得我所有动态下所有未读的点赞数
+    Msg getNotSeenLikeNumForMyActvity(int uid);
+
+    //获取用户对我动态的点赞列表
+    Msg listUserLikeForMyActivity(int uid);
+
     //点赞
     Msg like(int aid, int uid, int type);
 

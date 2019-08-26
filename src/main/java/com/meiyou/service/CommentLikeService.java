@@ -11,6 +11,7 @@ import com.meiyou.utils.Msg;
  */
 public interface CommentLikeService {
 
+
     //评论点赞接口
     Msg like(int uid, int cid, int type);
 

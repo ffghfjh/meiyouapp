@@ -143,6 +143,7 @@ public class CommentServiceImpl implements CommentService {
         Msg msg = new Msg();
         //获取我发布的所有动态
         ActivityExample example = new ActivityExample();
+        example.setOrderByClause("create_time desc");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
         List<Activity> activities = activityMapper.selectByExample(example);
@@ -153,9 +154,9 @@ public class CommentServiceImpl implements CommentService {
             return msg;
         }
         for (Activity activity : activities) {
-            HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //查询对此条动态的所有评论
             CommentExample example1 = new CommentExample();
+            example1.setOrderByClause("create_time desc");
             CommentExample.Criteria criteria1 = example1.createCriteria();
             criteria1.andActivityIdEqualTo(activity.getId());
             List<Comment> comments = commentMapper.selectByExample(example1);
@@ -186,15 +187,19 @@ public class CommentServiceImpl implements CommentService {
                 if (i == 0) {
                     System.out.println("hzy----更改评论为已读状态失败...");
                 }
-                //如果用户存在
+                HashMap<String, Object> hashMap = new HashMap<String, Object>();
                 hashMap.put("header", user.getHeader());
                 hashMap.put("nickname", user.getNickname());
-                //装载评论内容
-                hashMap.put("content", comment.getContent());
+                //动态id
+                hashMap.put("aid", activity.getId());
+                hashMap.put("ActivityTime", DateUtil.formatDateTime(activity.getCreateTime()));
+                hashMap.put("AcitivityContent", activity.getContent());
                 //装载评论id
                 hashMap.put("cid", comment.getId());
-                hashMap.put("AcitivityContent", activity.getContent());
-                hashMap.put("aid", activity.getId());
+                //装载评论时间
+                hashMap.put("comTime", DateUtil.formatDateTime(comment.getCreateTime()));
+                //装载评论内容
+                hashMap.put("content", comment.getContent());
                 list.add(hashMap);
             }
         }

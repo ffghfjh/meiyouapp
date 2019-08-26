@@ -16,11 +16,6 @@ public interface TourService {
     Msg insert(Tour tour, String password, String token, double latitude,double longitude);
 
     /**
-     * 查询我的发布
-     */
-    Msg selectTourList(String uid,String token);
-
-    /**
      * 取消发布
      */
     Msg deleteTourPublish(Integer id,String token);

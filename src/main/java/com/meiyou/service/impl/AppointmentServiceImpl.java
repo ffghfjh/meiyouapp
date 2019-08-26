@@ -136,7 +136,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         int i = 0;
         if (state == 1) {
             AppointmentExample example = new AppointmentExample();
-            example.createCriteria().andIdEqualTo(id);
+            example.createCriteria().andIdEqualTo(id)
+                        .andPublisherIdEqualTo(appointment.getPublisherId());
             appointment.setState(5);
             appointment.setUpdateTime(new Date());
             i = appointmentMapper.updateByExample(appointment, example);
@@ -245,7 +246,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         AppointAskExample appointAskExample1 = new AppointAskExample();
         appointAskExample1.createCriteria().andAppointIdEqualTo(id)
-                .andAskStateEqualTo(1);
+                .andAskStateEqualTo(1)
+                .andAskerIdEqualTo(Integer.parseInt(uid));
         //获取当前约会订单报名人数
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample1);
         //当前约会订单报名人数为空并且为0，则修改该约会订单状态为1
@@ -326,7 +328,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
         AppointmentExample example = new AppointmentExample();
-        example.createCriteria().andIdEqualTo(appointId);
+        example.createCriteria().andIdEqualTo(appointId)
+                    .andPublisherIdEqualTo(Integer.parseInt(uid));
         appointment.setConfirmId(askerId);
         //在约会表中3是选中人员等待赴约状态
         appointment.setState(3);

@@ -98,7 +98,7 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         Msg msg = new Msg();
         //获取我自己的所有动态
         ActivityExample example = new ActivityExample();
-        example.setOrderByClause("create_time desc");
+        example.setOrderByClause("id desc");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
         List<Activity> activities = activityMapper.selectByExample(example);
@@ -112,7 +112,7 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
         for (Activity activity : activities) {
             //获取对我这条动态的点赞记录
             ActivityLikeExample example1 = new ActivityLikeExample();
-            example1.setOrderByClause("create_time desc");
+            example1.setOrderByClause("id desc");
             ActivityLikeExample.Criteria criteria1 = example1.createCriteria();
             criteria1.andActivityIdEqualTo(activity.getId());
             List<ActivityLike> activityLikes = activityLikeMapper.selectByExample(example1);

@@ -78,17 +78,6 @@ public class AppointmentController {
         return appointmentService.insert(appointment, password, token, latitude,longitude);
     }
 
-    /**
-     * @Description: 查询所有我发布的约会
-     * @Author: JK
-     * @Date: 2019/8/22
-     */
-    @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "GET")
-    @GetMapping(value = "/selectAppointmentList")
-    public Msg selectAppointmentList(String uid,String token) {
-        Msg msg = appointmentService.selectAppointmentList(uid, token);
-        return msg;
-    }
 
     /**
      * @Description: 取消发布约会订单
@@ -100,7 +89,6 @@ public class AppointmentController {
     public Msg deleteAppointmentPublish(@RequestParam(value = "id", required = false) Integer id,
                              @RequestParam(value = "token", required = false) String token) {
         return appointmentService.deleteAppointmentPublish(id, token);
-
     }
 
     /**

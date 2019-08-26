@@ -54,17 +54,7 @@ public class TourController {
 
     }
 
-    /**
-     * @Description: 查询所有我发布的旅游
-     * @Author: JK
-     * @Date: 2019/8/22
-     */
-    @ApiOperation(value = "查询所有我发布的旅游", notes = "查询所有我发布的旅游", httpMethod = "GET")
-    @GetMapping(value = "/selectTourList")
-    public Msg selectTourList(String uid,String token) {
-        Msg msg = tourService.selectTourList(uid, token);
-        return msg;
-    }
+
 
     /**
      * @Description: 取消发布旅游订单

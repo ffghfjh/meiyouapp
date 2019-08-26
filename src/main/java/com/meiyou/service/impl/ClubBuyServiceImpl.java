@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
+import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
@@ -30,6 +31,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
     @Autowired
     ClubMapper clubMapper;
+
+    @Autowired
+    ClubStarMapper clubStarMapper;
 
     /**
      * 生成购买会所记录
@@ -155,6 +159,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return result;
     }
 
+
     /**
      * 查找指定的会所购买记录
      * @param uid
@@ -172,15 +177,55 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
         Msg msg = new Msg();
-        if(result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
-
         msg.add("clubBuy", result.get(0));
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;
     }
+
+    /**
+     * 评星
+     * @param uid
+     * @param token
+     * @param cid
+     * @param star
+     * @return
+     */
+    @Override
+    public Msg addClubStar(Integer uid, String token, Integer cid,Integer star) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        Msg msg = new Msg();
+        if(result == null){
+            msg.setCode(404);
+            msg.setMsg("找不到指定的会所购买记录");
+            return msg;
+        }
+        //判断订单状态是否完成(完成了才可以评星)
+        if(result.get(0).getState() != 1){
+            return Msg.fail();
+        }
+        ClubStar clubStar = new ClubStar();
+        clubStar.setClubId(cid);
+        clubStar.setEvaluationId(uid);
+        clubStar.setStar(star);
+        clubStar.setCreateTime(new Date());
+        clubStar.setUpdateTime(new Date());
+        int i = clubStarMapper.insertSelective(clubStar);
+        if(i != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
+    }
+
 }

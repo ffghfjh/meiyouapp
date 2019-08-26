@@ -16,11 +16,6 @@ public interface AppointmentService {
     Msg insert(Appointment appointment, String password, String token,double latitude,double longitude);
 
     /**
-     * 查询我的发布
-     */
-    Msg selectAppointmentList(String uid,String token);
-
-    /**
      * 取消发布
      */
     Msg deleteAppointmentPublish(Integer id,String token);

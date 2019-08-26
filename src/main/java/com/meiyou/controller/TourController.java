@@ -168,9 +168,9 @@ public class TourController {
      * @Date: 2019/8/24
      */
     @ApiOperation(value = "确认报名人已到达", notes = "确认报名人已到达", httpMethod = "POST")
-    @PostMapping(value = "/confirmArrive")
-    public Msg confirmArrive(String uid, Integer id, String token) {
-        return tourService.confirmArrive(uid,id,token);
+    @PostMapping(value = "/confirmTourArrive")
+    public Msg confirmTourArrive(String uid, Integer id, String token) {
+        return tourService.confirmTourArrive(uid,id,token);
     }
 
     /**

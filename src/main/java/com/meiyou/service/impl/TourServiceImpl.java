@@ -672,7 +672,7 @@ public class TourServiceImpl implements TourService {
     */
     @Transactional
     @Override
-    public Msg confirmArrive(String uid, Integer id, String token) {
+    public Msg confirmTourArrive(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {

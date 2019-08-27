@@ -19,6 +19,7 @@ import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import com.tls.tls_sigature.tls_sigature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -91,12 +92,13 @@ public class UserServiceImpl implements UserService {
                         msg.add("token",token);
                         return msg;
                     }else {
-                       String account = user.getAccount();
+                       int uid = user.getId();
                        msg = Msg.fail();
                        msg.setCode(1000);
                        msg.setMsg("未绑定手机");
                        msg.add("aliId",alipayUserId);
                        msg.add("aliToken",authorization.getCredential());//阿里token
+                        msg.add("uid",uid);
                        return msg;
                     }
                 }
@@ -452,6 +454,55 @@ public class UserServiceImpl implements UserService {
         return String.valueOf(money);
     }
 
+    @Override
+    public Msg registBindAlipay(int uId, String aliId, String aliToken,String phone,String code,String password,String shareCode) {
+        Msg msg;
+        //验证码校验
+        if(RedisUtil.authCode(phone,code)){  //通过
+            AuthorizationExample example = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria = example.createCriteria();
+            criteria.andUserIdEqualTo(uId);
+            criteria.andIdentifierEqualTo(aliId);
+            criteria.andCredentialEqualTo(aliToken);
+            criteria.andIdentityTypeEqualTo(2);
+            criteria.andBoolVerifiedEqualTo(false);
+            List<Authorization> authorizations = authMapper.selectByExample(example);
+            if(authorizations.size()>0){
+                Authorization authorization = authorizations.get(0);
+                authorization.setBoolVerified(true);//开放
+
+                Authorization newAuthorization = new Authorization();
+                newAuthorization.setBoolVerified(true);
+                newAuthorization.setIdentifier(phone);
+                newAuthorization.setIdentityType(1);//类型为手机号
+                newAuthorization.setUserId(uId);
+                newAuthorization.setCredential(password);
+                Date date = new Date();
+                newAuthorization.setCreateTime(date);
+                newAuthorization.setUpdateTime(date);
+                if(authMapper.updateByPrimaryKeySelective(authorization)==1&&authMapper.insertSelective(newAuthorization)==1){
+                    addShare(shareCode,uId);//添加分享记录
+                    User user = userMapper.selectByPrimaryKey(uId);
+                    msg = Msg.success();
+                    msg.add("uid",user.getId());
+                    msg.add("account",user.getAccount());
+                    msg.add("nickName",user.getNickname());
+                    msg.add("header",user.getHeader());
+                    String token = UUID.randomUUID().toString();
+                    RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
+                    return msg;
+                }
+            }
+        }else{
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("验证码错误");
+            return msg;
+        }
+        return Msg.fail();
+
+    }
+
 
     @Override
     public Msg selRedPackage(int id) {
@@ -472,7 +523,6 @@ public class UserServiceImpl implements UserService {
                         return Msg.success();
                     }
             }
-
         }
         return Msg.fail();
     }

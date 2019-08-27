@@ -69,4 +69,6 @@ public interface UserService {
     * @Date: 2019/8/26
     */
     String selectUserMoney(String uid,String password);
+
+    Msg registBindAlipay(int uId,String aliId,String aliToken,String phone,String code,String password,String shareCode);
 }

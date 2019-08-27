@@ -169,4 +169,12 @@ public class UserController {
     public String selectUserMoney(String uid,String token) {
         return userService.selectUserMoney(uid,token);
     }
+
+
+     @RequestMapping(value="registBindAlipay",method = RequestMethod.POST)
+     @ApiOperation("手机号绑定支付宝")
+    public Msg registBindAlipay(int uid,String aliId,String aliToken,String phone,String code,String password,String shareCode){
+       return userService.registBindAlipay(uid,aliId,aliToken,phone,code,password,shareCode);
+    }
+
 }

@@ -41,7 +41,7 @@ public class ShopController {
                        @RequestParam("time") Integer time,
                        @RequestParam("password") String password,
                        @RequestParam("files") MultipartFile[] files,
-                       Double latitude, Double longitude,HttpServletRequest request){
+                       Double longitude, Double latitude, HttpServletRequest request){
 
         //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
@@ -61,7 +61,7 @@ public class ShopController {
         shop.setServiceArea(service_area);
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
-        return shopService.addShop(shop,token,time, password, latitude, longitude);
+        return shopService.addShop(shop,token,time, password, longitude, latitude);
     }
 
     @PostMapping("/addShopStar")

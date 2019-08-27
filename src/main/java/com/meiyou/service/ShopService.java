@@ -19,7 +19,7 @@ public interface ShopService {
      * @param password
      * @return
      */
-    Msg addShop(Shop shop, String token, Integer time, String password, Double latitude, Double longitude);
+    Msg addShop(Shop shop, String token, Integer time, String password, Double longitude, Double latitude);
 
     /**
      * 取消发布对应id的景点商家(同城导游)

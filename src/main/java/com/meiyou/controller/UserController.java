@@ -195,4 +195,11 @@ public class UserController {
         return userService.registBindWeChat(uId,openId,accesssToken,phone,code,password,shareCode);
     }
 
+    @RequestMapping(value = "registBindQQ",method = RequestMethod.POST)
+    @ApiOperation("手机绑定QQ")
+    public Msg registBindQQ(int uId,String qqOpenId,String qqTokenn,String phone,String code,String password,String shareCode){
+        System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
+        return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
+    }
+
 }

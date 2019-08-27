@@ -208,7 +208,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1).andAppointIdEqualTo(id);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() != 0){
+        if (appointAsks.size() >= 0){
             return Msg.fail();
         }
 

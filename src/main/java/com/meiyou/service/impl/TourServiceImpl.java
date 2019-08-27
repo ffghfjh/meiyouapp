@@ -212,7 +212,7 @@ public class TourServiceImpl implements TourService {
         tourAskExample.createCriteria().andAskState0EqualTo(1)
                 .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
-        if (tourAsks.size() != 0){
+        if (tourAsks.size() >= 0){
             return Msg.fail();
         }
 

@@ -213,10 +213,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             //通过id查找shop
             ShopExample example = new ShopExample();
             example.createCriteria().andIdEqualTo(id);
-            Shop shop = shopMapper.selectByExample(example).get(0);
+            List<Shop> shops = shopMapper.selectByExample(example);
+            if(shops.isEmpty()){
+                msg.setCode(404);
+                msg.setMsg("附近没有找到景点商家");
+                return msg;
+            }
 
             //把shop的值转换到ShopVO中
-            ShopVO shopVO = setShopToShopVO(shop);
+            ShopVO shopVO = setShopToShopVO(shops.get(0));
             shopVO.setDistance(dis);
 
             shopVOS.add(shopVO);

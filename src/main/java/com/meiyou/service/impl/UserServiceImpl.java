@@ -358,7 +358,7 @@ public class UserServiceImpl implements UserService {
             List<Authorization> authorizations = authMapper.selectByExample(example);
             if(authorizations.size()>0){
                   Authorization authorization = authorizations.get(0);
-                User user = userMapper.selectByPrimaryKey(authorization.getUserId());
+                  User user = userMapper.selectByPrimaryKey(authorization.getUserId());
                   if(authorization.getBoolVerified()){ //已激活
 
                       msg  = Msg.success();
@@ -742,7 +742,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Msg qqLogin(String qqOpenId, String qqToken) {
-
+       Msg msg;
         AuthorizationExample example = new AuthorizationExample();
         AuthorizationExample.Criteria criteria = example.createCriteria();
         criteria.andIdentityTypeEqualTo(4);
@@ -750,7 +750,31 @@ public class UserServiceImpl implements UserService {
         criteria.andCredentialEqualTo(qqToken);
         List<Authorization> authorizations = authMapper.selectByExample(example);
         if(authorizations.size()>0){ //存在该用户
+            //校验绑定手机
+            if(authorizations.get(0).getBoolVerified()){
+                Authorization authorization = authorizations.get(0);
+                User user = userMapper.selectByPrimaryKey(authorization.getUserId());
+                if(authorization.getBoolVerified()) { //已激活
 
+                    msg = Msg.success();
+                    msg.add("uid", user.getId());
+                    msg.add("account", user.getAccount());
+                    msg.add("nickName", user.getNickname());
+                    msg.add("header", user.getHeader());
+                    String token = UUID.randomUUID().toString();
+                    //保存token
+                    RedisUtil.setToken(String.valueOf(user.getId()), token, Constants.TOKEN_EXPIRES_SECOND);
+                    msg.add("token", token);
+                    return msg;
+                }
+                }else {
+                    msg = Msg.success();
+                    msg.setCode(1000);//需要绑定手机号
+                    msg.add("qqOpenId",qqOpenId);
+                    msg.add("qqToken",qqToken);
+                    msg.add("uId",authorizations.get(0).getUserId());
+                    return msg;
+            }
         }else{ //不存在该qq用户
             String url = "https://graph.qq.com/user/get_user_info?access_token="+qqToken+"&oauth_consumer_key="+Constants.QQ_APP_ID+"&openid="+qqOpenId;
             JSONObject json = HttpUtil.getToJSONObject(url);
@@ -783,7 +807,6 @@ public class UserServiceImpl implements UserService {
                 user.setMoney(0f);
                 user.setSignature(Constants.SIGNATURE);//设置默认签名
                 user.setShareCode(ShareCodeUtil.toSerialCode(2));//设置邀请码
-
                 if(userMapper.insert(user)==1){
                     int uId = user.getId();
                     Authorization authorization = new Authorization();
@@ -791,6 +814,24 @@ public class UserServiceImpl implements UserService {
                     authorization.setBoolVerified(false);
                     authorization.setIdentifier(qqOpenId);
                     authorization.setCredential(qqToken);
+                    authorization.setIdentityType(4);//类型qq
+                    authorization.setCreateTime(date);
+                    authorization.setUpdateTime(date);
+
+                    if(authMapper.insertSelective(authorization)==1){
+                        if(imService.registTencent(user)){
+                            msg = Msg.success();
+                            msg.setCode(1000);//需要绑定手机号
+                            msg.add("qqOpenId",qqOpenId);
+                            msg.add("qqToken",qqToken);
+                            msg.add("uId",uId);
+                            return msg;
+                        }else {
+                            msg = Msg.fail();
+                            msg.setMsg("腾讯云账号注册失败");
+                            return msg;
+                        }
+                    }
 
                 }
 

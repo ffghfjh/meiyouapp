@@ -102,7 +102,11 @@ public class UserController {
         return userService.weChatLogin(auth_code);
     }
 
-
+    @RequestMapping(value = "qqLogin",method = RequestMethod.POST)
+    @ApiOperation(value="QQ登录",notes = "1000 需要绑定手机 接收参数  aliId aliToken 绑定手机要用。")
+    public Msg qqLogin(String qqOpenId,String qqToken){
+        return userService.qqLogin(qqOpenId,qqToken);
+    }
     /**
      * 获取签名信息和加签信息
      */

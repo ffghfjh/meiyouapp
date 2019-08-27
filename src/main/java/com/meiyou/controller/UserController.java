@@ -5,6 +5,7 @@ import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,6 +96,12 @@ public class UserController {
         return userService.alipayLogin(auth_code);
     }
 
+    @RequestMapping(value = "weChatLogin",method = RequestMethod.POST)
+    @ApiOperation(value = "微信登录",notes = "1000 需要绑定手机 接收参数 openId  accessToken")
+    public Msg weChatLogin(String auth_code){
+        return userService.weChatLogin(auth_code);
+    }
+
 
     /**
      * 获取签名信息和加签信息
@@ -175,6 +182,12 @@ public class UserController {
      @ApiOperation("手机号绑定支付宝")
     public Msg registBindAlipay(int uid,String aliId,String aliToken,String phone,String code,String password,String shareCode){
        return userService.registBindAlipay(uid,aliId,aliToken,phone,code,password,shareCode);
+    }
+
+    @RequestMapping(value = "registBindWeChat",method = RequestMethod.POST)
+    @ApiOperation("手机绑定微信")
+    public Msg registBindWeChat(){
+        return null;
     }
 
 }

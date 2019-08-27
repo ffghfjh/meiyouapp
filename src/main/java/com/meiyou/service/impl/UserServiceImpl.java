@@ -335,6 +335,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Msg weChatLogin(String auth_code) {
+        Msg msg;
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + Constants.WX_APP_ID + "&secret="
                 + Constants.APPSECRET + "&code=" + auth_code + "&grant_type=authorization_code";
         CloseableHttpClient client;
@@ -356,7 +357,28 @@ public class UserServiceImpl implements UserService {
             criteria.andIdentityTypeEqualTo(3);//微信
             List<Authorization> authorizations = authMapper.selectByExample(example);
             if(authorizations.size()>0){
+                  Authorization authorization = authorizations.get(0);
+                User user = userMapper.selectByPrimaryKey(authorization.getUserId());
+                  if(authorization.getBoolVerified()){ //已激活
 
+                      msg  = Msg.success();
+                      msg.add("uid",user.getId());
+                      msg.add("account",user.getAccount());
+                      msg.add("nickName",user.getNickname());
+                      msg.add("header",user.getHeader());
+                      String token = UUID.randomUUID().toString();
+                      //保存token
+                      RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);
+                      msg.add("token",token);
+                      return msg;
+                  }else {//未激活
+                      msg = new Msg();
+                      msg.setCode(1000);
+                      msg.add("openId",openid);
+                      msg.add("accessToken",authorization.getCredential());
+                      msg.add("uId",user.getId());
+                      return msg;
+                  }
             }else {
                 System.out.println("微信新用户");
 
@@ -377,16 +399,34 @@ public class UserServiceImpl implements UserService {
                 user.setUpdateTime(date);
                 user.setMoney(0f);
                 user.setSignature(Constants.SIGNATURE);//设置默认签名
-
-
-                Authorization authorization = new Authorization();
-                authorization.setIdentityType(3);
-                authorization.setIdentifier(openid);
-                authorization.setBoolVerified(false);
-                authorization.setCredential(access_token);
-
+                user.setShareCode(ShareCodeUtil.toSerialCode(2));//设置邀请码
+                if(userMapper.insert(user)==1){
+                    int uid = user.getId();
+                    Authorization authorization = new Authorization();
+                    authorization.setIdentityType(3);
+                    authorization.setIdentifier(openid);
+                    authorization.setBoolVerified(false);
+                    authorization.setCredential(access_token);
+                    authorization.setUserId(uid);
+                    authorization.setCreateTime(date);
+                    authorization.setUpdateTime(date);
+                    if(authMapper.insertSelective(authorization)==1){
+                        if(imService.registTencent(user)){
+                            msg = Msg.success();
+                            msg.setCode(1000);//需要绑定手机号
+                            msg.add("openId",openid);
+                            msg.add("accessToken",access_token);
+                            msg.add("uId",uid);
+                            return msg;
+                        }else {
+                            msg = Msg.fail();
+                            msg.setMsg("腾讯云账号注册失败");
+                            return msg;
+                        }
+                    }
+                }
             }
-            return null;
+            return Msg.fail();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -617,6 +657,55 @@ public class UserServiceImpl implements UserService {
         }
         return Msg.fail();
 
+    }
+
+    @Override
+    public Msg registBindWeChat(int uId, String openId, String accesssToken, String phone, String code, String password, String shareCode) {
+        Msg msg;
+        //验证码校验
+        if(RedisUtil.authCode(phone,code)){
+            AuthorizationExample example = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria = example.createCriteria();
+            criteria.andUserIdEqualTo(uId);
+            criteria.andIdentifierEqualTo(openId);
+            criteria.andCredentialEqualTo(accesssToken);
+            criteria.andIdentityTypeEqualTo(3);//微信方式
+            criteria.andBoolVerifiedEqualTo(false);
+            List<Authorization> authorizations = authMapper.selectByExample(example);
+            if(authorizations.size()>0) {
+                Authorization authorization = authorizations.get(0);
+                authorization.setBoolVerified(true);//更新激活状态
+
+                Authorization newAuthorization = new Authorization();
+                newAuthorization.setBoolVerified(true);
+                newAuthorization.setIdentifier(phone);
+                newAuthorization.setIdentityType(1);//类型为手机号
+                newAuthorization.setUserId(uId);
+                newAuthorization.setCredential(password);
+                Date date = new Date();
+                newAuthorization.setCreateTime(date);
+                newAuthorization.setUpdateTime(date);
+                if (authMapper.updateByPrimaryKeySelective(authorization) == 1 && authMapper.insertSelective(newAuthorization) == 1) {
+                    addShare(shareCode,uId);//添加分享记录
+                    User user = userMapper.selectByPrimaryKey(uId);
+                    msg = Msg.success();
+                    msg.add("uid",user.getId());
+                    msg.add("account",user.getAccount());
+                    msg.add("nickName",user.getNickname());
+                    msg.add("header",user.getHeader());
+                    String token = UUID.randomUUID().toString();
+                    RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
+                    msg.add("token",token);
+                    return msg;
+                }
+              }
+        }else {
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("验证码错误");
+            return msg;
+        }
+        return Msg.fail();
     }
 
 

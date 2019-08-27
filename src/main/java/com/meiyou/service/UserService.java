@@ -84,4 +84,18 @@ public interface UserService {
      * @return
      */
     Msg registBindAlipay(int uId,String aliId,String aliToken,String phone,String code,String password,String shareCode);
+
+    /**
+     * 手机绑定微信
+     * @param uId
+     * @param openId
+     * @param accesssToken
+     * @param phone
+     * @param code
+     * @param password
+     * @param shareCode
+     * @return
+     */
+    Msg registBindWeChat(int uId,String openId,String accesssToken,String phone,String code,String password,String shareCode);
+
 }

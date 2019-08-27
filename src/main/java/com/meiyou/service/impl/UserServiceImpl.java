@@ -908,7 +908,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Msg getUserInfo(int uId, String token) {
+        Msg msg;
         if(RedisUtil.authToken(String.valueOf(uId),token)){
+            User user = userMapper.selectByPrimaryKey(uId);
+            msg = Msg.success();
+            msg.add("bgImg",user.getBgPicture());
             return null;
         }else {
             System.out.println("鉴权失败");

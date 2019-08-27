@@ -5,8 +5,6 @@ import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
-import com.meiyou.utils.Constants;
-import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.GeoRadiusResponse;

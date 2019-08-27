@@ -113,7 +113,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         return arrayList;
     }
 
-
     /**
      * @Description: 查询我的旅游发布列表
      * @Author: JK
@@ -188,7 +187,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         return arrayList;
     }
 
-
     /**
      * 查找指定用户发布的有效按摩会所
      * @param uid
@@ -196,17 +194,15 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      */
     @Override
     //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-    public List<Object> selectClubByUid(Integer uid,String token) {
+    public List<ClubVO> selectClubByUid(Integer uid,String token) {
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
         clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
 
         List<ClubVO> clubVOS = new ArrayList<>();
-        if(result == null && result.size() == 0){
-//            msg.setCode(404);
-//            msg.setMsg("没有找到指定对象的Shop");
-//            return msg;
+        if(result.isEmpty()){
+            return clubVOS;
         }
 
         for(Club club : result){
@@ -214,39 +210,33 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             clubVOS.add(setClubToClubVO(club));
         }
 
-        return null;
+        return clubVOS;
     }
-//
-//    /**
-//     * 查找用户发布的景点商家shop
-//     * @param uid
-//     * @param token
-//     * @return
-//     */
-//    @Override
-//    public Msg selectShopByUid(Integer uid, String token) {
-//        Msg msg = new Msg();
-//        ShopExample shopExample = new ShopExample();
-//        shopExample.createCriteria().andPublishIdEqualTo(uid);
-//        List<Shop> result = shopMapper.selectByExample(shopExample);
-//
-//        if(result == null && result.size() == 0){
-//            msg.setCode(404);
-//            msg.setMsg("没有找到指定对象的Shop");
-//            return msg;
-//        }
-//
-//        //添加人数到VO类中
-//        List<ShopVO> shopVOS = new ArrayList<>();
-//        for(Shop shop : result){
-//            //把每一个重新赋值的shopVOS类加到新的集合中
-//            shopVOS.add(setShopToShopVO(shop));
-//        }
-//
-//        msg.add("shopVOS",shopVOS);
-//        msg.setMsg("成功");
-//        msg.setCode(100);
-//        return msg;
-//    }
+
+    /**
+     * 查找用户发布的景点商家shop
+     * @param uid
+     * @param token
+     * @return
+     */
+    @Override
+    public List<ShopVO> selectShopByUid(Integer uid, String token) {
+        ShopExample shopExample = new ShopExample();
+        shopExample.createCriteria().andPublishIdEqualTo(uid);
+        List<Shop> result = shopMapper.selectByExample(shopExample);
+
+        //添加人数到VO类中
+        List<ShopVO> shopVOS = new ArrayList<>();
+        if(result.isEmpty()){
+            return shopVOS;
+        }
+
+        for(Shop shop : result){
+            //把每一个重新赋值的shopVOS类加到新的集合中
+            shopVOS.add(setShopToShopVO(shop));
+        }
+
+        return shopVOS;
+    }
 
 }

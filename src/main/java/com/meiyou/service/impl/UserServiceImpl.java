@@ -787,7 +787,11 @@ public class UserServiceImpl implements UserService {
                 if(userMapper.insert(user)==1){
                     int uId = user.getId();
                     Authorization authorization = new Authorization();
-                    
+                    authorization.setUserId(uId);
+                    authorization.setBoolVerified(false);
+                    authorization.setIdentifier(qqOpenId);
+                    authorization.setCredential(qqToken);
+
                 }
 
             }

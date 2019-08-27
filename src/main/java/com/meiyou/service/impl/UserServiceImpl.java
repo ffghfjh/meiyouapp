@@ -913,7 +913,12 @@ public class UserServiceImpl implements UserService {
             User user = userMapper.selectByPrimaryKey(uId);
             msg = Msg.success();
             msg.add("bgImg",user.getBgPicture());
-            return null;
+            msg.add("money",user.getMoney());
+            msg.add("nickName",user.getNickname());
+            msg.add("account",user.getAccount());
+            msg.add("uId",user.getId());
+            msg.add("signature",user.getSignature());
+            return msg;
         }else {
             System.out.println("鉴权失败");
             return Msg.noLogin();

@@ -22,6 +22,16 @@ public interface ShopBuyService {
     Msg addShopBuy(ShopBuy shopBuy, String token,Integer password);
 
     /**
+     * 添加导游评星
+     * @param uid
+     * @param token
+     * @param sid
+     * @param star
+     * @return
+     */
+    Msg addShopStar(Integer uid, String token, Integer sid, Integer star);
+
+    /**
      * 通过景点商家(同城导游)id 取消购买指定的景点商家(同城导游)
      * @param uid
      * @param token
@@ -29,6 +39,15 @@ public interface ShopBuyService {
      * @return
      */
     Msg updateShopBuy(Integer uid, String token, Integer sid);
+
+    /**
+     * 修改状态为已完成状态
+     * @param uid
+     * @param sid 景点商家(导游Id)
+     * @param token
+     * @return
+     */
+    Msg updateShopBuyComplete(Integer uid,Integer sid,String token);
 
     /**
      * 查找用户的景点商家(同城导游)购买记录
@@ -45,5 +64,14 @@ public interface ShopBuyService {
      * @param sid
      * @return
      */
-    Msg selectBySid(Integer uid, String token,Integer sid);
+    Msg selectBySidAndUid(Integer uid, String token,Integer sid);
+
+    /**
+     * 查询聘请了此导游的所有记录
+     * @param uid
+     * @param sid
+     * @param token
+     * @return
+     */
+    Msg selectBySid(Integer uid,Integer sid,String token);
 }

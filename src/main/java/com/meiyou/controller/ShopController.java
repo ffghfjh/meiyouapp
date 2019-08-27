@@ -3,6 +3,7 @@ package com.meiyou.controller;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.pojo.Shop;
+import com.meiyou.service.ShopBuyService;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
@@ -26,6 +27,9 @@ public class ShopController {
 
     @Autowired
     ShopService shopService;
+
+    @Autowired
+    ShopBuyService shopBuyService;
 
     @PostMapping("/add")
     @ApiOperation(value = "发布同城导游",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
@@ -60,6 +64,15 @@ public class ShopController {
         return shopService.addShop(shop,token,time, password, latitude, longitude);
     }
 
+    @PostMapping("/addShopStar")
+    @ApiOperation(value = "添加同城导游的评星",notes = "添加评星")
+    public Msg addClubStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("sid") Integer sid,
+                           @RequestParam("star") Integer star){
+        return shopBuyService.addShopStar(uid,token,sid,star);
+    }
+
     @PutMapping("/update")
     @ApiOperation(value = "取消发布聘请同城导游",notes = "取消即更发布状态，实际数据不删除")
     public Msg updateShop(@RequestParam("uid") Integer uid,
@@ -74,5 +87,14 @@ public class ShopController {
                              @RequestParam("token") String token,
                              @RequestParam("sid") Integer sid){
         return shopService.selectBySid(uid,token,sid);
+    }
+
+    @GetMapping("/getByPosition")
+    @ApiOperation(value = "查找附近的shop",notes = "查找用户所在位置附近的shop,返回为ShopVO类")
+    public Msg getByPosition(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("longitude") Double longitude,
+                             @RequestParam("latitude") Double latitude){
+        return shopService.selectShopByPosition(uid,token,longitude,latitude);
     }
 }

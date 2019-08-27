@@ -10,6 +10,7 @@ import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,22 @@ public class BaseServiceImpl {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 查找附近的key
+     * @param uid
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public List<GeoRadiusResponse> getGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+        String range = getRootMessage("range");
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(Integer.toString(uid));
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        return RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
     }
 
     /**

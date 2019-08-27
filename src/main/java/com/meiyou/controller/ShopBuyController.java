@@ -36,6 +36,15 @@ public class ShopBuyController {
         return shopBuyService.addShopBuy(shopBuy,token,password);
     }
 
+    @PostMapping("/addStar")
+    @ApiOperation(value = "评星",notes = "对状态为已完成的导游记录进行评星")
+    public Msg addShopStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("sid") Integer cid,
+                           @RequestParam("star") Integer star){
+        return shopBuyService.addShopStar(uid,token,cid,star);
+    }
+
     @PutMapping("/update")
     @ApiOperation(value = "取消聘请的同城导游",notes = "取消即更发布状态，实际数据不删除")
     public Msg updateShop(@RequestParam("uid") Integer uid,
@@ -44,18 +53,34 @@ public class ShopBuyController {
         return shopBuyService.updateShopBuy(uid, token, sid);
     }
 
-    @GetMapping("/get")
+    @PutMapping("/updateComplete")
+    @ApiOperation(value = "更改购买景点商家的状态为已到店(已完成)",notes = "修改状态为已赴约(已完成)--->>1")
+    public Msg updateShopBuyComplete(@RequestParam("uid") Integer uid,
+                                     @RequestParam("token") String token,
+                                     @RequestParam("sid") Integer sid){
+        return shopBuyService.updateShopBuyComplete(uid, sid, token);
+    }
+
+    @GetMapping("/getByUid")
     @ApiOperation(value = "通过用户id查找指定用户id聘请的全部同城导游",notes = "查找")
-    public Msg getClubByUid(@RequestParam("uid") Integer uid,
+    public Msg getShopByUid(@RequestParam("uid") Integer uid,
                             @RequestParam("token") String token){
         return shopBuyService.selectByUid(uid,token);
     }
 
-    @GetMapping("/find")
+    @GetMapping("/findBySidAndUid")
     @ApiOperation(value = "通过同城导游记录id(shopBuy_id)查找对应的同城导游信息",notes = "查找")
-    public Msg findClubByCid(@RequestParam("uid") Integer uid,
+    public Msg findShopBySidAndUid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("sid") Integer sid){
-        return shopBuyService.selectBySid(uid,token,sid);
+        return shopBuyService.selectBySidAndUid(uid,token,sid);
+    }
+
+    @GetMapping("/findBySid")
+    @ApiOperation(value = "通过导游id查找聘请了此同城导游的所有记录",notes = "查找")
+    public Msg findShopBuyBySid(@RequestParam("uid") Integer uid,
+                                @RequestParam("sid") Integer sid,
+                                @RequestParam("token") String  token){
+        return shopBuyService.selectBySid(uid, sid, token);
     }
 }

@@ -1,10 +1,14 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.AppointmentMapper;
+import com.meiyou.pojo.Appointment;
+import com.meiyou.pojo.AppointmentExample;
 import com.meiyou.service.AppointmentManagementService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import java.util.List;
 

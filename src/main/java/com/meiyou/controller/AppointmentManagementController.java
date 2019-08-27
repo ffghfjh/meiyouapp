@@ -1,12 +1,17 @@
 package com.meiyou.controller;
 
+import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentManagementService;
-import com.meiyou.utils.Msg;
+import com.meiyou.utils.LayuiDataUtil;
+import com.meiyou.utils.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @program: meiyou
@@ -27,8 +32,11 @@ public class AppointmentManagementController {
     */
     @ApiOperation(value = "发布约会", notes = "发布约会", httpMethod = "POST")
     @RequestMapping(value = "selectAllAppointment")
-    public Msg selectAllAppointment(){
-        return appointmentManagementService.selectAllAppointment();
+    public Map<String,Object> selectAllAppointment(){
+        Page<Appointment> page = new Page<>();
+        List<Appointment> appointments = appointmentManagementService.selectAllAppointment();
+        page.setList(appointments);
+        return LayuiDataUtil.getLayuiData(page);
     }
 
 }

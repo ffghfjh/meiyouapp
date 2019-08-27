@@ -10,7 +10,7 @@ public class Constants {
     public static String USER_BAC_DEFAULT = "http://www.meiyou8.cn/meiyou/uimg/imgs/default.jpg";//默认用户资料背景
     public static String USER_BIRTHDAY = "1996-11-12";//默认用户出生年月
     public static String SIGNATURE = "该用户很懒，什么都没有";//用户默认签名
-
+    public static String AGE = "22";//默认用户年龄
 
 
     /**
@@ -32,7 +32,7 @@ public class Constants {
     public static long SDKAPPID = 1400207520;// 腾讯云SDKAPPID
     public static String IDENTIFIER = "administrator";// 腾讯云IM管理员账号
 
-    public static int TOKEN_EXPIRES_SECOND = 72000; // token过期时间 单位/秒
+    public static int TOKEN_EXPIRES_SECOND = 864000; // token过期时间 单位/秒
     public static int REDIS_CODE_OUT_TIME = 1000;//验证码redis过期时间 单位/秒
     public static String GEO_USER_KEY = "user";
     public static String GEO_ACTIVITY = "activity";
@@ -89,4 +89,13 @@ public class Constants {
     public static String DELAY_PROCESS_QUEUE_NAME = "delay_process_queue";//实际消费队列
     public static String DELAY_EXCHANGE_NAME = "dlx";//死信交换机
     public static int QUEUE_EXPIRATION = 1000;//过期时间
+
+    /**
+     * 微信开放平台
+     */
+    public static String APPSECRET = "718e5f07e14afa07e08ee93ac64dacd5";
+    public static String WX_APP_ID = "wxa85b1b1ddcddffd5";
+
+    public static String QQ_APP_ID = "101726019";
+    public static String QQ_APP_KEY = "77ed8921d867b24c55fe3ee3e316b510";
 };

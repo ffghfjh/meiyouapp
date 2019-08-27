@@ -5,6 +5,7 @@ import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,7 +96,17 @@ public class UserController {
         return userService.alipayLogin(auth_code);
     }
 
+    @RequestMapping(value = "weChatLogin",method = RequestMethod.POST)
+    @ApiOperation(value = "微信登录",notes = "1000 需要绑定手机 接收参数 openId  accessToken")
+    public Msg weChatLogin(String auth_code){
+        return userService.weChatLogin(auth_code);
+    }
 
+    @RequestMapping(value = "qqLogin",method = RequestMethod.POST)
+    @ApiOperation(value="QQ登录",notes = "1000 需要绑定手机 接收参数  aliId aliToken 绑定手机要用。")
+    public Msg qqLogin(String qqOpenId,String qqToken){
+        return userService.qqLogin(qqOpenId,qqToken);
+    }
     /**
      * 获取签名信息和加签信息
      */
@@ -169,4 +180,26 @@ public class UserController {
     public String selectUserMoney(String uid,String token) {
         return userService.selectUserMoney(uid,token);
     }
+
+
+     @RequestMapping(value="registBindAlipay",method = RequestMethod.POST)
+     @ApiOperation("手机号绑定支付宝")
+    public Msg registBindAlipay(int uid,String aliId,String aliToken,String phone,String code,String password,String shareCode){
+       return userService.registBindAlipay(uid,aliId,aliToken,phone,code,password,shareCode);
+    }
+
+    @RequestMapping(value = "registBindWeChat",method = RequestMethod.POST)
+    @ApiOperation("手机绑定微信")
+    public Msg registBindWeChat(int uId,String openId,String accesssToken,String phone,String code,String password,String shareCode){
+        System.out.println("参数：openId:"+openId+",accessTken:"+accesssToken+",uid:"+uId);
+        return userService.registBindWeChat(uId,openId,accesssToken,phone,code,password,shareCode);
+    }
+
+    @RequestMapping(value = "registBindQQ",method = RequestMethod.POST)
+    @ApiOperation("手机绑定QQ")
+    public Msg registBindQQ(int uId,String qqOpenId,String qqTokenn,String phone,String code,String password,String shareCode){
+        System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
+        return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
+    }
+
 }

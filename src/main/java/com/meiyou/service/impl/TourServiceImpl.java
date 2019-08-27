@@ -206,7 +206,18 @@ public class TourServiceImpl implements TourService {
         tourAsk.setAppointId(id);
         tourAsk.setAskState0(1);
         tourAsk.setCreateTime(new Date());
-        tourAsk.setUpdateTime(new Date());
+
+        //查询该报名者是否已经报名
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(1)
+                .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        if (tourAsks.size() >= 0){
+            msg.setCode(200);
+            msg.setMsg("请勿重复报名");
+            return msg;
+        }
+
         //旅游记录表中增加一条记录
         tourAskMapper.insertSelective(tourAsk);
         //根据旅游订单表id查出该订单所有信息
@@ -215,6 +226,7 @@ public class TourServiceImpl implements TourService {
         tourExample.createCriteria().andIdEqualTo(id);
         tour.setState(2);
         tour.setUpdateTime(new Date());
+
         //更改该订单状态
         int i = tourMapper.updateByExample(tour,tourExample);
         if (i == 1) {

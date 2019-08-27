@@ -16,6 +16,8 @@ public interface UserService {
    //获取腾讯云IM鉴权Sig
     public Msg getSig(int uid,String token);
 
+    //微信登录
+    public Msg weChatLogin(String auth_code);
 
     /**
      * hzy
@@ -70,5 +72,16 @@ public interface UserService {
     */
     String selectUserMoney(String uid,String password);
 
+    /**
+     * 手机绑定支付宝
+     * @param uId
+     * @param aliId
+     * @param aliToken
+     * @param phone
+     * @param code
+     * @param password
+     * @param shareCode
+     * @return
+     */
     Msg registBindAlipay(int uId,String aliId,String aliToken,String phone,String code,String password,String shareCode);
 }

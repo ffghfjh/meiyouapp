@@ -10,7 +10,7 @@ public class Constants {
     public static String USER_BAC_DEFAULT = "http://www.meiyou8.cn/meiyou/uimg/imgs/default.jpg";//默认用户资料背景
     public static String USER_BIRTHDAY = "1996-11-12";//默认用户出生年月
     public static String SIGNATURE = "该用户很懒，什么都没有";//用户默认签名
-
+    public static String AGE = "22";//默认用户年龄
 
 
     /**
@@ -89,4 +89,10 @@ public class Constants {
     public static String DELAY_PROCESS_QUEUE_NAME = "delay_process_queue";//实际消费队列
     public static String DELAY_EXCHANGE_NAME = "dlx";//死信交换机
     public static int QUEUE_EXPIRATION = 1000;//过期时间
+
+    /**
+     * 微信开放平台
+     */
+    public static String APPSECRET = "718e5f07e14afa07e08ee93ac64dacd5";
+    public static String WX_APP_ID = "wxa85b1b1ddcddffd5";
 };

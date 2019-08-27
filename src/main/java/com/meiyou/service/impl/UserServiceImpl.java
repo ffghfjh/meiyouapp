@@ -12,12 +12,21 @@ import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
+import com.meiyou.model.WXUserInfo;
 import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.TencentImService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import com.tls.tls_sigature.tls_sigature;
+import net.sf.json.JSONObject;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cache.annotation.CacheConfig;
@@ -28,8 +37,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.sql.DatabaseMetaData;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 @CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
@@ -124,8 +137,9 @@ public class UserServiceImpl implements UserService {
                         user.setAccount(userAccount);
                         user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                         user.setBindAlipay(false);//未绑定支付宝
-                        user.setBirthday(Constants.USER_BIRTHDAY);//设置默认出生年月
-                        user.setBoolClose(true);
+
+                        user.setBirthday(Constants.AGE);//设置默认年龄
+                        user.setBoolClose(false);
                         user.setHeader(alipayinfo.getAvatar());//设置头像
                         user.setNickname(alipayinfo.getNick_name());//设置昵称
                         Date date = new Date();
@@ -318,6 +332,107 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    @Transactional
+    public Msg weChatLogin(String auth_code) {
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + Constants.WX_APP_ID + "&secret="
+                + Constants.APPSECRET + "&code=" + auth_code + "&grant_type=authorization_code";
+        CloseableHttpClient client;
+        CloseableHttpResponse response;
+
+        HttpGet get = new HttpGet(url);
+        client = HttpClients.createDefault();
+        try {
+            response = client.execute(get);
+            HttpEntity repentity = response.getEntity();
+            String resresult = EntityUtils.toString(repentity, "utf-8");
+            JSONObject json = JSONObject.fromObject(resresult);
+            String access_token = json.getString("access_token");// 接口调用凭证
+            String openid = json.getString("openid");// 授权用户唯一标识
+
+            AuthorizationExample example = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria = example.createCriteria();
+            criteria.andIdentifierEqualTo(openid);
+            criteria.andIdentityTypeEqualTo(3);//微信
+            List<Authorization> authorizations = authMapper.selectByExample(example);
+            if(authorizations.size()>0){
+
+            }else {
+                System.out.println("微信新用户");
+
+                WXUserInfo info = getWxUserInfo(access_token,openid);
+                User user = new User();
+                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                user.setAccount(userAccount);
+                user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
+                user.setBindAlipay(false);//未绑定支付宝
+
+                user.setBirthday(Constants.AGE);//设置默认年龄
+                user.setBoolClose(false);
+                user.setHeader(info.getHeadimgurl());//设置头像
+                user.setNickname(info.getNickname());//设置昵称
+                user.setSex(info.isSex());//设置昵称
+                Date date = new Date();
+                user.setCreateTime(date);
+                user.setUpdateTime(date);
+                user.setMoney(0f);
+                user.setSignature(Constants.SIGNATURE);//设置默认签名
+
+
+                Authorization authorization = new Authorization();
+                authorization.setIdentityType(3);
+                authorization.setIdentifier(openid);
+                authorization.setBoolVerified(false);
+                authorization.setCredential(access_token);
+
+            }
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取微信用户信息
+     *
+     * @param access_token
+     * @param openid
+     * @return
+     */
+    public WXUserInfo getWxUserInfo(String access_token, String openid) {
+
+        String url = "https://api.weixin.qq.com/sns/userinfo?access_token=" + access_token + "&openid=" + openid;
+        CloseableHttpClient client;
+        CloseableHttpResponse response;
+        // TODO Auto-generated method stub
+        HttpGet get = new HttpGet(url);
+        client = HttpClients.createDefault();
+        try {
+            response = client.execute(get);
+            HttpEntity repentity = response.getEntity();
+            String resresult = EntityUtils.toString(repentity, "utf-8");
+            JSONObject json = JSONObject.fromObject(resresult);
+            WXUserInfo wx = new WXUserInfo();
+            wx.setOpenid(json.getString("openid"));
+            wx.setNickname(json.getString("nickname"));
+            if (json.getInt("sex") == 1) {
+                wx.setSex(false);
+            } else {
+                wx.setSex(true);
+            }
+            wx.setHeadimgurl(json.getString("headimgurl"));
+            return wx;
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * 添加邀请记录
@@ -490,6 +605,7 @@ public class UserServiceImpl implements UserService {
                     msg.add("header",user.getHeader());
                     String token = UUID.randomUUID().toString();
                     RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
+                    msg.add("token",token);
                     return msg;
                 }
             }
@@ -525,5 +641,38 @@ public class UserServiceImpl implements UserService {
             }
         }
         return Msg.fail();
+    }
+
+
+    /**
+     * 字符串日期换算年龄
+     * @param birth
+     * @return
+     * @throws ParseException
+     */
+    public  int getAgeByBirth(String birth) throws ParseException {
+        Date birthDay = new SimpleDateFormat("yyyy-M-dd").parse(birth);
+        int age = 0;
+        Calendar cal = Calendar.getInstance();
+        if (cal.before(birthDay)) { //出生日期晚于当前时间，无法计算
+            throw new IllegalArgumentException(
+                    "The birthDay is before Now.It's unbelievable!");
+        }
+        int yearNow = cal.get(Calendar.YEAR);  //当前年份
+        int monthNow = cal.get(Calendar.MONTH);  //当前月份
+        int dayOfMonthNow = cal.get(Calendar.DAY_OF_MONTH); //当前日期
+        cal.setTime(birthDay);
+        int yearBirth = cal.get(Calendar.YEAR);
+        int monthBirth = cal.get(Calendar.MONTH);
+        int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
+        age = yearNow - yearBirth;   //计算整岁数
+        if (monthNow <= monthBirth) {
+            if (monthNow == monthBirth) {
+                if (dayOfMonthNow < dayOfMonthBirth) age--;//当前日期在生日之前，年龄减一
+            } else {
+                age--;//当前月份在生日之前，年龄减一
+            }
+        }
+        return age;
     }
 }

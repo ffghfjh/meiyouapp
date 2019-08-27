@@ -210,6 +210,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         example.createCriteria().andIdEqualTo(id);
         appointment.setState(2);
         appointment.setUpdateTime(new Date());
+
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskStateEqualTo(1).andAppointIdEqualTo(id);
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+        if (appointAsks.size() != 0){
+            return Msg.fail();
+        }
         //更改该订单状态
         int i = appointmentMapper.updateByExample(appointment, example);
         if (i == 1) {

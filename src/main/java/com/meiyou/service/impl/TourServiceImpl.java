@@ -215,6 +215,16 @@ public class TourServiceImpl implements TourService {
         tourExample.createCriteria().andIdEqualTo(id);
         tour.setState(2);
         tour.setUpdateTime(new Date());
+
+
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(1)
+                .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        if (tourAsks.size() != 0){
+            return Msg.fail();
+        }
+
         //更改该订单状态
         int i = tourMapper.updateByExample(tour,tourExample);
         if (i == 1) {

@@ -4,14 +4,17 @@ import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.ClubVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,12 +46,13 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     @Transactional
     @Override
     public Msg addBuyClub(ClubBuy clubBuy,String token,Integer password) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         clubBuy.setCreateTime(new Date());
         clubBuy.setUpdateTime(new Date());
+        clubBuy.setState(0);
 
         //从系统数据表获取报名费用
         String ask_money = getRootMessage("ask_money");
@@ -76,7 +80,6 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             return msg;
         }else {
             clubBuyMapper.insertSelective(clubBuy);
-            System.out.println(clubBuy.getId());
 
             //计算剩余金额
             User user = new User();
@@ -104,9 +107,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     @Transactional
     @Override
     public Msg updateBuyClub(Integer uid,Integer cid,String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         //从系统数据表获取置顶费用
         String ask_money = getRootMessage("ask_money");
@@ -136,37 +139,70 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return Msg.success();
     }
 
-    @Override
-    public Msg updateClubBuy(Integer uid, Integer cid, String token) {
-        return null;
-    }
-
     /**
-     * 查找指定用户的会所购买记录
+     * 修改状态为已到店(已完成)--->>1
      * @param uid
+     * @param cid
+     * @param token
      * @return
      */
     @Override
-    @Cacheable(cacheNames = "buy")
-    public List<ClubBuy> selectByUid(Integer uid,String token) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+    public Msg updateClubBuyComplete(Integer uid, Integer cid, String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
-        Msg msg = new Msg();
-        //查找购买按摩会所的记录
+        //修改购买表状态
+        ClubBuy clubBuy = new ClubBuy();
+        clubBuy.setState(1);
+        clubBuy.setUpdateTime(new Date());
+
         ClubBuyExample clubBuyExample = new ClubBuyExample();
-        //购买者id为uid的购买记录
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        int rows = clubBuyMapper.updateByExampleSelective(clubBuy, clubBuyExample);
+        if(rows < 1){
+            return Msg.fail();
+        }
 
-        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-
-        return result;
+        return Msg.success();
     }
 
+    /**
+     * 查找当前用户指定的会所购买记录
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg selectByCidAndUid(Integer uid, Integer cid, String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        Msg msg = new Msg();
+        if(result == null && result.size() ==0){
+            msg.setCode(404);
+            msg.setMsg("找不到指定的会所购买记录");
+            return msg;
+        }
+
+        //对查找出来的ClubBuy进行封装
+        Club club = clubMapper.selectByPrimaryKey(result.get(0).getClubId());
+        ClubVO clubVO = setClubToClubVO(club);
+        clubVO.setAskState(result.get(0).getState());
+
+        msg.add("clubVO", clubVO);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
 
     /**
-     * 查找指定的会所购买记录
+     * 查找购买了cid的全部购买记录
      * @param uid
      * @param cid
      * @param token
@@ -174,20 +210,46 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCid(Integer uid, Integer cid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
-        ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
-        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
         Msg msg = new Msg();
-        if(result == null){
+        //判断访问者是否为发布者
+        Integer publishId = clubMapper.selectByPrimaryKey(cid).getPublishId();
+        if(publishId != uid){
+            msg.setCode(506);
+            msg.setMsg("没有访问权限");
+            return msg;
+        }
+
+        //查找购买按摩会所的记录
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        //购买者了id为cid的所有购买记录
+        clubBuyExample.createCriteria().andClubIdEqualTo(cid);
+
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+
+        if(result == null && result.size() ==0){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
-        msg.add("clubBuy", result.get(0));
+
+        //对查找出来的ClubBuy进行封装
+        List<ClubVO> clubVOS = new ArrayList<>();
+        for(ClubBuy c : result){
+            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
+
+            ClubVO clubVO = setClubToClubVO(club);
+            //设置购买者状态
+            clubVO.setAskState(c.getState());
+
+            clubVOS.add(clubVO);
+        }
+
+        //返回一个封装好的ClubVO类
+        msg.add("clubVOS",clubVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;
@@ -203,15 +265,16 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg addClubStar(Integer uid, String token, Integer cid,Integer star) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+
         Msg msg = new Msg();
-        if(result == null){
+        if(result == null && result.size() == 0){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;

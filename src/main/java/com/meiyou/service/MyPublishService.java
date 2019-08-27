@@ -1,6 +1,10 @@
 package com.meiyou.service;
 
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.utils.Msg;
+
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -13,12 +17,12 @@ public interface MyPublishService {
     /**
      * 查询我的约会发布
      */
-    Msg selectAppointmentList(String uid,String token);
+    List<Object> selectAppointmentList(String uid, String token);
 
     /**
      * 查询我的旅游发布
      */
-    Msg selectTourList(String uid, String token);
+    List<Object> selectTourList(String uid, String token);
 
 
     /**
@@ -26,12 +30,12 @@ public interface MyPublishService {
      * @param uid
      * @return
      */
-    Msg selectClubByUid(Integer uid, String token);
+    List<ClubVO> selectClubByUid(Integer uid, String token);
 
     /**
      * 查找指定用户所发布的景点商家(同城导游)
      * @param uid
      * @return
      */
-    Msg selectShopByUid(Integer uid,String token);
+    List<ShopVO> selectShopByUid(Integer uid, String token);
 }

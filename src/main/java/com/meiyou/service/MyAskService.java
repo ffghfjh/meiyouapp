@@ -23,4 +23,19 @@ public interface MyAskService {
     * @Date: 2019/8/26
     */
     Msg selectMyTourAsk(String uid, String token);
+
+    /**
+     * 查询我的会所购买
+     * @param uid
+     * @return
+     */
+  //  Msg selectMyClubAsk(Integer uid, String token);
+
+    /**
+     * 查询我的导游聘请
+     * @param uid
+     * @param token
+     * @return
+     */
+   // Msg selectMyShopAsk(Integer uid, String token);
 }

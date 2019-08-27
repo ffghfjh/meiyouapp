@@ -24,6 +24,8 @@ public class ShopVO implements Serializable {
     private Integer charge;
     private String imgsUrl;
     private Integer state;
+    //聘用者状态
+    private Integer askState;
     private Boolean boolClose;
     //聘请该导游的人数
     private Integer nums;
@@ -49,6 +51,7 @@ public class ShopVO implements Serializable {
                 ", charge=" + charge +
                 ", imgsUrl='" + imgsUrl + '\'' +
                 ", state=" + state +
+                ", askState=" + askState +
                 ", boolClose=" + boolClose +
                 ", nums=" + nums +
                 ", distance=" + distance +
@@ -151,6 +154,14 @@ public class ShopVO implements Serializable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getAskState() {
+        return askState;
+    }
+
+    public void setAskState(Integer askState) {
+        this.askState = askState;
     }
 
     public Boolean getBoolClose() {

@@ -15,4 +15,6 @@ public interface AppointmentManagementService {
      * @return
      */
     Msg selectAllAppointment();
+
+    Msg  selectClub();
 }

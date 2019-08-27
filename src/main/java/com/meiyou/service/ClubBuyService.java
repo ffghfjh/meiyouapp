@@ -1,11 +1,7 @@
 package com.meiyou.service;
 
-import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.utils.Msg;
-
-import java.util.List;
-
 
 /**
  * @description: 会所购买业务层接口
@@ -33,17 +29,19 @@ public interface ClubBuyService {
      * @param token
      * @return
      */
-    Msg updateClubBuy(Integer uid,Integer cid,String token);
-
-    /**
-     * 查找指定用户uid下所有的会所购买记录
-     * @param uid
-     * @return
-     */
-    List<ClubBuy> selectByUid(Integer uid, String token);
+    Msg updateClubBuyComplete(Integer uid,Integer cid,String token);
 
     /**
      * 查找指定的会所购买记录
+     * @param uid
+     * @param cid
+     * @param token
+     * @return
+     */
+    Msg selectByCidAndUid(Integer uid,Integer cid,String token);
+
+    /**
+     * 查询购买了此会所的所有记录
      * @param uid
      * @param cid
      * @param token

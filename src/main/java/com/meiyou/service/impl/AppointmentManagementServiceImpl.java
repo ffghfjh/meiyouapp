@@ -1,5 +1,8 @@
 package com.meiyou.service.impl;
 
+import com.meiyou.mapper.ClubMapper;
+import com.meiyou.pojo.Club;
+import com.meiyou.pojo.ClubExample;
 import com.meiyou.mapper.AppointmentMapper;
 import com.meiyou.pojo.Appointment;
 import com.meiyou.pojo.AppointmentExample;
@@ -31,6 +34,22 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
         List<Appointment> appointments = appointmentMapper.selectByExample(new AppointmentExample());
         Msg msg = new Msg();
         msg.add("appointments",appointments);
+        return msg;
+    }
+    @Autowired
+    ClubMapper clubMapper;
+
+    @Override
+    public Msg selectClub() {
+        Msg msg = new Msg();
+
+        ClubExample clubExample = new ClubExample();
+        clubExample.createCriteria();
+        List<Club> clubs = clubMapper.selectByExample(clubExample);
+
+        msg.setMsg("成功");
+        msg.setCode(100);
+        msg.add("clubs",clubs);
         return msg;
     }
 }

@@ -3,6 +3,7 @@ package com.meiyou.controller;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.meiyou.pojo.Shop;
+import com.meiyou.service.ShopBuyService;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
@@ -27,6 +28,9 @@ public class ShopController {
     @Autowired
     ShopService shopService;
 
+    @Autowired
+    ShopBuyService shopBuyService;
+
     @PostMapping("/add")
     @ApiOperation(value = "发布同城导游",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
     public Msg addShop(@RequestParam("publish_id") Integer publishId,
@@ -36,28 +40,37 @@ public class ShopController {
                        @RequestParam("charge") Integer charge,
                        @RequestParam("time") Integer time,
                        @RequestParam("password") String password,
-                       /*@RequestParam("files") MultipartFile[] files,*/
+                       @RequestParam("files") MultipartFile[] files,
                        Double latitude, Double longitude,HttpServletRequest request){
 
-//        //使用Hutool进行json操作
-//        JSONArray array = JSONUtil.createArray();
-//        for (MultipartFile file : files) {
-//            Msg msg = FileUploadUtil.uploadUtil(file, "shop", request);
-//            if (msg.getCode() == 100) {
-//                array.add(msg.getExtend().get("path"));
-//            }
-//        }
-//        if (array.size() == 0) {
-//            return Msg.fail();
-//        }
+        //使用Hutool进行json操作
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "shop", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
+            }
+        }
+        if (array.size() == 0) {
+            return Msg.fail();
+        }
 
         Shop shop = new Shop();
         shop.setPublishId(publishId);
-        //shop.setImgsUrl(array.toString());////以json数组的形式存图片
+        shop.setImgsUrl(array.toString());////以json数组的形式存图片
         shop.setServiceArea(service_area);
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
         return shopService.addShop(shop,token,time, password, latitude, longitude);
+    }
+
+    @PostMapping("/addShopStar")
+    @ApiOperation(value = "添加同城导游的评星",notes = "添加评星")
+    public Msg addClubStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("sid") Integer sid,
+                           @RequestParam("star") Integer star){
+        return shopBuyService.addShopStar(uid,token,sid,star);
     }
 
     @PutMapping("/update")
@@ -68,11 +81,20 @@ public class ShopController {
         return shopService.updateShop(uid,token,sid);
     }
 
-    @GetMapping("/find")
+    @PostMapping("/find")
     @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("sid") Integer sid){
         return shopService.selectBySid(uid,token,sid);
+    }
+
+    @PostMapping("/getByPosition")
+    @ApiOperation(value = "查找附近的shop",notes = "查找用户所在位置附近的shop,返回为ShopVO类")
+    public Msg getByPosition(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("longitude") Double longitude,
+                             @RequestParam("latitude") Double latitude){
+        return shopService.selectShopByPosition(uid,token,longitude,latitude);
     }
 }

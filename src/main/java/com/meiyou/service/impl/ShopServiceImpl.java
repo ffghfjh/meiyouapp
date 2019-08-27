@@ -2,7 +2,6 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
-import com.meiyou.model.Coordinate;
 import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopService;
@@ -10,7 +9,9 @@ import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,10 +41,10 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      */
     @Override
     public Msg addShop(Shop shop, String token, Integer time, String password,
-                       Double latitude, Double longitude) {
-//        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+                       Double longitude, Double latitude) {
+        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         Date now = new Date();
@@ -68,12 +69,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             msg.setMsg("请设置支付密码!!");
             msg.setCode(1000);
             return msg;
-        }else if(!payWord.equals(password)){
+        }
+        if(!payWord.equals(password)){
             msg.setMsg("支付密码错误!!!");
             msg.setCode(1001);
             return msg;
             //用户金额与发布金额进行比较
-        }else if(money < pay_money){
+        }
+        //用户金额与支付金额进行比较
+        if(money < pay_money){
             msg.setMsg("发布失败,账户余额不足!!!");
             msg.setCode(1002);
             return msg;
@@ -85,7 +89,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
 
             //添加地理位置到缓存
-            Boolean result = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            Boolean result = setPosition(longitude, latitude, shop.getId(), Constants.GEO_SHOP);
             if (!result) {
                 msg.setCode(505);
                 msg.setMsg("获取地理位置失败");
@@ -103,7 +107,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             userExample.createCriteria().andIdEqualTo(shop.getPublishId());
             userMapper.updateByExampleSelective(user,userExample);
 
-            return Msg.success();
+            msg.setMsg("获取地理位置成功");
+            msg.setCode(100);
+            return msg;
         }
     }
 
@@ -116,9 +122,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      */
     @Override
     public Msg updateShop(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Integer status = shopMapper.selectByPrimaryKey(sid).getState();
         if(status!=0){
             return Msg.fail();
@@ -126,6 +132,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         //设置状态为2，已失效
         Shop shop = new Shop();
         shop.setState(2);
+        shop.setUpdateTime(new Date());
 
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andPublishIdEqualTo(uid).andIdEqualTo(sid);
@@ -145,9 +152,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      */
     @Override
     public Msg selectBySid(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);
@@ -168,34 +175,62 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         return msg;
     }
 
-    @Override
-    public Msg selectShop(float longitude, float latitude) {
-        return null;
-    }
-
     /**
-     * 把Shop对象中的值转移到ShopVO对象中
-     * @param Shop
+     * 查找附近的shop
+     * @param uid
+     * @param token
+     * @param longitude
+     * @param latitude
      * @return
      */
-//    public ShopVO setShopToShopVO(Shop Shop){
-//
-//        //查找报名每个会所的人数
-//        ShopBuyExample example = new ShopBuyExample();
-//        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(Shop.getId());
-//        Integer nums = shopBuyMapper.selectByExample(example).size();
-//
-//        ShopVO shopVO = new ShopVO();
-//        shopVO.setNums(nums);
-//        shopVO.setId(Shop.getId());
-//        shopVO.setPublishId(Shop.getPublishId());
-//        shopVO.setImgsUrl(Shop.getImgsUrl());
-//        shopVO.setState(Shop.getState());
-//        shopVO.setServiceArea(Shop.getServiceArea());
-//        shopVO.setCharge(Shop.getCharge());
-//        shopVO.setTravelTime(Shop.getTravelTime());
-//        shopVO.setBoolClose(Shop.getBoolClose());
-//
-//        return shopVO;
-//    }
+    @Override
+    @Cacheable(value = "nearShop")
+    public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
+
+        //查找附近的key
+        List<GeoRadiusResponse> geoRadiusResponses = getGeoRadiusResponse(uid,longitude,latitude);
+
+        if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
+            return Msg.fail();
+        }
+
+        List<ShopVO> shopVOS = new ArrayList<>();
+        for(GeoRadiusResponse result : geoRadiusResponses){
+            //获取id
+            String member = result.getMemberByString();
+
+            //距离我多远
+            Double dis = result.getDistance();
+            if (dis != null) {
+                dis = 0.00;
+            }
+            Integer id = Integer.valueOf(member);
+
+            //通过id查找shop
+            ShopExample example = new ShopExample();
+            example.createCriteria().andIdEqualTo(id);
+            List<Shop> shops = shopMapper.selectByExample(example);
+            if(shops.isEmpty()){
+                msg.setCode(404);
+                msg.setMsg("附近没有找到景点商家");
+                return msg;
+            }
+
+            //把shop的值转换到ShopVO中
+            ShopVO shopVO = setShopToShopVO(shops.get(0));
+            shopVO.setDistance(dis);
+
+            shopVOS.add(shopVO);
+        }
+
+        msg.add("shopVOS",shopVOS);
+        msg.setMsg("成功");
+        msg.setCode(100);
+
+        return msg;
+    }
 }

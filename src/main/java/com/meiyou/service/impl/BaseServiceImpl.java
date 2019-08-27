@@ -5,11 +5,9 @@ import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
-import com.meiyou.utils.Constants;
-import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +66,7 @@ public class BaseServiceImpl {
      * @param value
      * @return
      */
-    public Boolean setPosition(Double latitude, Double longitude, Integer key, String value){
+    public Boolean setPosition(Double longitude, Double latitude, Integer key, String value){
         //添加地理位置和aid到Redis缓存中
         Coordinate coordinate = new Coordinate();
         coordinate.setLatitude(latitude);
@@ -79,6 +77,22 @@ public class BaseServiceImpl {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 查找附近的key
+     * @param uid
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public List<GeoRadiusResponse> getGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+        String range = getRootMessage("range");
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(Integer.toString(uid));
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        return RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
     }
 
     /**
@@ -119,6 +133,10 @@ public class BaseServiceImpl {
         Integer starNums = getStarNumsByClubId(club.getId());
 
         clubVO.setStar(starNums);
+
+        //封装发布者头像
+        User user = getUserByUid(club.getPublishId());
+        clubVO.setPublishHeader(user.getHeader());
 
         return clubVO;
     }

@@ -13,13 +13,18 @@ public class ClubVO implements Serializable {
     //nums 为查询报名了这个club的人数
     private Integer id;
     private Integer publishId;
+    private String publishHeader;
     private String imgsUrl;
     private String projectName;
     private String projectDesc;
     private String projectAddress;
     private Integer projectPrice;
     private Integer marketPrice;
+    //会所状态
     private Integer state;
+    //购买者状态
+    private Integer askState;
+    //购买人数
     private Integer nums;
     //查附近的club的时候需要用到的 距离
     private Double distance;
@@ -33,6 +38,7 @@ public class ClubVO implements Serializable {
         return "ClubVO{" +
                 "id=" + id +
                 ", publishId=" + publishId +
+                ", publishHeader='" + publishHeader + '\'' +
                 ", imgsUrl='" + imgsUrl + '\'' +
                 ", projectName='" + projectName + '\'' +
                 ", projectDesc='" + projectDesc + '\'' +
@@ -40,6 +46,7 @@ public class ClubVO implements Serializable {
                 ", projectPrice=" + projectPrice +
                 ", marketPrice=" + marketPrice +
                 ", state=" + state +
+                ", askState=" + askState +
                 ", nums=" + nums +
                 ", distance=" + distance +
                 ", star=" + star +
@@ -61,6 +68,14 @@ public class ClubVO implements Serializable {
 
     public void setPublishId(Integer publishId) {
         this.publishId = publishId;
+    }
+
+    public String getPublishHeader() {
+        return publishHeader;
+    }
+
+    public void setPublishHeader(String publishHeader) {
+        this.publishHeader = publishHeader;
     }
 
     public String getImgsUrl() {
@@ -117,6 +132,14 @@ public class ClubVO implements Serializable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getAskState() {
+        return askState;
+    }
+
+    public void setAskState(Integer askState) {
+        this.askState = askState;
     }
 
     public Integer getNums() {

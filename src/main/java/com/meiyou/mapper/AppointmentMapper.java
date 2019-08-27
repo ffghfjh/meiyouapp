@@ -1,5 +1,7 @@
 package com.meiyou.mapper;
 
+import com.meiyou.pojo.Appointment;
+import com.meiyou.pojo.AppointmentExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

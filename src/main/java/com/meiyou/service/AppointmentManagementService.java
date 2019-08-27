@@ -11,27 +11,8 @@ import com.meiyou.utils.Msg;
 public interface AppointmentManagementService {
 
     /**
-     * 查询所有的约会订单
-     */
-    Msg selectAppointment();
-
-    /**
-     * 查询已发布的约会订单，1对应约会表中的状态，
+     * 查询所有约会
      * @return
      */
-    Msg selectAppointment1();
-
-    /**
-     * 查询准备赴约的约会订单，4对应约会表中的状态，
-     * @return
-     */
-    Msg selectAppointment4();
-
-    /**
-     * 查询赴约成功的约会订单，5对应约会表中的状态，
-     * @return
-     */
-    Msg selectAppointment5();
-
-
+    Msg selectAllAppointment();
 }

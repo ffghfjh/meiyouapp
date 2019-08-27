@@ -2,6 +2,7 @@ package com.meiyou.controller;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import com.meiyou.pojo.Appointment;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;

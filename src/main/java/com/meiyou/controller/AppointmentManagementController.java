@@ -20,10 +20,15 @@ public class AppointmentManagementController {
     @Autowired
     private AppointmentManagementService appointmentManagementService;
 
-    @ApiOperation(value = "约会列表", notes = "约会列表", httpMethod = "POST")
-    @RequestMapping(value = "selectAppointment")
-    public Msg selectAppointment() {
-        return appointmentManagementService.selectAppointment();
-
+    /**
+    * @Description: 查询所有的约会
+    * @Author: JK
+    * @Date: 2019/8/27
+    */
+    @ApiOperation(value = "发布约会", notes = "发布约会", httpMethod = "POST")
+    @RequestMapping(value = "selectAllAppointment")
+    public Msg selectAllAppointment(){
+        return appointmentManagementService.selectAllAppointment();
     }
+
 }

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import java.util.List;
-
 /**
  * @program: meiyou
  * @description: 约会服务后台管理业务层
@@ -23,52 +21,16 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
     @Autowired
     private AppointmentMapper appointmentMapper;
 
-
     /**
-    * @Description: 查询所有的约会订单
+    * @Description: 查询所有约会
     * @Author: JK
     * @Date: 2019/8/27
     */
     @Override
-    public Msg selectAppointment() {
-        AppointmentExample appointmentExample = new AppointmentExample();
-        List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
+    public Msg selectAllAppointment() {
+        List<Appointment> appointments = appointmentMapper.selectByExample(new AppointmentExample());
         Msg msg = new Msg();
         msg.add("appointments",appointments);
         return msg;
-    }
-
-    /**
-    * @Description: 查询已发布的约会订单
-     *              1对应约会表中的状态，
-    * @Author: JK
-    * @Date: 2019/8/27
-    */
-    @Override
-    public Msg selectAppointment1() {
-
-        return null;
-    }
-
-    /**
-    * @Description: 询准备赴约的约会订单
-     *              4对应约会表中的状态，
-    * @Author: JK
-    * @Date: 2019/8/27
-    */
-    @Override
-    public Msg selectAppointment4() {
-        return null;
-    }
-
-    /**
-    * @Description: 查询赴约成功的约会订单
-     *              5对应约会表中的状态，
-    * @Author: JK
-    * @Date: 2019/8/27
-    */
-    @Override
-    public Msg selectAppointment5() {
-        return null;
     }
 }

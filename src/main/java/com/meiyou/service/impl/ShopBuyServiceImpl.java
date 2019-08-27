@@ -1,14 +1,19 @@
 package com.meiyou.service.impl;
 
+import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopBuyService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,13 +41,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg addShopBuy(ShopBuy shopBuy, String token, Integer password) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(shopBuy.getBuyerId().toString(),token)){
+            return Msg.noLogin();
+        }
 
         shopBuy.setCreateTime(new Date());
         shopBuy.setUpdateTime(new Date());
-        //shopBuy.setState(0);
+        shopBuy.setState(0);
 
         //从系统数据表获取报名费用
         //String ask_money = getRootMessage("ask_money");
@@ -53,8 +58,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         Float money = result.getMoney();
 
         //计算所购买的导游的总收费
-        Integer charge = shopMapper.selectByPrimaryKey(shopBuy.getGuideId())
-                .getCharge() * shopBuy.getTime();
+        Integer time = shopBuy.getTime();
+        Integer charge = shopMapper.selectByPrimaryKey(shopBuy.getGuideId()).getCharge();
+        Integer charges = charge * time;
 
         Msg msg = new Msg();
         if(payWord.equals("")){
@@ -67,7 +73,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             msg.setCode(1001);
             return msg;
         }
-        if(money < charge){
+        if(money < charges){
             msg.setMsg("发布失败,账户余额不足!");
             msg.setCode(1002);
             return msg;
@@ -76,7 +82,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
             //计算剩余金额
             User user = new User();
-            money = money - Float.valueOf(charge);
+            money = money - Float.valueOf(charges);
             user.setMoney(money);
             user.setUpdateTime(new Date());
 
@@ -90,6 +96,49 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     }
 
     /**
+     * 给完成了的景点商家评星
+     * @param uid
+     * @param token
+     * @param sid
+     * @param star
+     * @return
+     */
+    @Override
+    public Msg addShopStar(Integer uid, String token, Integer sid, Integer star) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
+        List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
+
+        Msg msg = new Msg();
+        if(shopBuys == null && shopBuys.size() == 0){
+            msg.setCode(404);
+            msg.setMsg("找不到指定的会所购买记录");
+            return msg;
+        }
+        //判断订单状态是否完成(完成了才可以评星)
+        if(shopBuys.get(0).getState() != 1){
+            return Msg.fail();
+        }
+
+        ShopStar shopStar = new ShopStar();
+        shopStar.setStart(star);
+        shopStar.setCreateTime(new Date());
+        shopStar.setUpdateTime(new Date());
+        shopStar.setEvaluationId(uid);
+        shopStar.setGuideId(sid);
+
+        int i = shopStarMapper.insertSelective(shopStar);
+        if(i != 1){
+            return Msg.fail();
+        }
+
+        return Msg.success();
+    }
+
+    /**
      * 取消聘请导游
      * @param uid
      * @param token
@@ -99,20 +148,20 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg updateShopBuy(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
 //        从系统数据表获取置顶费用
 //        String ask_money = getRootMessage("ask_money");
 
         //获取每小时收费和聘请时间
-        Integer projectPrice = shopMapper.selectByPrimaryKey(sid).getCharge();
+        Integer charge = shopMapper.selectByPrimaryKey(sid).getCharge();
 
         ShopBuyExample example = new ShopBuyExample();
         example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
         Integer time = shopBuyMapper.selectByExample(example).get(0).getTime();
-        Integer money = time * projectPrice;
+        Integer money = time * charge;
 
         //修改聘用表状态-->取消状态-2
         ShopBuy shopBuy = new ShopBuy();
@@ -136,6 +185,32 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     }
 
     /**
+     * 修改状态为已赴约(已完成)--->>1
+     * @param uid
+     * @param sid 景点商家(导游Id)
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg updateShopBuyComplete(Integer uid, Integer sid, String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        ShopBuy shopBuy = new ShopBuy();
+        shopBuy.setState(1);
+        shopBuy.setUpdateTime(new Date());
+
+        //修改购买表状态
+        ShopBuyExample example = new ShopBuyExample();
+        example.createCriteria().andBuyerIdEqualTo(uid).andGuideIdEqualTo(sid);
+        int rows = shopBuyMapper.updateByExampleSelective(shopBuy, example);
+        if(rows != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
+    }
+
+    /**
      * 查询用户聘请的全部导游记录
      * @param uid
      * @param token
@@ -143,9 +218,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectByUid(Integer uid, String token) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         //查找购买按摩会所的记录
         ShopBuyExample shopBuyExample = new ShopBuyExample();
@@ -153,41 +228,113 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 
         Msg msg = new Msg();
-        if(result == null){
+        if(result == null && result.size() ==0){
             msg.setCode(404);
-            msg.setMsg("找不到用户所购买的聘请记录");
+            msg.setMsg("找不到用户的聘请记录");
         }
 
-        msg.add("shopBuy",result);
+        //对查找出来的ShopBuy进行封装
+        List<ShopVO> shopVOS = new ArrayList<>();
+        for(ShopBuy shopBuy : result){
+            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
+
+            ShopVO shopVO = setShopToShopVO(shop);
+            //设置购买者状态
+            shopVO.setState(shopBuy.getState());
+
+            shopVOS.add(shopVO);
+        }
+
+        //返回一个封装好的ShopVO类
+        msg.add("shopVOS",shopVOS);
         msg.setMsg("成功");
         msg.setCode(100);
-        return null;
+        return msg;
     }
 
     /**
-     * 查询指定的聘请的导游记录
+     * 查询当前用户指定的聘请导游记录
      * @param uid
      * @param token
      * @param sid
      * @return
      */
     @Override
-    public Msg selectBySid(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(clubBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+    public Msg selectBySidAndUid(Integer uid, String token, Integer sid) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
         shopBuyExample.createCriteria().andIdEqualTo(sid).andBuyerIdEqualTo(uid);
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
         Msg msg = new Msg();
-        if(result == null){
+        if(result == null && result.size() ==0){
             msg.setCode(404);
             msg.setMsg("没找到指定的聘请的导游记录");
             return msg;
         }
 
-        msg.add("shopBuy", result.get(0));
+        //对查找出来的ShopBuy进行封装
+        Shop shop = shopMapper.selectByPrimaryKey(result.get(0).getGuideId());
+        ShopVO shopVO = setShopToShopVO(shop);
+        shopVO.setState(result.get(0).getState());
+
+        msg.add("shopVO", shopVO);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
+
+    /**
+     * 查询聘请了此导游的全部记录
+     * @param uid
+     * @param sid
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg selectBySid(Integer uid, Integer sid, String token) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Msg msg = new Msg();
+        //判断访问者是否为发布者
+        Integer publishId = shopMapper.selectByPrimaryKey(sid).getPublishId();
+        if(publishId != uid){
+            msg.setCode(506);
+            msg.setMsg("没有访问权限");
+            return msg;
+        }
+
+        //查找聘请了此导游的记录
+        ShopBuyExample shopBuyExample = new ShopBuyExample();
+        //聘请id为sid的所有聘请记录
+        shopBuyExample.createCriteria().andGuideIdEqualTo(sid);
+
+        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
+
+        if(result == null && result.size() ==0){
+            msg.setCode(404);
+            msg.setMsg("找不到指定的导游聘请记录");
+            return msg;
+        }
+
+        //对查找出来的ShopBuy进行封装
+        List<ShopVO> shopVOS = new ArrayList<>();
+        for(ShopBuy s : result){
+            Shop shop = shopMapper.selectByPrimaryKey(s.getGuideId());
+
+            ShopVO shopVO = setShopToShopVO(shop);
+            //设置聘用者状态
+            shopVO.setAskState(s.getState());
+
+            shopVOS.add(shopVO);
+        }
+
+        //返回一个封装好的ShopVO类
+        msg.add("shopVOS",shopVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;

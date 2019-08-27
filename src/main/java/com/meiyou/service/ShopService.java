@@ -43,5 +43,5 @@ public interface ShopService {
      * @param latitude
      * @return
      */
-    Msg selectShop(float longitude, float latitude);
+    Msg selectShopByPosition(Integer uid, String token,Double longitude, Double latitude);
 }

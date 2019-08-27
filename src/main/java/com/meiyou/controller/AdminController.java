@@ -3,7 +3,6 @@ package com.meiyou.controller;
 import com.meiyou.service.AdminService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.ApiOperation;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  * @create: 2019-08-26 21:16
  **/
 @RestController
+@RequestMapping("admin")
 public class AdminController {
 
     @Autowired

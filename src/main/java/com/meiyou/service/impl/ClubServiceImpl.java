@@ -51,9 +51,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Transactional
     @Cacheable()
     public Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude) {
-//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         Date now = new Date();
         club.setCreateTime(now);
@@ -103,7 +103,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 msg.setMsg("获取地理位置失败");
                 return msg;
             }
-            System.out.println("获取地理位置成功");
 
             //执行扣钱操作
             User user = new User();
@@ -115,7 +114,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             example.createCriteria().andIdEqualTo(club.getPublishId());
             userMapper.updateByExampleSelective(user,example);
 
-            return Msg.success();
+            msg.setMsg("获取地理位置成功");
+            msg.setCode(100);
+            return msg;
         }
     }
 
@@ -128,9 +129,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @CachePut(key = "#result.id")
     public Msg updateClub(Integer uid,String token, Integer cid) {
-//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Integer state = clubMapper.selectByPrimaryKey(cid).getState();
         if(state != 0){
@@ -142,7 +143,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         club.setUpdateTime(new Date());
 
         ClubExample example = new ClubExample();
-        example.createCriteria().andIdEqualTo(cid);
+        example.createCriteria().andIdEqualTo(cid).andPublishIdEqualTo(uid);
         int rows = clubMapper.updateByExampleSelective(club,example);
 
         if(rows != 1){
@@ -159,9 +160,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @Cacheable()
     public Msg selectByCid(Integer uid,String token,Integer cid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         ClubExample example = new ClubExample();
@@ -194,18 +195,15 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @Cacheable(value = "nearClub")
     public Msg selectClubByPosition(Integer uid, String token, Double longitude, Double latitude) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
-        String range = getRootMessage("range");
-        Coordinate coordinate = new Coordinate();
-        coordinate.setKey(Integer.toString(uid));
-        coordinate.setLatitude(latitude);
-        coordinate.setLongitude(longitude);
 
-        List<GeoRadiusResponse> geoRadiusResponses = RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
-        if(geoRadiusResponses == null){
+        //查找附近的key
+        List<GeoRadiusResponse> geoRadiusResponses = getGeoRadiusResponse(uid,longitude,latitude);
+
+        if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
             return Msg.fail();
         }
 

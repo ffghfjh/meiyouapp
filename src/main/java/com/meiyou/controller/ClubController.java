@@ -104,7 +104,7 @@ public class ClubController {
     public Msg getByPosition(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("longitude") Double longitude,
-                             @RequestParam("longitude") Double latitude){
+                             @RequestParam("latitude") Double latitude){
         return clubService.selectClubByPosition(uid,token,longitude,latitude);
     }
 }

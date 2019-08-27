@@ -46,13 +46,9 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @Date: 2019/8/22
      */
     @Override
-    public Msg selectAppointmentList(String uid, String token) {
+    public List<Object> selectAppointmentList(String uid, String token) {
         Msg msg = new Msg();
-        boolean authToken = RedisUtil.authToken(uid, token);
-        //判断是否登录
-        if (!authToken) {
-            return Msg.noLogin();
-        }
+
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
@@ -108,14 +104,13 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         }
 
         if (appointments != null && appointments.size() != 0) {
-            msg.add("arrayList", arrayList);
-            msg.setCode(100);
-            msg.setMsg("我的约会发布列表返回成功");
-            return msg;
+            return arrayList;
         }
-        Msg fail = Msg.fail();
-        msg.add("fail", fail);
-        return msg;
+
+        msg.setCode(200);
+        msg.setMsg("没找到");
+        arrayList.add(msg);
+        return arrayList;
     }
 
 
@@ -125,13 +120,9 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @Date: 2019/8/26
      */
     @Override
-    public Msg selectTourList(String uid, String token) {
+    public List<Object> selectTourList(String uid, String token) {
         Msg msg = new Msg();
-        boolean authToken = RedisUtil.authToken(uid, token);
-        //判断是否登录
-        if (!authToken) {
-            return Msg.noLogin();
-        }
+
         TourExample tourExample = new TourExample();
         tourExample.createCriteria().andPublishIdEqualTo(Integer.parseInt(uid));
         List<Tour> tours = tourMapper.selectByExample(tourExample);
@@ -188,14 +179,13 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         }
 
         if (tours != null && tours.size() != 0) {
-            msg.add("arrayList", arrayList);
-            msg.setCode(100);
-            msg.setMsg("我的旅游发布列表返回成功");
-            return msg;
+            return arrayList;
         }
-        Msg fail = Msg.fail();
-        msg.add("fail", fail);
-        return msg;
+
+        msg.setCode(200);
+        msg.setMsg("没找到");
+        arrayList.add(msg);
+        return arrayList;
     }
 
 
@@ -204,70 +194,70 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @param uid
      * @return
      */
-    @Override
-    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-    public Msg selectClubByUid(Integer uid,String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-
-        Msg msg = new Msg();
-        //查找发布出去的有效按摩会所
-        ClubExample clubExample = new ClubExample();
-        clubExample.createCriteria().andPublishIdEqualTo(uid);
-        List<Club> result = clubMapper.selectByExample(clubExample);
-
-        List<ClubVO> clubVOS = new ArrayList<>();
-        if(result == null && result.size() == 0){
-            msg.setCode(404);
-            msg.setMsg("没有找到指定对象的Shop");
-            return msg;
-        }
-
-        for(Club club : result){
-            //把每一个重新赋值的clubVO类加到新的集合中
-            clubVOS.add(setClubToClubVO(club));
-        }
-        msg.add("clubVOS",clubVOS);
-        msg.setCode(100);
-        msg.setMsg("成功");
-
-        return msg;
-    }
-
-    /**
-     * 查找用户发布的景点商家shop
-     * @param uid
-     * @param token
-     * @return
-     */
-    @Override
-    public Msg selectShopByUid(Integer uid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-        Msg msg = new Msg();
-        ShopExample shopExample = new ShopExample();
-        shopExample.createCriteria().andPublishIdEqualTo(uid);
-        List<Shop> result = shopMapper.selectByExample(shopExample);
-
-        if(result == null && result.size() == 0){
-            msg.setCode(404);
-            msg.setMsg("没有找到指定对象的Shop");
-            return msg;
-        }
-
-        //添加人数到VO类中
-        List<ShopVO> shopVOS = new ArrayList<>();
-        for(Shop shop : result){
-            //把每一个重新赋值的shopVOS类加到新的集合中
-            shopVOS.add(setShopToShopVO(shop));
-        }
-
-        msg.add("shopVOS",shopVOS);
-        msg.setMsg("成功");
-        msg.setCode(100);
-        return msg;
-    }
+//    @Override
+//    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
+//    public Msg selectClubByUid(Integer uid,String token) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+//
+//        Msg msg = new Msg();
+//        //查找发布出去的有效按摩会所
+//        ClubExample clubExample = new ClubExample();
+//        clubExample.createCriteria().andPublishIdEqualTo(uid);
+//        List<Club> result = clubMapper.selectByExample(clubExample);
+//
+//        List<ClubVO> clubVOS = new ArrayList<>();
+//        if(result == null && result.size() == 0){
+//            msg.setCode(404);
+//            msg.setMsg("没有找到指定对象的Shop");
+//            return msg;
+//        }
+//
+//        for(Club club : result){
+//            //把每一个重新赋值的clubVO类加到新的集合中
+//            clubVOS.add(setClubToClubVO(club));
+//        }
+//        msg.add("clubVOS",clubVOS);
+//        msg.setCode(100);
+//        msg.setMsg("成功");
+//
+//        return msg;
+//    }
+//
+//    /**
+//     * 查找用户发布的景点商家shop
+//     * @param uid
+//     * @param token
+//     * @return
+//     */
+//    @Override
+//    public Msg selectShopByUid(Integer uid, String token) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+//        Msg msg = new Msg();
+//        ShopExample shopExample = new ShopExample();
+//        shopExample.createCriteria().andPublishIdEqualTo(uid);
+//        List<Shop> result = shopMapper.selectByExample(shopExample);
+//
+//        if(result == null && result.size() == 0){
+//            msg.setCode(404);
+//            msg.setMsg("没有找到指定对象的Shop");
+//            return msg;
+//        }
+//
+//        //添加人数到VO类中
+//        List<ShopVO> shopVOS = new ArrayList<>();
+//        for(Shop shop : result){
+//            //把每一个重新赋值的shopVOS类加到新的集合中
+//            shopVOS.add(setShopToShopVO(shop));
+//        }
+//
+//        msg.add("shopVOS",shopVOS);
+//        msg.setMsg("成功");
+//        msg.setCode(100);
+//        return msg;
+//    }
 
 }

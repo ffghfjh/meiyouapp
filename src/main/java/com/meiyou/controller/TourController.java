@@ -48,6 +48,7 @@ public class TourController {
         tour.setGoTime(goTime);
         tour.setGoMessage(goMessage);
         tour.setNeedNum(1);
+        tour.setState(1);
         tour.setReward(reward);
         tour.setPayType(payType);
         return tourService.insert(tour,password,token,latitude,longitude);

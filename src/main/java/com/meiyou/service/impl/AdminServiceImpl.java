@@ -5,6 +5,7 @@ import com.meiyou.pojo.AdminExample;
 import com.meiyou.service.AdminService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @program: meiyou
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author: dengshilin
  * @create: 2019-08-26 21:22
  **/
+@Service
 public class AdminServiceImpl implements AdminService {
     @Autowired
     AdminMapper adminMapper;

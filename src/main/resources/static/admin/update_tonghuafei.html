@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.1</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./js/cookie.js"></script>
+  </head>
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label for="L_email" class="layui-form-label">
+                  <span class="x-red">*</span>视频通话费:
+              </label>
+              <div class="layui-input-inline">
+                  <input id="upd_tonghuafei" name="z_u_bcount" required="" 
+                  autocomplete="off" class="layui-input" />
+               
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" id="pass">
+                  通过
+              </button>
+               <button type="reset" class="layui-btn" lay-filter="add" id="ignore">
+                  重置 
+              </button>
+          </div>
+      </form>
+    </div>
+    
+    <script type="text/javascript">
+          $('#pass').click(function(){
+        	  var quantity = $('#upd_tonghuafei').val();
+        	  if(!quantity){
+        		  layer.msg('请填写数据', { 
+ 						icon: 2,
+ 						time: 500 //2秒关闭（如果不配置，默认是3秒）
+ 						}, function(){
+ 							
+ 						});
+        		  return false;
+        	  }
+        	  var adminUser = localStorage.getItem("adminUser");
+     	      adminUser = JSON.parse(adminUser);
+     	      if(adminUser ==null){
+	       		  parent.location.href='login.html';
+	       		  return false;
+     	      }
+        	  $.ajax({
+        		  url:'/meiyou/shuju/updateTHgetMeijin',
+        		  type:'post',
+        		  data:"quantity="+quantity,
+        		  headers: {
+       		        Accept: "application/json; charset=utf-8",
+       		        headerId:adminUser.aId,
+       		        headerToken:adminUser.token
+       		      },
+        		  success:function(data){
+        			  parent.location.href="essential_data.html";
+        		  }
+        	  });
+          });
+    </script> 
+</html>

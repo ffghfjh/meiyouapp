@@ -34,7 +34,7 @@ public class AdminController {
 
     @RequestMapping(value = "authAdmin",method = RequestMethod.GET)
     @ApiOperation("登录校验")
-    public boolean authAdmin(HttpServletRequest request,String account){
+    public boolean authAdmin(HttpServletRequest request){
         if(request.getSession().getAttribute("admin")!=null){
             return true;
         }

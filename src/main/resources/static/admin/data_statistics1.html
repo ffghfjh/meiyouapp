@@ -1,0 +1,170 @@
+<html class="x-admin-sm">
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.1</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./js/cookie.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+      </div>
+      <xblock>
+        <span class="x-right" style="line-height:40px" id="totil"></span>
+      </xblock>
+      <table class="layui-table x-admin">
+        <thead>
+          <tr>
+            <th>时间</th>
+            <th>注册用户</th>
+            <th>分享金币</th>
+            <th>总发需求</th>
+            <th>悬赏金币</th>
+            <th>诚意金收益</th>
+            <th>平台费收益</th>
+            <th>充值金币总数</th>
+            <th>提现金额</th>
+            <th>视频聊天收益</th>
+            <th>报名人数</th></tr>
+        </thead>
+        <tbody id="td">
+             <tr id="today">
+                <td>今天</td>
+                
+             </tr>
+             <tr id="yesterday">
+                <td>昨天</td>
+             </tr>
+             <tr id="thisWeek">
+                <td>本周</td>
+             </tr>
+             <tr id="thisMonth">
+                <td>本月</td>
+             </tr>
+             <tr id="lastMonth">
+                <td>上月</td>
+             </tr>
+             <tr id="thisYear">
+                <td>本年</td>
+             </tr>
+             <tr id="all">
+                <td>全部</td>
+             </tr>
+        </tbody>
+      </table>
+      <div class="page">
+      
+      </div>
+
+    </div>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+
+     $(function(){
+    	 get_all_info("今天",'#today'); 
+    	 get_all_info("昨天",'#yesterday'); 
+    	 get_all_info("本周",'#thisWeek');
+    	 get_all_info("本月",'#thisMonth');
+    	 get_all_info("上月",'#lastMonth');
+    	 get_all_info("本年",'#thisYear');
+    	 get_all_info("全部",'#all'); 
+     });
+     
+     //获取后台数据 
+     function get_all_info(date,id){
+    	 var adminUser = localStorage.getItem("adminUser");
+   	     adminUser = JSON.parse(adminUser);
+   	     if(adminUser ==null){
+	   		  parent.location.href='login.html';
+	   		  return false;
+   	     }
+    	 $.ajax({
+    		 url:"/meiyou/shuju/getAllShujuByDate",
+    		 type:"post",
+    		 data:"condition="+date,
+    		 headers: {
+   		        Accept: "application/json; charset=utf-8",
+   		        headerId:adminUser.aId,
+   		        headerToken:adminUser.token
+   		     },
+    		 success:function(result){
+    			 if(result.code==100){
+    				 show_info(result,id);
+       		     }else if(result.code==200){
+       			  
+       		     }else if(result.code==300){
+       			    //登录时间过期
+       			     layer.msg('登录信息过期，请重新登录',{
+  						icon: 1,
+  						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+  						}, function(){
+  							parent.location.href = "login.html";
+  						});
+       		    }
+    			 
+    		}
+    	 }); 
+     }
+     
+     function show_info(result,id){
+    	 console.log(result);
+		 var shuju = result.extend.shuju;
+		 var td1 = $('<td></td>').html(shuju.volumeNumber);
+		 var td2 = $('<td></td>').html(shuju.fenxiangJin);
+		 var td3 = $('<td></td>').html(shuju.needData);
+		 var td4 = $('<td></td>').html(shuju.postReward);
+		 var td5 = $('<td></td>').html(shuju.chenyijin);
+		 var td6 = $('<td></td>').html(shuju.pingtaifei);
+		 var td7 = $('<td></td>').html(shuju.chongzhi);
+		 var td8 = $('<td></td>').html(shuju.tixian);
+		 var td9 = $('<td></td>').html(shuju.shipingfei);
+		 var td10 = $('<td></td>').html(shuju.baominshu);
+		 $(id).append(td1).append(td2).append(td3)
+		 .append(td4).append(td5).append(td6).append(td7)
+		 .append(td8).append(td9).append(td10);
+     }
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>

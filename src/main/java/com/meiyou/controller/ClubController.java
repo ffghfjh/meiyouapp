@@ -44,24 +44,24 @@ public class ClubController {
                        @RequestParam("market_price") Integer marketPrice,
                        @RequestParam("time") Integer time,
                        @RequestParam("password") String password,
-                       @RequestParam("files") MultipartFile[] files,
+//                       @RequestParam("files") MultipartFile[] files,
                        Double longitude, Double latitude, HttpServletRequest request){
 
         //使用Hutool进行json操作
-        JSONArray array = JSONUtil.createArray();
-        for (MultipartFile file : files) {
-            Msg msg = FileUploadUtil.uploadUtil(file, "club", request);
-            if (msg.getCode() == 100) {
-                array.add(msg.getExtend().get("path"));
-            }
-        }
-        if (array.size() == 0) {
-            return Msg.fail();
-        }
+//        JSONArray array = JSONUtil.createArray();
+//        for (MultipartFile file : files) {
+//            Msg msg = FileUploadUtil.uploadUtil(file, "club", request);
+//            if (msg.getCode() == 100) {
+//                array.add(msg.getExtend().get("path"));
+//            }
+//        }
+//        if (array.size() == 0) {
+//            return Msg.fail();
+//        }
 
         Club club = new Club();
         club.setPublishId(publishId);
-        club.setImgsUrl(array.toString());//以json数组的形式存图片
+//        club.setImgsUrl(array.toString());//以json数组的形式存图片
         club.setProjectName(projectName);
         club.setProjectDesc(projectDesc);
         club.setProjectAddress(projectAddress);

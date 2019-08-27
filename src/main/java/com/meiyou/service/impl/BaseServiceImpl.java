@@ -80,19 +80,35 @@ public class BaseServiceImpl {
     }
 
     /**
-     * 查找附近的key
+     * 查找附近的ClubKey
      * @param uid
      * @param longitude
      * @param latitude
      * @return
      */
-    public List<GeoRadiusResponse> getGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+    public List<GeoRadiusResponse> getClubGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
         String range = getRootMessage("range");
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
         coordinate.setLatitude(latitude);
         coordinate.setLongitude(longitude);
         return RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
+    }
+
+    /**
+     * 查找附近的ShopKey
+     * @param uid
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public List<GeoRadiusResponse> getShopGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+        String range = getRootMessage("range");
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(Integer.toString(uid));
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        return RedisUtil.geoQueryShop(coordinate, Double.valueOf(range));
     }
 
     /**

@@ -51,9 +51,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Transactional
     @Cacheable()
     public Msg addClub(Club club,String token, Integer time, String password, Double longitude, Double latitude) {
-        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
         Date now = new Date();
         club.setCreateTime(now);
@@ -195,13 +195,13 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @Cacheable(value = "nearClub")
     public Msg selectClubByPosition(Integer uid, String token, Double longitude, Double latitude) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
 
         //查找附近的key
-        List<GeoRadiusResponse> geoRadiusResponses = getGeoRadiusResponse(uid,longitude,latitude);
+        List<GeoRadiusResponse> geoRadiusResponses = getClubGeoRadiusResponse(uid,longitude,latitude);
 
         if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
             return Msg.fail();

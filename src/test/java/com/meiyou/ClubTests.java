@@ -2,9 +2,12 @@ package com.meiyou;
 
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
+import com.meiyou.mapper.ShopMapper;
 import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.pojo.ClubBuyExample;
+import com.meiyou.pojo.Shop;
+import com.meiyou.service.ShopService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,12 @@ public class ClubTests {
 
     @Autowired
     ClubMapper clubMapper;
+
+    @Autowired
+    ShopMapper shopMapper;
+
+    @Autowired
+    ShopService shopService;
 
     @Test
     public void findPhoto(){
@@ -57,7 +66,20 @@ public class ClubTests {
         }
     }
 
-
+    @Test
+    public void testShop(){
+        Shop shop = new Shop();
+        shop.setPublishId(19);
+        //shop.setImgsUrl(array.toString());////以json数组的形式存图片
+        shop.setServiceArea("龙花");
+        shop.setTravelTime("后晚");
+        shop.setCharge(16);
+        String token = "5655";
+        String pas = "123456";
+        Double lo = 114.00;
+        Double la = 23.00;
+        shopService.addShop(shop,token,5, pas, lo, la);
+    }
 
 
     @Test

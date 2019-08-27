@@ -41,7 +41,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      */
     @Override
     public Msg addShop(Shop shop, String token, Integer time, String password,
-                       Double latitude, Double longitude) {
+                       Double longitude, Double latitude) {
         if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
             return Msg.noLogin();
         }
@@ -89,7 +89,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
 
             //添加地理位置到缓存
-            Boolean result = setPosition(latitude, longitude, shop.getId(), Constants.GEO_SHOP);
+            Boolean result = setPosition(longitude, latitude, shop.getId(), Constants.GEO_SHOP);
             if (!result) {
                 msg.setCode(505);
                 msg.setMsg("获取地理位置失败");

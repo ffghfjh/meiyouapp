@@ -1,6 +1,5 @@
 package com.meiyou.service;
 
-import com.meiyou.pojo.Appointment;
 import com.meiyou.utils.Msg;
 
 /**

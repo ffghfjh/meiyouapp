@@ -213,7 +213,9 @@ public class TourServiceImpl implements TourService {
                 .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
         if (tourAsks.size() >= 0){
-            return Msg.fail();
+            msg.setCode(200);
+            msg.setMsg("请勿重复报名");
+            return msg;
         }
 
         //旅游记录表中增加一条记录

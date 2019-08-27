@@ -1,6 +1,8 @@
 package com.meiyou.service;
 
-import com.meiyou.utils.Msg;
+import com.meiyou.pojo.Appointment;
+
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -10,5 +12,9 @@ import com.meiyou.utils.Msg;
  **/
 public interface AppointmentManagementService {
 
-    Msg  selectClub();
+    /**
+     * 查询所有约会
+     * @return
+     */
+    List<Appointment> selectAllAppointment();
 }

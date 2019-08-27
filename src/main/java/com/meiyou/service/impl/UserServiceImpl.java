@@ -697,7 +697,7 @@ public class UserServiceImpl implements UserService {
             criteria.andUserIdEqualTo(uId);
             criteria.andIdentifierEqualTo(openId);
             criteria.andCredentialEqualTo(accesssToken);
-            criteria.andIdentityTypeEqualTo(3);//微信方式
+            criteria.andIdentityTypeEqualTo(4);//QQ方式
             criteria.andBoolVerifiedEqualTo(false);
             List<Authorization> authorizations = authMapper.selectByExample(example);
             if(authorizations.size()>0) {
@@ -729,7 +729,7 @@ public class UserServiceImpl implements UserService {
                     System.out.println("更新用户数据失败");
                 }
               }else {
-                System.out.println("未找到该微信用户");
+                System.out.println("未找到该QQ用户");
                 }
         }else {
             msg = Msg.fail();
@@ -756,7 +756,6 @@ public class UserServiceImpl implements UserService {
                 msg.setMsg("手机号已被注册");
                 return msg;
             }
-
             AuthorizationExample example = new AuthorizationExample();
             AuthorizationExample.Criteria criteria = example.createCriteria();
             criteria.andUserIdEqualTo(uId);
@@ -778,6 +777,21 @@ public class UserServiceImpl implements UserService {
                 Date date = new Date();
                 newAuthorization.setCreateTime(date);
                 newAuthorization.setUpdateTime(date);
+                if (authMapper.updateByPrimaryKeySelective(authorization) == 1 && authMapper.insertSelective(newAuthorization) == 1) {
+                    addShare(shareCode,uId);//添加分享记录
+                    User user = userMapper.selectByPrimaryKey(uId);
+                    msg = Msg.success();
+                    msg.add("uid",user.getId());
+                    msg.add("account",user.getAccount());
+                    msg.add("nickName",user.getNickname());
+                    msg.add("header",user.getHeader());
+                    String token = UUID.randomUUID().toString();
+                    RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
+                    msg.add("token",token);
+                    return msg;
+                }else {
+                    System.out.println("更新用户数据失败");
+                }
             }else {
                 System.out.println("未找到该QQ用户");
             }

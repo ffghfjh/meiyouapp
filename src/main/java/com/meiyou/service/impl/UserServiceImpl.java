@@ -730,7 +730,58 @@ public class UserServiceImpl implements UserService {
                 }
               }else {
                 System.out.println("未找到该微信用户");
+                }
+        }else {
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("验证码错误");
+            return msg;
+        }
+        return Msg.fail();
+    }
+
+    @Override
+    public Msg registBindQQ(int uId, String qqOpenId, String qqToken, String phone, String code, String password, String shareCode) {
+        Msg msg;
+        //验证码校验
+        if(RedisUtil.authCode(phone,code)){
+            //校验手机是否可注册
+            AuthorizationExample example1 = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andIdentifierEqualTo(phone);
+            criteria1.andIdentityTypeEqualTo(1);
+            if(authMapper.selectByExample(example1).size()>0){
+                msg = Msg.fail();
+                msg.setCode(1001);
+                msg.setMsg("手机号已被注册");
+                return msg;
             }
+
+            AuthorizationExample example = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria = example.createCriteria();
+            criteria.andUserIdEqualTo(uId);
+            criteria.andIdentifierEqualTo(qqOpenId);
+            criteria.andCredentialEqualTo(qqToken);
+            criteria.andIdentityTypeEqualTo(4);//QQ方式
+            criteria.andBoolVerifiedEqualTo(false);
+            List<Authorization> authorizations = authMapper.selectByExample(example);
+            if(authorizations.size()>0) {
+                Authorization authorization = authorizations.get(0);
+                authorization.setBoolVerified(true);//更新激活状态
+
+                Authorization newAuthorization = new Authorization();
+                newAuthorization.setBoolVerified(true);
+                newAuthorization.setIdentifier(phone);
+                newAuthorization.setIdentityType(1);//类型为手机号
+                newAuthorization.setUserId(uId);
+                newAuthorization.setCredential(password);
+                Date date = new Date();
+                newAuthorization.setCreateTime(date);
+                newAuthorization.setUpdateTime(date);
+            }else {
+                System.out.println("未找到该QQ用户");
+            }
+
         }else {
             msg = Msg.fail();
             msg.setCode(1000);

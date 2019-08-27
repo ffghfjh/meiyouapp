@@ -99,6 +99,18 @@ public interface UserService {
     Msg registBindWeChat(int uId,String openId,String accesssToken,String phone,String code,String password,String shareCode);
 
     /**
+     * 手机绑定QQ
+     * @param uId
+     * @param qqOpenId
+     * @param qqToken
+     * @param phone
+     * @param code
+     * @param password
+     * @param shareCode
+     * @return
+     */
+    Msg registBindQQ(int uId,String qqOpenId,String qqToken,String phone,String code,String password,String shareCode);
+    /**
      * QQ登录
      * @param qqOpenId
      * @param qqToken

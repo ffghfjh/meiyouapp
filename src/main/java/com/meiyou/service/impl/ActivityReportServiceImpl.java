@@ -33,7 +33,7 @@ public class ActivityReportServiceImpl implements ActivityReportService {
      */
     @Override
     public Msg report(int aid, int uid, int type) {
-        Msg msg = new Msg();
+
         ActivityReport activityReport = new ActivityReport();
         activityReport.setActivityId(aid);
         activityReport.setReporterId(uid);

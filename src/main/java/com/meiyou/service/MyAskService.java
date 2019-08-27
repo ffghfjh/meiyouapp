@@ -29,7 +29,7 @@ public interface MyAskService {
      * @param uid
      * @return
      */
-    Msg selectMyClubAsk(Integer uid, String token);
+  //  Msg selectMyClubAsk(Integer uid, String token);
 
     /**
      * 查询我的导游聘请
@@ -37,5 +37,5 @@ public interface MyAskService {
      * @param token
      * @return
      */
-    Msg selectMyShopAsk(Integer uid, String token);
+   // Msg selectMyShopAsk(Integer uid, String token);
 }

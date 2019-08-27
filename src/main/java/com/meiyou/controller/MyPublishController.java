@@ -25,20 +25,6 @@ public class MyPublishController {
     @Autowired
     private MyPublishService myPublishService;
 
-//    @GetMapping("/selectClubList")
-//    @ApiOperation(value = "通过用户id查找指定用户id发布的全部按摩会所",notes = "返回为ClubVO类,nums为报名人数")
-//    public Msg getClubByUid(@RequestParam("uid") Integer uid,
-//                            @RequestParam("token") String token){
-//        return myPublishService.selectClubByUid(uid,token);
-//    }
-
-//    @GetMapping("/selectShopList")
-//    @ApiOperation(value = "通过用户id查找指定用户id发布的全部景点商家",notes = "返回为ShopVO类,nums为报名人数")
-//    public Msg getShopByUid(@RequestParam("uid") Integer uid,
-//                            @RequestParam("token") String token){
-//        return myPublishService.selectShopByUid(uid, token);
-//    }
-
     @GetMapping("/selectMyPublishList")
     @ApiOperation(value = "通过用户id查找指定用户id发布的全部景点商家",notes = "返回为ShopVO类,nums为报名人数")
     public Msg selectMyPublishList(@RequestParam("uid") String uid,
@@ -49,7 +35,7 @@ public class MyPublishController {
         Msg msg = new Msg();
         List<Object> appointmentList = myPublishService.selectAppointmentList(uid, token);
         List<Object> tourList = myPublishService.selectTourList(uid, token);
-//        myPublishService.selectClubByUid(Integer.valueOf(uid),token);
+        List<Object> clubList = myPublishService.selectClubByUid(Integer.valueOf(uid), token);
 //        myPublishService.selectShopByUid(Integer.valueOf(uid), token);
         msg.add("appointmentList",appointmentList);
         msg.add("tourList",tourList);

@@ -81,7 +81,7 @@ public class ShopController {
         return shopService.updateShop(uid,token,sid);
     }
 
-    @GetMapping("/find")
+    @PostMapping("/find")
     @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
@@ -89,7 +89,7 @@ public class ShopController {
         return shopService.selectBySid(uid,token,sid);
     }
 
-    @GetMapping("/getByPosition")
+    @PostMapping("/getByPosition")
     @ApiOperation(value = "查找附近的shop",notes = "查找用户所在位置附近的shop,返回为ShopVO类")
     public Msg getByPosition(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,

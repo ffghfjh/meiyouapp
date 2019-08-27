@@ -194,31 +194,28 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @param uid
      * @return
      */
-//    @Override
-//    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-//    public List<Object> selectClubByUid(Integer uid,String token) {
-//        //查找发布出去的有效按摩会所
-//        ClubExample clubExample = new ClubExample();
-//        clubExample.createCriteria().andPublishIdEqualTo(uid);
-//        List<Club> result = clubMapper.selectByExample(clubExample);
-//
-//        List<ClubVO> clubVOS = new ArrayList<>();
-//        if(result == null && result.size() == 0){
+    @Override
+    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
+    public List<Object> selectClubByUid(Integer uid,String token) {
+        //查找发布出去的有效按摩会所
+        ClubExample clubExample = new ClubExample();
+        clubExample.createCriteria().andPublishIdEqualTo(uid);
+        List<Club> result = clubMapper.selectByExample(clubExample);
+
+        List<ClubVO> clubVOS = new ArrayList<>();
+        if(result == null && result.size() == 0){
 //            msg.setCode(404);
 //            msg.setMsg("没有找到指定对象的Shop");
 //            return msg;
-//        }
-//
-//        for(Club club : result){
-//            //把每一个重新赋值的clubVO类加到新的集合中
-//            clubVOS.add(setClubToClubVO(club));
-//        }
-//        msg.add("clubVOS",clubVOS);
-//        msg.setCode(100);
-//        msg.setMsg("成功");
-//
-//        return msg;
-//    }
+        }
+
+        for(Club club : result){
+            //把每一个重新赋值的clubVO类加到新的集合中
+            clubVOS.add(setClubToClubVO(club));
+        }
+
+        return null;
+    }
 //
 //    /**
 //     * 查找用户发布的景点商家shop

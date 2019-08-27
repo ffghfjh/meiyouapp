@@ -51,7 +51,7 @@ public class ClubBuyController {
         return clubBuyService.updateClubBuyComplete(uid, cid, token);
     }
 
-    @GetMapping("/findByCidAndUid")
+    @PostMapping("/findByCidAndUid")
     @ApiOperation(value = "通过会所id和用户id查找对应购买的会所记录",notes = "查找")
     public Msg findClubBuyByCidAndUid(@RequestParam("uid") Integer uid,
                                 @RequestParam("cid") Integer cid,
@@ -59,7 +59,7 @@ public class ClubBuyController {
         return clubBuyService.selectByCidAndUid(uid, cid, token);
     }
 
-    @GetMapping("/findByCid")
+    @PostMapping("/findByCid")
     @ApiOperation(value = "通过会所id查找购买了此会所的所有记录",notes = "查找")
     public Msg findClubBuyByCid(@RequestParam("uid") Integer uid,
                                 @RequestParam("cid") Integer cid,

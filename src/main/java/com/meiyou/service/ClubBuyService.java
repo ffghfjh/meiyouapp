@@ -32,13 +32,6 @@ public interface ClubBuyService {
     Msg updateClubBuyComplete(Integer uid,Integer cid,String token);
 
     /**
-     * 查找指定用户uid下所有的会所购买记录
-     * @param uid
-     * @return
-     */
-    Msg selectByUid(Integer uid, String token);
-
-    /**
      * 查找指定的会所购买记录
      * @param uid
      * @param cid

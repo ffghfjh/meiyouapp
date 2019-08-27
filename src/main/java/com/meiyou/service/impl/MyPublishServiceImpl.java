@@ -196,12 +196,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      */
 //    @Override
 //    //@Cacheable(value = "clubVO",keyGenerator = "myKeyGenerator", unless = "#result.isEmpty()")
-//    public Msg selectClubByUid(Integer uid,String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-//
-//        Msg msg = new Msg();
+//    public List<Object> selectClubByUid(Integer uid,String token) {
 //        //查找发布出去的有效按摩会所
 //        ClubExample clubExample = new ClubExample();
 //        clubExample.createCriteria().andPublishIdEqualTo(uid);
@@ -233,9 +228,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
 //     */
 //    @Override
 //    public Msg selectShopByUid(Integer uid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
 //        Msg msg = new Msg();
 //        ShopExample shopExample = new ShopExample();
 //        shopExample.createCriteria().andPublishIdEqualTo(uid);

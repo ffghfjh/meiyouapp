@@ -8,7 +8,6 @@ import com.meiyou.pojo.*;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.GeoRadiusResponse;
 
@@ -136,6 +135,10 @@ public class BaseServiceImpl {
         Integer starNums = getStarNumsByClubId(club.getId());
 
         clubVO.setStar(starNums);
+
+        //封装发布者头像
+        User user = getUserByUid(club.getPublishId());
+        clubVO.setPublishHeader(user.getHeader());
 
         return clubVO;
     }

@@ -211,48 +211,6 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     }
 
     /**
-     * 查询用户聘请的全部导游记录
-     * @param uid
-     * @param token
-     * @return
-     */
-    @Override
-    public Msg selectByUid(Integer uid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-
-        //查找购买按摩会所的记录
-        ShopBuyExample shopBuyExample = new ShopBuyExample();
-        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
-
-        Msg msg = new Msg();
-        if(result == null && result.size() ==0){
-            msg.setCode(404);
-            msg.setMsg("找不到用户的聘请记录");
-        }
-
-        //对查找出来的ShopBuy进行封装
-        List<ShopVO> shopVOS = new ArrayList<>();
-        for(ShopBuy shopBuy : result){
-            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
-
-            ShopVO shopVO = setShopToShopVO(shop);
-            //设置购买者状态
-            shopVO.setState(shopBuy.getState());
-
-            shopVOS.add(shopVO);
-        }
-
-        //返回一个封装好的ShopVO类
-        msg.add("shopVOS",shopVOS);
-        msg.setMsg("成功");
-        msg.setCode(100);
-        return msg;
-    }
-
-    /**
      * 查询当前用户指定的聘请导游记录
      * @param uid
      * @param token

@@ -25,30 +25,6 @@ public class MyPublishController {
     @Autowired
     private MyPublishService myPublishService;
 
-    /**
-     * @Description: 查询所有我发布的约会
-     * @Author: JK
-     * @Date: 2019/8/22
-     */
-//    @ApiOperation(value = "查询所有我发布的约会", notes = "查询所有我发布的约会", httpMethod = "GET")
-//    @GetMapping(value = "/selectAppointmentList")
-//    public Msg selectAppointmentList(String uid, String token) {
-//        Msg msg = myPublishService.selectAppointmentList(uid, token);
-//        return msg;
-//    }
-
-    /**
-     * @Description: 查询所有我发布的旅游
-     * @Author: JK
-     * @Date: 2019/8/22
-     */
-//    @ApiOperation(value = "查询所有我发布的旅游", notes = "查询所有我发布的旅游", httpMethod = "GET")
-//    @GetMapping(value = "/selectTourList")
-//    public Msg selectTourList(String uid,String token) {
-//        Msg msg = myPublishService.selectTourList(uid, token);
-//        return msg;
-//    }
-
 //    @GetMapping("/selectClubList")
 //    @ApiOperation(value = "通过用户id查找指定用户id发布的全部按摩会所",notes = "返回为ClubVO类,nums为报名人数")
 //    public Msg getClubByUid(@RequestParam("uid") Integer uid,

@@ -614,39 +614,54 @@ public class UserServiceImpl implements UserService {
         Msg msg;
         //验证码校验
         if(RedisUtil.authCode(phone,code)){  //通过
-            AuthorizationExample example = new AuthorizationExample();
-            AuthorizationExample.Criteria criteria = example.createCriteria();
-            criteria.andUserIdEqualTo(uId);
-            criteria.andIdentifierEqualTo(aliId);
-            criteria.andCredentialEqualTo(aliToken);
-            criteria.andIdentityTypeEqualTo(2);
-            criteria.andBoolVerifiedEqualTo(false);
-            List<Authorization> authorizations = authMapper.selectByExample(example);
-            if(authorizations.size()>0){
-                Authorization authorization = authorizations.get(0);
-                authorization.setBoolVerified(true);//开放
 
-                Authorization newAuthorization = new Authorization();
-                newAuthorization.setBoolVerified(true);
-                newAuthorization.setIdentifier(phone);
-                newAuthorization.setIdentityType(1);//类型为手机号
-                newAuthorization.setUserId(uId);
-                newAuthorization.setCredential(password);
-                Date date = new Date();
-                newAuthorization.setCreateTime(date);
-                newAuthorization.setUpdateTime(date);
-                if(authMapper.updateByPrimaryKeySelective(authorization)==1&&authMapper.insertSelective(newAuthorization)==1){
-                    addShare(shareCode,uId);//添加分享记录
-                    User user = userMapper.selectByPrimaryKey(uId);
-                    msg = Msg.success();
-                    msg.add("uid",user.getId());
-                    msg.add("account",user.getAccount());
-                    msg.add("nickName",user.getNickname());
-                    msg.add("header",user.getHeader());
-                    String token = UUID.randomUUID().toString();
-                    RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
-                    msg.add("token",token);
-                    return msg;
+            //校验手机是否可注册
+            AuthorizationExample example1 = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andIdentifierEqualTo(phone);
+            criteria1.andIdentityTypeEqualTo(1);
+            if(authMapper.selectByExample(example1).size()>0){
+                msg = Msg.fail();
+                msg.setCode(1001);
+                msg.setMsg("手机号已被注册");
+                return msg;
+            }else {
+                AuthorizationExample example = new AuthorizationExample();
+                AuthorizationExample.Criteria criteria = example.createCriteria();
+                criteria.andUserIdEqualTo(uId);
+                criteria.andIdentifierEqualTo(aliId);
+                criteria.andCredentialEqualTo(aliToken);
+                criteria.andIdentityTypeEqualTo(3);
+                criteria.andBoolVerifiedEqualTo(false);
+                List<Authorization> authorizations = authMapper.selectByExample(example);
+                if(authorizations.size()>0){
+                    Authorization authorization = authorizations.get(0);
+                    authorization.setBoolVerified(true);//开放
+
+                    Authorization newAuthorization = new Authorization();
+                    newAuthorization.setBoolVerified(true);
+                    newAuthorization.setIdentifier(phone);
+                    newAuthorization.setIdentityType(1);//类型为手机号
+                    newAuthorization.setUserId(uId);
+                    newAuthorization.setCredential(password);
+                    Date date = new Date();
+                    newAuthorization.setCreateTime(date);
+                    newAuthorization.setUpdateTime(date);
+                    if(authMapper.updateByPrimaryKeySelective(authorization)==1&&authMapper.insertSelective(newAuthorization)==1){
+                        addShare(shareCode,uId);//添加分享记录
+                        User user = userMapper.selectByPrimaryKey(uId);
+                        msg = Msg.success();
+                        msg.add("uid",user.getId());
+                        msg.add("account",user.getAccount());
+                        msg.add("nickName",user.getNickname());
+                        msg.add("header",user.getHeader());
+                        String token = UUID.randomUUID().toString();
+                        RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
+                        msg.add("token",token);
+                        return msg;
+                    }else{
+                        System.out.println("更新用户数据失败");
+                    }
                 }
             }
         }else{
@@ -656,14 +671,27 @@ public class UserServiceImpl implements UserService {
             return msg;
         }
         return Msg.fail();
-
     }
 
     @Override
     public Msg registBindWeChat(int uId, String openId, String accesssToken, String phone, String code, String password, String shareCode) {
         Msg msg;
+
         //验证码校验
         if(RedisUtil.authCode(phone,code)){
+
+            //校验手机是否可注册
+            AuthorizationExample example1 = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andIdentifierEqualTo(phone);
+            criteria1.andIdentityTypeEqualTo(1);
+            if(authMapper.selectByExample(example1).size()>0){
+                msg = Msg.fail();
+                msg.setCode(1001);
+                msg.setMsg("手机号已被注册");
+                return msg;
+            }
+
             AuthorizationExample example = new AuthorizationExample();
             AuthorizationExample.Criteria criteria = example.createCriteria();
             criteria.andUserIdEqualTo(uId);
@@ -697,8 +725,12 @@ public class UserServiceImpl implements UserService {
                     RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
                     msg.add("token",token);
                     return msg;
+                }else {
+                    System.out.println("更新用户数据失败");
                 }
-              }
+              }else {
+                System.out.println("未找到该微信用户");
+            }
         }else {
             msg = Msg.fail();
             msg.setCode(1000);
@@ -706,6 +738,62 @@ public class UserServiceImpl implements UserService {
             return msg;
         }
         return Msg.fail();
+    }
+
+    @Override
+    public Msg qqLogin(String qqOpenId, String qqToken) {
+
+        AuthorizationExample example = new AuthorizationExample();
+        AuthorizationExample.Criteria criteria = example.createCriteria();
+        criteria.andIdentityTypeEqualTo(4);
+        criteria.andIdentifierEqualTo(qqOpenId);
+        criteria.andCredentialEqualTo(qqToken);
+        List<Authorization> authorizations = authMapper.selectByExample(example);
+        if(authorizations.size()>0){ //存在该用户
+
+        }else{ //不存在该qq用户
+            String url = "https://graph.qq.com/user/get_user_info?access_token="+qqToken+"&oauth_consumer_key="+Constants.QQ_APP_ID+"&openid="+qqOpenId;
+            JSONObject json = HttpUtil.getToJSONObject(url);
+            System.out.println(json.toString());
+            if(json.getInt("ret")==0) {
+                String header = json.getString("figureurl_qq_1");
+                String nickName = json.getString("nickname");
+                boolean sex = false;
+                if(json.getString("gender").equals("男")){
+                    sex = false;
+                }else{
+                    sex = true;
+                }
+
+
+                User user = new User();
+                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                user.setAccount(userAccount);
+                user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
+                user.setBindAlipay(false);//未绑定支付宝
+
+                user.setBirthday(Constants.AGE);//设置默认年龄
+                user.setBoolClose(false);
+                user.setHeader(header);//设置头像
+                user.setNickname(nickName);//设置昵称
+                user.setSex(sex);//设置昵称
+                Date date = new Date();
+                user.setCreateTime(date);
+                user.setUpdateTime(date);
+                user.setMoney(0f);
+                user.setSignature(Constants.SIGNATURE);//设置默认签名
+                user.setShareCode(ShareCodeUtil.toSerialCode(2));//设置邀请码
+
+                if(userMapper.insert(user)==1){
+                    int uId = user.getId();
+                    Authorization authorization = new Authorization();
+                    
+                }
+
+            }
+        }
+
+        return null;
     }
 
 

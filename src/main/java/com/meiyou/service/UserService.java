@@ -98,4 +98,12 @@ public interface UserService {
      */
     Msg registBindWeChat(int uId,String openId,String accesssToken,String phone,String code,String password,String shareCode);
 
+    /**
+     * QQ登录
+     * @param qqOpenId
+     * @param qqToken
+     * @return
+     */
+    Msg qqLogin(String qqOpenId,String qqToken);
+
 }

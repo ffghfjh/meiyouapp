@@ -95,4 +95,7 @@ public class Constants {
      */
     public static String APPSECRET = "718e5f07e14afa07e08ee93ac64dacd5";
     public static String WX_APP_ID = "wxa85b1b1ddcddffd5";
+
+    public static String QQ_APP_ID = "101726019";
+    public static String QQ_APP_KEY = "77ed8921d867b24c55fe3ee3e316b510";
 };

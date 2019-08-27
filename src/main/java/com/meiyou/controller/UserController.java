@@ -186,8 +186,9 @@ public class UserController {
 
     @RequestMapping(value = "registBindWeChat",method = RequestMethod.POST)
     @ApiOperation("手机绑定微信")
-    public Msg registBindWeChat(){
-        return null;
+    public Msg registBindWeChat(int uId,String openId,String accesssToken,String phone,String code,String password,String shareCode){
+        System.out.println("参数：openId:"+openId+",accessTken:"+accesssToken+",uid:"+uId);
+        return userService.registBindWeChat(uId,openId,accesssToken,phone,code,password,shareCode);
     }
 
 }

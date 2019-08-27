@@ -222,10 +222,15 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             //通过id查找club
             ClubExample example = new ClubExample();
             example.createCriteria().andIdEqualTo(id);
-            Club club = clubMapper.selectByExample(example).get(0);
+            List<Club> clubs = clubMapper.selectByExample(example);
+            if(clubs.isEmpty()){
+                msg.setCode(404);
+                msg.setMsg("附近没有找到按摩会所");
+                return msg;
+            }
 
             //把club的值转换到ClubVO中
-            ClubVO clubVO = setClubToClubVO(club);
+            ClubVO clubVO = setClubToClubVO(clubs.get(0));
             clubVO.setDistance(dis);
 
             clubVOS.add(clubVO);

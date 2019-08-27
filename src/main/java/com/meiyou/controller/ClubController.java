@@ -45,7 +45,7 @@ public class ClubController {
                        @RequestParam("time") Integer time,
                        @RequestParam("password") String password,
                        @RequestParam("files") MultipartFile[] files,
-                       Double latitude, Double longitude, HttpServletRequest request){
+                       Double longitude, Double latitude, HttpServletRequest request){
 
         //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
@@ -69,7 +69,7 @@ public class ClubController {
         club.setProjectPrice(projectPrice);
         club.setMarketPrice(marketPrice);
 
-        return clubService.addClub(club,token,time,password,latitude,longitude);
+        return clubService.addClub(club,token,time,password,longitude,latitude);
     }
 
 

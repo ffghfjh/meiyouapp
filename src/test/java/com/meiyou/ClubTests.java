@@ -57,6 +57,9 @@ public class ClubTests {
         }
     }
 
+
+
+
     @Test
     public void udate(){
         ClubBuy clubBuy = new ClubBuy();

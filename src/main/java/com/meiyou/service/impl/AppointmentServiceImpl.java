@@ -202,6 +202,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointAsk.setAskState(1);
         appointAsk.setCreateTime(new Date());
         appointAsk.setUpdateTime(new Date());
+
+        //查询该报名者是否已经报名
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskStateEqualTo(1).andAppointIdEqualTo(id);
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+        if (appointAsks.size() != 0){
+            return Msg.fail();
+        }
+
         //约会记录表中增加一条记录
         appointAskMapper.insertSelective(appointAsk);
         //根据约会订单表id查出该订单所有信息
@@ -211,13 +221,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setState(2);
         appointment.setUpdateTime(new Date());
 
-        AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
-                .andAskStateEqualTo(1).andAppointIdEqualTo(id);
-        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() != 0){
-            return Msg.fail();
-        }
         //更改该订单状态
         int i = appointmentMapper.updateByExample(appointment, example);
         if (i == 1) {

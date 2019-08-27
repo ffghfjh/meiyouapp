@@ -17,11 +17,12 @@ import javax.servlet.http.HttpServletRequest;
  * @create: 2019-08-26 21:16
  **/
 @RestController
+@RequestMapping("admin")
 public class AdminController {
 
     @Autowired
     AdminService adminService;
-    @RequestMapping(value = "/adminLogin",method = RequestMethod.POST)
+    @RequestMapping(value = "adminLogin",method = RequestMethod.POST)
     @ApiOperation("后台登录")
     public Msg adminLogin(String adminAccount, String adminPassword, HttpServletRequest request){
         Msg msg = adminService.adminLogin(adminAccount,adminPassword);

@@ -44,7 +44,10 @@
         	$.ajax({
             	url:"adminLogin",
             	type:"POST",
-            	data:"username="+username+"&password="+password,
+            	data:{
+            	    "adminAccount":username,
+                    "adminPassword":password,
+                },
             	success:function(data){
             		console.log(data);
             		if(data.code==100){

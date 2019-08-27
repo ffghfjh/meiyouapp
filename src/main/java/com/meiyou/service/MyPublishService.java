@@ -28,12 +28,12 @@ public interface MyPublishService {
      * @param uid
      * @return
      */
-//    List<Object> selectClubByUid(Integer uid, String token);
+    //List<Object> selectClubByUid(Integer uid, String token);
 
     /**
      * 查找指定用户所发布的景点商家(同城导游)
      * @param uid
      * @return
      */
-//    List<Object> selectShopByUid(Integer uid,String token);
+    //List<Object> selectShopByUid(Integer uid,String token);
 }

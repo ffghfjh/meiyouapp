@@ -168,52 +168,6 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     }
 
     /**
-     * 查找指定用户的会所购买记录
-     * @param uid
-     * @return
-     */
-    @Override
-    @Cacheable(cacheNames = "buy")
-    public Msg selectByUid(Integer uid,String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-
-        Msg msg = new Msg();
-        //查找购买按摩会所的记录
-        ClubBuyExample clubBuyExample = new ClubBuyExample();
-        //购买者id为uid的购买记录
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-
-        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-
-        if(result == null && result.size() ==0){
-            msg.setCode(404);
-            msg.setMsg("找不到指定的会所购买记录");
-            return msg;
-        }
-
-        //对查找出来的ClubBuy进行封装
-        List<ClubVO> clubVOS = new ArrayList<>();
-        for(ClubBuy c : result){
-            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
-
-            ClubVO clubVO = setClubToClubVO(club);
-            //设置购买者状态
-            clubVO.setAskState(c.getState());
-
-            clubVOS.add(clubVO);
-        }
-
-        //返回一个封装好的ClubVO类
-        msg.add("clubVOS",clubVOS);
-        msg.setMsg("成功");
-        msg.setCode(100);
-        return msg;
-    }
-
-
-    /**
      * 查找当前用户指定的会所购买记录
      * @param uid
      * @param cid

@@ -51,13 +51,6 @@ public class ClubBuyController {
         return clubBuyService.updateClubBuyComplete(uid, cid, token);
     }
 
-    @GetMapping("/getByUid")
-    @ApiOperation(value = "通过用户id查找指定用户id的全部购买的推拿会所",notes = "查找")
-    public Msg getClubBuyByUid(@RequestParam("uid") Integer uid,
-                               @RequestParam("token") String token){
-         return clubBuyService.selectByUid(uid, token);
-    }
-
     @GetMapping("/findByCidAndUid")
     @ApiOperation(value = "通过会所id和用户id查找对应购买的会所记录",notes = "查找")
     public Msg findClubBuyByCidAndUid(@RequestParam("uid") Integer uid,

@@ -13,6 +13,7 @@ public class ClubVO implements Serializable {
     //nums 为查询报名了这个club的人数
     private Integer id;
     private Integer publishId;
+    private String publishHeader;
     private String imgsUrl;
     private String projectName;
     private String projectDesc;
@@ -37,6 +38,7 @@ public class ClubVO implements Serializable {
         return "ClubVO{" +
                 "id=" + id +
                 ", publishId=" + publishId +
+                ", publishHeader='" + publishHeader + '\'' +
                 ", imgsUrl='" + imgsUrl + '\'' +
                 ", projectName='" + projectName + '\'' +
                 ", projectDesc='" + projectDesc + '\'' +
@@ -66,6 +68,14 @@ public class ClubVO implements Serializable {
 
     public void setPublishId(Integer publishId) {
         this.publishId = publishId;
+    }
+
+    public String getPublishHeader() {
+        return publishHeader;
+    }
+
+    public void setPublishHeader(String publishHeader) {
+        this.publishHeader = publishHeader;
     }
 
     public String getImgsUrl() {

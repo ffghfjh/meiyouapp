@@ -61,13 +61,6 @@ public class ShopBuyController {
         return shopBuyService.updateShopBuyComplete(uid, sid, token);
     }
 
-    @GetMapping("/getByUid")
-    @ApiOperation(value = "通过用户id查找指定用户id聘请的全部同城导游",notes = "查找")
-    public Msg getShopByUid(@RequestParam("uid") Integer uid,
-                            @RequestParam("token") String token){
-        return shopBuyService.selectByUid(uid,token);
-    }
-
     @GetMapping("/findBySidAndUid")
     @ApiOperation(value = "通过同城导游记录id(shopBuy_id)查找对应的同城导游信息",notes = "查找")
     public Msg findShopBySidAndUid(@RequestParam("uid") Integer uid,

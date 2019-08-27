@@ -50,14 +50,6 @@ public interface ShopBuyService {
     Msg updateShopBuyComplete(Integer uid,Integer sid,String token);
 
     /**
-     * 查找用户的景点商家(同城导游)购买记录
-     * @param uid
-     * @param token
-     * @return
-     */
-    Msg selectByUid(Integer uid, String token);
-
-    /**
      * 查找指定的景点商家(同城导游)购买记录
      * @param uid
      * @param token

@@ -114,7 +114,6 @@ public class QueueConfig {
 
     /**
      * 将per_queue_ttl_exchange绑定到delay_queue_per_queue_ttl队列（统一失效时间，用于队列延迟重试）
-     *
      * @param delayQueuePerQueueTTL
      * @param perQueueTTLExchange
      * @return
@@ -136,7 +135,7 @@ public class QueueConfig {
     SimpleMessageListenerContainer processContainer(ConnectionFactory connectionFactory, ProcessReceiver processReceiver) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(DELAY_PROCESS_QUEUE_NAME); // 监听delay_process_queue
+        container.setQueueNames(DELAY_PROCESS_QUEUE_NAME); //监听delay_process_queue
         container.setMessageListener(new MessageListenerAdapter(processReceiver));
         return container;
     }

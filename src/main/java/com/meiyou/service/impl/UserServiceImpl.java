@@ -7,6 +7,7 @@ import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
+import com.meiyou.config.AliMQConfig;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
@@ -27,6 +28,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cache.annotation.CacheConfig;
@@ -62,6 +64,9 @@ public class UserServiceImpl implements UserService {
     ShareMapper shareMapper;
     @Autowired
     RedPacketMapper redPacketMapper;
+    @Autowired
+    AmqpTemplate rabbitTemplate;
+
 
 
     // 支付宝调用接口之前的初始化
@@ -585,6 +590,7 @@ public class UserServiceImpl implements UserService {
             redPacket.setCreateTime(date);
             redPacket.setUpdateTime(date);
             if(redPacketMapper.insertSelective(redPacket)==1) {
+
                 msg = Msg.success();
                 msg.add("hId",redPacket.getId());
                 return msg;

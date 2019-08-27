@@ -1,12 +1,7 @@
 package com.meiyou.service.impl;
 
-import com.meiyou.mapper.AppointAskMapper;
-import com.meiyou.mapper.AppointmentMapper;
-import com.meiyou.mapper.UserMapper;
-import com.meiyou.pojo.AppointAsk;
-import com.meiyou.pojo.AppointAskExample;
-import com.meiyou.pojo.Appointment;
-import com.meiyou.pojo.User;
+import com.meiyou.mapper.*;
+import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
@@ -31,6 +26,10 @@ public class MyAskServiceImpl implements MyAskService {
     private AppointAskMapper appointAskMapper;
     @Autowired
     private AppointmentMapper appointmentMapper;
+    @Autowired
+    private TourAskMapper tourAskMapper;
+    @Autowired
+    private TourMapper tourMapper;
 
     /**
      * @Description: 查询我的约会报名
@@ -156,15 +155,163 @@ public class MyAskServiceImpl implements MyAskService {
                         break;
                 }
             }
-            msg.setMsg("查询我的报名返回成功");
+            msg.setMsg("查询我的约会报名返回成功");
             msg.setCode(100);
             return msg.add("list", list);
         }
         return Msg.fail();
     }
 
+    /**
+    * @Description: 查询我的旅游报名
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
     @Override
     public Msg selectMyTourAsk(String uid, String token) {
-        return null;
+        Msg msg = new Msg();
+        new Msg();
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return Msg.noLogin();
+        }
+        TourAskExample tourAskExample = new TourAskExample();
+        HashMap<String, Object> map = new HashMap<>();
+        tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        if (tourAsks != null && tourAsks.size() != 0) {
+            ArrayList<Object> list = new ArrayList<>();
+            for (TourAsk ask : tourAsks) {
+                Integer appointId = ask.getAppointId();
+                Integer askState = ask.getAskState0();
+                Tour tour = tourMapper.selectByPrimaryKey(appointId);
+                User user = userMapper.selectByPrimaryKey(appointId);
+                String header = null;
+                String goMessage = null;
+                String startAddress = null;
+                String endAddress = null;
+                String goTime = null;
+
+                switch (askState) {
+                    case 1:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 2:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 3:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 4:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 5:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 6:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                    case 7:
+                        header = user.getHeader();
+                        goMessage = tour.getGoMessage();
+                        startAddress = tour.getStartAddress();
+                        endAddress = tour.getEndAddress();
+                        goTime = tour.getGoTime();
+
+
+                        map.put("header", header);
+                        map.put("goMessage ", goMessage );
+                        map.put("startAddress ", startAddress );
+                        map.put("endAddress ", endAddress );
+                        map.put("goTime ", goTime );
+                        map.put("askState", askState);
+                        list.add(map);
+                        break;
+                }
+            }
+            msg.setMsg("查询我的旅游报名返回成功");
+            msg.setCode(100);
+            return msg.add("list", list);
+        }
+        return Msg.fail();
     }
 }

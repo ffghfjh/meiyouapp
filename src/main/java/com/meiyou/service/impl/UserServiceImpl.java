@@ -8,6 +8,7 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.mapper.AuthorizationMapper;
+import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
@@ -19,7 +20,6 @@ import com.meiyou.utils.*;
 import com.tls.tls_sigature.tls_sigature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.DatabaseMetaData;
 import java.util.*;
 
 @Service
@@ -45,6 +46,8 @@ public class UserServiceImpl implements UserService {
     RootMessageService rootMessageService;
     @Autowired
     ShareMapper shareMapper;
+    @Autowired
+    RedPacketMapper redPacketMapper;
 
 
     // 支付宝调用接口之前的初始化
@@ -395,5 +398,82 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public Msg sendMoney(int id,String text,int money, String toAccount) {
+        Msg msg;
+        User me = userMapper.selectByPrimaryKey(id);
+        float meMoney = me.getMoney();
 
+        //余额检测
+        if(meMoney<money){
+            msg = Msg.fail();
+            msg.setCode(1000);//余额不足
+            msg.setMsg("余额不足");
+            return msg;
+        }
+        me.setMoney(meMoney-money);
+        if(userMapper.updateByPrimaryKeySelective(me)==1){
+            UserExample example = new UserExample();
+            UserExample.Criteria criteria = example.createCriteria();
+            criteria.andAccountEqualTo(toAccount);
+            int toId = userMapper.selectByExample(example).get(0).getId();
+            RedPacket redPacket = new RedPacket();
+            redPacket.setContent(text);
+            redPacket.setMoney(money);
+            redPacket.setState(0);
+            redPacket.setReceiveId(toId);
+            redPacket.setSenderId(id);
+            Date date = new Date();
+            redPacket.setCreateTime(date);
+            redPacket.setUpdateTime(date);
+            if(redPacketMapper.insertSelective(redPacket)==1) {
+                msg = Msg.success();
+                msg.add("hId",redPacket.getId());
+                return msg;
+            }
+        }
+        return Msg.fail();
+    }
+    /**
+    * @Description: 查询用户余额
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @Override
+    public String selectUserMoney(String uid,String token) {
+        boolean authToken = RedisUtil.authToken(uid, token);
+        //判断是否登录
+        if (!authToken) {
+            return "登陆失败";
+        }
+        User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
+        Float money = user.getMoney();
+        return String.valueOf(money);
+    }
+
+
+    @Override
+    public Msg selRedPackage(int id) {
+        int state = redPacketMapper.selectByPrimaryKey(id).getState();
+        return Msg.success().add("state",state);
+    }
+
+    @Override
+    @Transactional
+    public Msg getRedPackage(int id) {
+        RedPacket redPacket = redPacketMapper.selectByPrimaryKey(id);
+        if(redPacket.getState()==0){
+            redPacket.setState(1);
+            Date date = new Date();
+            redPacket.setUpdateTime(date);
+            if(redPacketMapper.updateByPrimaryKey(redPacket)==1){
+                    if(addMoney(redPacket.getReceiveId(),redPacket.getMoney())){
+                        return Msg.success();
+                    }
+            }
+
+        }
+        return Msg.fail();
+    }
 }

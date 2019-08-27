@@ -103,7 +103,7 @@ public class RootMessageServiceImpl implements RootMessageService {
         return Msg.success();
     }
 
-    @Cacheable(key = "#name")
+   // @Cacheable(key = "#name")
     @Override
     public String getMessageByName(String name) {
         RootMessageExample example = new RootMessageExample();

@@ -1,0 +1,375 @@
+<html class="x-admin-sm">
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.1</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./js/cookie.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
+          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end">
+          <button class="layui-btn" lay-filter="sreach" id="select_btn"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+      </div>
+      <xblock>
+        <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button> -->
+        <span class="x-right" style="line-height:40px" id="totil"></span>
+      </xblock>
+      <table class="layui-table x-admin">
+        <thead>
+          <tr>
+            <!-- <th>
+              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th> -->
+            <th>提现单号</th>
+            <th>提现人</th>
+            <th>美金</th>
+            <th>提现时间</th>
+            <th>状态</th>
+            <th>转账金额</th>
+            <th>提现方式</th>
+            <th>操作</th></tr>
+        </thead>
+        <tbody id="td">
+          
+        </tbody>
+      </table>
+      <div class="page">
+      
+      </div>
+
+    </div>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+
+       /*用户-停用*/
+      function member_stop(obj,id){
+          layer.confirm('确认要停用吗？',function(index){
+
+              if($(obj).attr('title')=='启用'){
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title','停用')
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!',{icon: 5,time:1000});
+
+              }else{
+                $(obj).attr('title','启用')
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!',{icon: 5,time:1000});
+              }
+              
+          });
+      }
+
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              var id = $('#delete').attr("deleteId");
+              //发送ajax请求删除数据 
+              var adminUser = localStorage.getItem("adminUser");
+        	  adminUser = JSON.parse(adminUser);
+        	 // alert(adminUser.aId+"||"+adminUser.token+"||"+id);
+        	  if(adminUser == null){
+        		  parent.location.href='login.html';
+        		  return false;
+        	  }
+              $.ajax({
+            	  url:"/meiyou/tixian/delete",
+            	  type:"POST",
+            	  data:"id="+id,
+            	  headers: {
+      		        Accept: "application/json; charset=utf-8",
+      		        headerId:adminUser.aId,
+      		        headerToken:adminUser.token
+      		      },
+            	  success:function(data){
+            		  
+            		  if(data.code==100){
+            			  location.reload(); 
+            		  }else if(data.code==200){
+            			  
+            		  }else if(data.code==300){
+            			  //登录时间过期
+            			  layer.msg('登录信息过期，请重新登录',{
+       						icon: 1,
+       						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+       						}, function(){
+       							parent.location.href = "login.html";
+       						});
+            		  }
+            	  }
+              });
+          });
+      }
+      
+      
+/////////////////////////////////////////////////////////////////////////////
+     $(function(){
+    	 get_all_info(1);
+     });
+      
+      function get_all_info(pn,textName,textValue){
+    	  var adminUser = localStorage.getItem("adminUser");
+    	  adminUser = JSON.parse(adminUser);
+    	  if(adminUser ==null){
+    		  parent.location.href='login.html';
+    		  return false;
+    	  }
+    	  $.ajax({
+    		  url:'/meiyou/tixian/tixianjilu',
+    		  type:'post',
+    		  data:'pn='+pn+"&"+textName+"="+textValue,
+    		  headers: {
+    		        Accept: "application/json; charset=utf-8",
+    		        headerId:adminUser.aId,
+    		        headerToken:adminUser.token
+    		  },
+    		  success:function(data){
+    			  console.log(data);
+    			  if(data.code==100){
+    				  //展示数据 
+    				  show_info(data,textName,textValue);
+    			  }else if(data.code==200){
+    				  //账号被挤出 
+    			  }else if(data.code==300){
+    				  //登录信息过去请重新登录 
+    				  layer.msg('登录信息过期，请重新登录',{
+     						icon: 1,
+     						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+     						}, function(){
+     							parent.location.href = "login.html";
+     						});
+    			  }
+    		  }
+    	  });
+      }
+      //信息展示 
+      function show_info(data,textName,textValue){
+    	  //清空之前的数据
+    	  $('#td').empty();
+    	  //数据信息展示 
+    	  var list = data.extend.pageInfo.list;
+    	  $.each(list,function(i,item){
+    		  var tr = $('<tr></tr>');
+    		  var td = $('<td></td>');
+    		  var div = $('<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="'+item.z_id+'"></div>');
+        	  var li = $('<i class="layui-icon">&#xe605;</i>');
+        	  div.append(li);
+        	  // td.append(div);
+    		  var tdtDdcode = $('<td></td>').append(item.tDdcode);
+        	  var tdtUCount = $('<td></td>').append(item.tUCount);
+        	  var tdtMeijin = $('<td></td>').append(item.tMeijin);
+        	  var tdtTime = $('<td></td>').append(item.tTime);
+        	  var tState = item.tState;
+        	  var tdtState;
+        	  if(tState === "2"){
+        		  tdtState = $('<td></td>').append("未审核");
+        	  }else{
+        		  tdtState = $('<td></td>').append("已审核");
+        	  }
+        	  var tdtSdmeijin = $('<td></td>').append(item.tSdmeijin);
+        	  var tdtFangshi = $('<td></td>').append(item.tFangshi);
+        	  var endtd = $(' <td class="td-manage"></td>');
+        	  var a1 = $('<a title="审核"  href="javascript:;"></a>'); 
+        	  a1.click(function(){
+        		  x_admin_show('审核','member-edit-tixian.html?id='+item.tDdcode,600,500);
+        		  return false;
+        	  });
+        	  var li1 = $('<i class="layui-icon">&#xe642;</i>');
+        	  a1.append(li1);
+        	  var a2 = $('<a title="删除" id="delete" href="javascript:;" deleteId="'+item.tDdcode+'"></a>');
+        	  a2.click(function(){
+        		  member_del(item.tDdcode);
+        		  alert(item.tDdcode);
+        	  });
+        	  var li2 = $('<i class="layui-icon">&#xe640;</i>');
+        	  a2.append(li2);
+        	  endtd.append(a1).append("  ").append(a2);
+        	  tr.append(tdtDdcode).append(tdtUCount).append(tdtMeijin)
+        	  .append(tdtTime).append(tdtState).append(tdtSdmeijin).append(tdtFangshi).append(endtd);
+        	  $('#td').append(tr);
+    	  });
+    	  $('#totil').empty();
+    	  $('#totil').append('共有数据：'+data.extend.pageInfo.total+"条");
+    	  //分页操作
+    	  $('.page').empty();
+    	  var div = $('<div></div>');
+    	  //判断是否是首页 
+    	  var shouyea;
+    	  var shangyiye;
+    	  if(data.extend.pageInfo.pageNum==1){
+    		  shouyea = $('<a class="num">首页</a>');
+        	  shangyiye = $('<a class="prev">&lt;&lt;</a>');
+    	  }else{
+    		  shouyea = $('<a class="num" href="">首页</a>');
+        	  shangyiye = $('<a class="prev" href="">&lt;&lt;</a>');
+    		  shouyea.click(function(){
+    			  get_all_info(1,textName,textValue);
+        		  return false;
+        	  });
+    		  shangyiye.click(function(){
+    			  get_all_info(data.extend.pageInfo.pageNum-1,textName,textValue);
+    			  return false;
+        	  });
+    	  }
+    	  div.append(shouyea).append(shangyiye);
+    	  $.each(data.extend.pageInfo.navigatepageNums,function(i,item){
+    		  var a;
+    		  if(item == data.extend.pageInfo.pageNum){
+    			  a = $('<span class="current"></span>').append(item);
+    		  }else{
+    			  a = $(' <a class="num" href=""></a>').append(item);
+    			  a.click(function(){
+    				  get_all_info(item,textName,textValue);
+    				  return false;
+    			  });
+    		  }
+    		  div.append(a);
+    	  });
+    	  //判断是否还有 下一页 
+    	  var xiayiye;
+    	  var moye;
+    	  if(data.extend.pageInfo.hasNextPage){
+    		  xiayiye = $(' <a class="next" href="">&gt;&gt;</a>');
+        	  moye = $('<a class="num" href="">末页</a>');
+    		  xiayiye.click(function(){
+    			  get_all_info(data.extend.pageInfo.pageNum+1,textName,textValue);
+    			  return false;
+        	  });
+        	  moye.click(function(){
+        		  get_all_info(data.extend.pageInfo.pages,textName,textValue);
+        		  return false;
+        	  });
+        	  
+    	  }else{
+    		  xiayiye = $(' <a class="next">&gt;&gt;</a>');
+        	  moye = $('<a class="num">末页</a>');
+    	  }
+    	  div.append(xiayiye).append(moye); 
+    	  $('.page').append(div);
+      }
+      
+      
+    //查询按钮事件
+      $('#select_btn').click(function(){
+    	  var starttime = $('#start').val();
+    	  var endtime = $('#end').val();
+    	  var username = $('#username').val(); 
+    	  if(starttime !=null && starttime !='' && endtime!=null && endtime!='' && username!=null && username!=''){
+    		  layer.msg('查询失败,请检查查询条件',{ 
+					icon: 2,
+					time: 1000 //2秒关闭（如果不配置，默认是3秒）
+					}); 
+    		  return false;
+    	  }
+    	  if((starttime ==null || starttime =='') && (endtime!=null || endtime!='') && (username!=null || username!='')){
+    		  get_all_info(1);
+    		  return false;
+    	  }
+    	  if(starttime !=null && starttime !='' && endtime!=null && endtime!=''){
+    		  var strtime = starttime+","+endtime;
+    		  var textName = "strtime";
+    		  var textValue = strtime;
+    		/*   alert(zType); */
+    		  get_all_info(1,textName,textValue);
+    		  return false;
+    	  }
+    	  if(username!=null && username!=''){
+    		  var textName = "z_u_bcount";
+    		  var textValue = username;
+    		  alert(zType);
+    		  get_all_info(1,textName,textValue);
+    		  return false;
+    	  }
+      });
+      
+    $('#not_audit').click(function(){
+    	var str = $('#not_audit').html();
+    	var textName = "z_state";
+		var textValue = str;
+		/* alert(textValue); */
+		get_all_info(1,textName,textValue);
+		return false;
+    });
+    $('#audit').click(function(){
+    	var str = $('#audit').html();
+    	var textName = "z_state";
+		var textValue = str;
+		/* alert(textValue); */
+		get_all_info(1,textName,textValue);
+		return false;
+    });
+    
+   
+    
+      /***
+                     获取url地址上参数
+       */
+     function getUrlParam(url,name){
+        var pattern = new RegExp("[?&]" + name +"\=([^&]+)","g");
+        var matcher = pattern.exec(url);
+        var items = null;
+        if(matcher != null){
+            try{
+                items = decodeURIComponent(decodeURIComponent(matcher[1]));   
+            }catch(e){
+                try{
+                    items = decodeURIComponent(matcher[1]);
+                }catch(e){
+                    items = matcher[1];
+                }
+            }
+        }
+        return items;
+     }
+      
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>

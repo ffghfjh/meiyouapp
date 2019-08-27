@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>欢迎页面-X-admin2.1</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <script type="text/javascript" src="./js/cookie.js"></script>
+    </head>
+    <body>
+    <div class="x-body">
+        <fieldset class="layui-elem-field">
+            <legend>基础数据设置</legend>
+            <div class="layui-field-box">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <div class="layui-carousel x-admin-carousel x-admin-backlog" lay-anim="" lay-indicator="inside" lay-arrow="none" style="width: 100%; height: 90px;">
+                                <div carousel-item="">
+                                    <ul class="layui-row layui-col-space10 layui-this">
+                                        <li class="layui-col-xs2" id="chenyijin">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>诚意金</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="fabujin">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>发布金</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="tixianlv">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>提现收费率</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="fenxiangjin">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>分享获得金币数</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="zhidingfei">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>置顶费用</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="tonghuafei">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>视频语音收取费用</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </fieldset>  
+        <font color="red">*</font>请点击想要修改的数据
+    </div>
+    </body>
+    <script type="text/javascript">
+    
+         $(function(){
+        	 //获取基础数据 
+        	 get_essential_data();
+         });
+    
+         //获取基础数据 
+         function get_essential_data(){
+        	 var adminUser = localStorage.getItem("adminUser");
+       	     adminUser = JSON.parse(adminUser);
+       	     if(adminUser ==null){
+	       		  parent.location.href='login.html';
+	       		  return false;
+       	     }
+        	 $.ajax({
+        		 url:"/meiyou/shuju/getalldata",
+        		 type:"post",
+        		 headers: {
+       		        Accept: "application/json; charset=utf-8",
+       		        headerId:adminUser.aId,
+       		        headerToken:adminUser.token
+       		      },
+        		 success:function(data){
+        			 if(data.code==100){
+	        			 console.log(data);
+	        			 show_info(data);
+	        		 }else if(data.code==200){
+	        			 
+	        		 }else if(data.code==300){
+	        			//登录时间过期
+           			  layer.msg('登录信息过期，请重新登录',{
+      						icon: 1,
+      						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+      						}, function(){
+      							parent.location.href = "login.html";
+      						});
+	        		 }
+        		 }
+        	 });
+         }
+         
+         //展示数据
+         function show_info(data){
+        	 var list = data.extend.list;
+        	 $.each(list,function(i,val){
+        		 if(val.jName==="chenyijin"){
+        			 $('#chenyijin').find("cite").append(val.jValue);
+        		 }
+        		 if(val.jName==="fabujin"){
+        			 $('#fabujin').find("cite").append(val.jValue);
+        		 }
+        		 if(val.jName==="tixian"){
+        			 $('#tixianlv').find("cite").append(val.jValue);
+        		 }
+        		 if(val.jName==="fenxiangjin"){
+        			 $('#fenxiangjin').find("cite").append(val.jValue);
+        		 }
+        		 if(val.jName==="zhiding"){
+        			 $('#zhidingfei').find("cite").append(val.jValue);
+        		 }
+        		 if(val.jName==="tonghuafei"){
+        			 $('#tonghuafei').find("cite").append(val.jValue);
+        		 }
+        	 });
+         }
+         
+         //修改数据
+         $('#chenyijin').click(function(){
+        	 x_admin_show('收取诚意金','update_chenyijin.html',600,185);
+         });  
+         
+         $('#fabujin').click(function(){
+        	 x_admin_show('收取发布金','update_fabujin.html',600,185);
+         });
+         
+         $('#tixianlv').click(function(){
+        	 x_admin_show('提现率','update_tixianlv.html',600,185);
+         });
+
+         $('#fenxiangjin').click(function(){
+        	 x_admin_show('分享金','update_fenxiangjin.html',600,185);
+         });
+         
+         $('#zhidingfei').click(function(){
+        	 x_admin_show('收取置顶费','update_zhidingfei.html',600,185);
+         });
+         
+         $('#tonghuafei').click(function(){
+        	 x_admin_show('视屏语音通话费','update_tonghuafei.html',600,185);
+         });
+    </script>
+</html>

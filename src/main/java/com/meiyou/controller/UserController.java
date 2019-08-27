@@ -3,7 +3,6 @@ package com.meiyou.controller;
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
-import com.tls.tls_sigature.tls_sigature;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -136,5 +133,40 @@ public class UserController {
             return true;
         }
         return false;
+    }
+
+    @RequestMapping(value="sendMoney",method = RequestMethod.POST)
+    @ApiOperation("发红包")
+    public Msg sendMoney(int id,String token,String text,String toAccount,int money) {
+        if (RedisUtil.authToken(String.valueOf(id), token)) {
+            return userService.sendMoney(id,text,money,toAccount);
+        }
+        return Msg.noLogin();
+    }
+    @RequestMapping(value="selRedPackage",method = RequestMethod.GET)
+    @ApiOperation("查询红包状态")
+    public Msg selRedPackage(int id){
+        return userService.selRedPackage(id);
+    }
+
+    @RequestMapping(value = "getRedPackage",method = RequestMethod.POST)
+    @ApiOperation("领取红包")
+    public Msg getRedPackage(int rid,int uid,String token){
+        if(RedisUtil.authToken(String.valueOf(uid),token)){
+            return userService.getRedPackage(rid);
+        }else {
+            return Msg.noLogin();
+        }
+    }
+
+    /**
+    * @Description: 查询用户余额
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    @RequestMapping(value = "selectUserMoney", method = RequestMethod.POST)
+    @ApiOperation("查询用户余额")
+    public String selectUserMoney(String uid,String token) {
+        return userService.selectUserMoney(uid,token);
     }
 }

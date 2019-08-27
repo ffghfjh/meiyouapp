@@ -41,4 +41,32 @@ public interface UserService {
      */
     boolean delMoney(int id,float money);
 
+    /**
+     * 发送红包
+     * @param id
+     * @param toAccount
+     * @return
+     */
+    Msg sendMoney(int id,String text,int money,String toAccount);
+
+    /**
+     * 查询红包
+     * @param id
+     * @return
+     */
+    Msg selRedPackage(int id);
+
+    /**
+     * 领取红包
+     * @param id
+     * @return
+     */
+    Msg getRedPackage(int id);
+
+    /**
+    * @Description: 查询用户余额
+    * @Author: JK
+    * @Date: 2019/8/26
+    */
+    String selectUserMoney(String uid,String password);
 }

@@ -1,0 +1,261 @@
+<html class="x-admin-sm">
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.1</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <script type="text/javascript" src="./js/cookie.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          <!-- <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
+          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end"> -->
+          <input type="text" id="uCount"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
+          <button class="layui-btn"  id="select_btn"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+      </div>
+      <xblock>
+        <span class="x-right" style="line-height:40px" id="totality"></span>
+      </xblock>
+      <table class="layui-table x-admin">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>手机号码</th>
+            <th>用户名</th>
+            <th>性别</th>
+            <th>年龄</th>
+            <th>昵称</th>
+            <th>创建时间</th>
+            <th>美金</th>
+             </tr>
+        </thead>
+        <tbody id="td">
+         
+        </tbody>
+      </table>
+      <div class="page">
+        
+      </div>
+    </div>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+
+      function delAll (argument) {
+
+        var data = tableCheck.getData();
+  
+        layer.confirm('确认要删除吗？'+data,function(index){
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+      }
+      
+      $(function(){
+    	  get_all_user_info(1);
+      });
+      
+      //查询所有用户 
+      function get_all_user_info(pn,textName,textValue){
+    	  var adminUser = localStorage.getItem("adminUser");
+    	  adminUser = JSON.parse(adminUser);
+    	  if(adminUser ==null){
+    		  parent.location.href='login.html';
+    		  return false;
+    	  }
+    	  $.ajax({
+    		  url:'/meiyou/admin/selectuserInfo',
+    		  type:'post',
+    		  data:'pn='+pn+"&"+textName+"="+textValue,
+    		  headers: {
+    		        Accept: "application/json; charset=utf-8",
+    		        headerId:adminUser.aId,
+    		        headerToken:adminUser.token
+    		    },
+    		  success:function(data){
+    			  console.log(data);
+    			  if(data.code==100){
+    				  //展示数据 
+    				  show_info(data,textName,textValue);
+    			  }else if(data.code==200){
+    				  //账号被挤出 
+    			  }else if(data.code==300){
+    				  //登录信息过去请重新登录 
+    				  layer.msg('登录信息过期，请重新登录',{
+     						icon: 1,
+     						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+     						}, function(){
+     							parent.location.href = "login.html";
+     						}); 
+    			  }
+    		  }
+    	  });
+      }
+      
+      //用户信息展示
+      function show_info(data,textName,textValue){
+    	  
+    	  //清空之前的数据
+    	  $('#td').empty();
+    	  //数据信息展示 
+    	  var list = data.extend.pageInfo.list;
+    	  $.each(list,function(i,item){
+    		  var tr = $('<tr></tr>');
+        	  var tdId = $('<td></td>').append(item.uId);
+        	  var tduPhone = $('<td></td>').append(item.uPhone);
+        	  //var tduImg = $('<td></td>').append($('<img src="'+item.uImg+'" width="50" height="50">'));
+        	  var tduCount = $('<td></td>').append(item.uCount);
+        	  var tduSex = $('<td></td>').append(item.uSex);
+        	  var tduOld = $('<td></td>').append(item.uOld);
+        	  var tduName = $('<td></td>').append(item.uName);
+        	  var tduTime = $('<td></td>').append(item.uTime);
+        	  var tduMeijin = $('<td></td>').append(item.uMeijin);
+        	  tr.append(tdId).append(tduPhone).append(tduCount).append(tduSex)
+        	  .append(tduOld).append(tduName).append(tduTime).append(tduMeijin);
+        	  $('#td').append(tr);
+    	  });
+    	  $('#totality').empty();
+    	  $('#totality').append('共有数据：'+data.extend.pageInfo.total+"条");
+    	  //分页操作
+    	  $('.page').empty();
+    	  var div = $('<div></div>');
+    	  //判断是否是首页 
+    	  var shouyea;
+    	  var shangyiye;
+    	  if(data.extend.pageInfo.pageNum==1){
+    		  shouyea = $('<a class="num">首页</a>');
+        	  shangyiye = $('<a class="prev">&lt;&lt;</a>');
+    	  }else{
+    		  shouyea = $('<a class="num" href="">首页</a>');
+        	  shangyiye = $('<a class="prev" href="">&lt;&lt;</a>');
+    		  shouyea.click(function(){
+        		  get_all_user_info(1,textName,textValue);
+        		  return false;
+        	  });
+    		  shangyiye.click(function(){
+    			  get_all_user_info(data.extend.pageInfo.pageNum-1,textName.textValue);
+    			  return false;
+        	  });
+    	  }
+    	  div.append(shouyea).append(shangyiye);
+    	  $.each(data.extend.pageInfo.navigatepageNums,function(i,item){
+    		  var a;
+    		  if(item == data.extend.pageInfo.pageNum){
+    			  a = $('<span class="current"></span>').append(item);
+    		  }else{
+    			  a = $(' <a class="num" href=""></a>').append(item);
+    			  a.click(function(){
+    				  get_all_user_info(item,textName,textValue);
+    				  return false;
+    			  });
+    		  }
+    		  div.append(a);
+    	  });
+    	  //判断是否还有 下一页 
+    	  var xiayiye;
+    	  var moye;
+    	  if(data.extend.pageInfo.hasNextPage){
+    		  xiayiye = $(' <a class="next" href="">&gt;&gt;</a>');
+        	  moye = $('<a class="num" href="">末页</a>');
+    		  xiayiye.click(function(){
+    			  get_all_user_info(data.extend.pageInfo.pageNum+1,textName.textValue);
+    			  return false;
+        	  });
+        	  moye.click(function(){
+        		  get_all_user_info(data.extend.pageInfo.pages,textName,textValue);
+        		  return false;
+        	  });
+    	  }else{
+    		  xiayiye = $(' <a class="next">&gt;&gt;</a>');
+        	  moye = $('<a class="num">末页</a>');
+    	  }
+    	  div.append(xiayiye).append(moye); 
+    	  $('.page').append(div);
+      }
+      
+     //查询按钮事件
+		$('#select_btn').click(function() {
+			var uCount = $('#uCount').val();
+			if (uCount == null || uCount == '') {
+				layer.msg('查询失败,请检查查询条件', {
+					icon : 2,
+					time : 1000
+				//2秒关闭（如果不配置，默认是3秒）
+				});
+				return false;
+			}
+			if (uCount != null && uCount != '') {
+				var textName = "uCount";
+				var textValue = uCount;
+				get_all_user_info(1, textName, textValue);
+				return false;
+			}
+		});
+     
+		/***
+		获取url地址上参数
+		 */
+		function getUrlParam(url, name) {
+			var pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
+			var matcher = pattern.exec(url);
+			var items = null;
+			if (matcher != null) {
+				try {
+					items = decodeURIComponent(decodeURIComponent(matcher[1]));
+				} catch (e) {
+					try {
+						items = decodeURIComponent(matcher[1]);
+					} catch (e) {
+						items = matcher[1];
+					}
+				}
+			}
+			return items;
+		}
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>

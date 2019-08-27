@@ -906,6 +906,16 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public Msg getUserInfo(int uId, String token) {
+        if(RedisUtil.authToken(String.valueOf(uId),token)){
+            return null;
+        }else {
+            System.out.println("鉴权失败");
+            return Msg.noLogin();
+        }
+    }
+
 
     @Override
     public Msg selRedPackage(int id) {

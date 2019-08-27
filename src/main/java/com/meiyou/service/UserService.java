@@ -117,5 +117,8 @@ public interface UserService {
      * @return
      */
     Msg qqLogin(String qqOpenId,String qqToken);
-
+    /**
+     * 拉取用户资料
+     */
+    Msg getUserInfo(int uID,String token);
 }

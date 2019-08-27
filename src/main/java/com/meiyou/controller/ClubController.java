@@ -91,7 +91,7 @@ public class ClubController {
         return clubService.updateClub(uid, token, cid);
     }
 
-    @GetMapping("/find")
+    @PostMapping("/find")
     @ApiOperation(value = "通过会所id查找对应的会所",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
@@ -99,7 +99,7 @@ public class ClubController {
         return clubService.selectByCid(uid, token, cid);
     }
 
-    @GetMapping("/getByPosition")
+    @PostMapping("/getByPosition")
     @ApiOperation(value = "查找附近的club",notes = "查找用户所在位置附近的club,返回为ClubVO类")
     public Msg getByPosition(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,

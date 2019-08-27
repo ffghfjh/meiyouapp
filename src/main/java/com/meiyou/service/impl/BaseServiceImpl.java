@@ -66,7 +66,7 @@ public class BaseServiceImpl {
      * @param value
      * @return
      */
-    public Boolean setPosition(Double latitude, Double longitude, Integer key, String value){
+    public Boolean setPosition(Double longitude, Double latitude, Integer key, String value){
         //添加地理位置和aid到Redis缓存中
         Coordinate coordinate = new Coordinate();
         coordinate.setLatitude(latitude);

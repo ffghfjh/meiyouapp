@@ -50,7 +50,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @Transactional
     @Cacheable()
-    public Msg addClub(Club club,String token, Integer time, String password, Double latitude, Double longitude) {
+    public Msg addClub(Club club,String token, Integer time, String password, Double longitude, Double latitude) {
         if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
             return Msg.noLogin();
         }
@@ -97,7 +97,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             }
 
             //添加地理位置到缓存
-            Boolean result = setPosition(latitude, longitude, club.getId(), Constants.GEO_CLUB);
+            Boolean result = setPosition(longitude, latitude, club.getId(), Constants.GEO_CLUB);
             if (!result) {
                 msg.setCode(505);
                 msg.setMsg("获取地理位置失败");

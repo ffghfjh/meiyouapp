@@ -1,5 +1,7 @@
 package com.meiyou.controller;
 
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.service.MyPublishService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
@@ -35,10 +37,21 @@ public class MyPublishController {
         Msg msg = new Msg();
         List<Object> appointmentList = myPublishService.selectAppointmentList(uid, token);
         List<Object> tourList = myPublishService.selectTourList(uid, token);
-        List<Object> clubList = myPublishService.selectClubByUid(Integer.valueOf(uid), token);
-//        myPublishService.selectShopByUid(Integer.valueOf(uid), token);
         msg.add("appointmentList",appointmentList);
         msg.add("tourList",tourList);
+
+        List<ClubVO> clubList = myPublishService.selectClubByUid(Integer.valueOf(uid), token);
+        if(clubList.isEmpty()){
+            msg.add("clubList",null);
+        }
+        msg.add("clubList",clubList);
+
+        List<ShopVO> shopList = myPublishService.selectShopByUid(Integer.valueOf(uid), token);
+        if(shopList.isEmpty()){
+            msg.add("shopList",null);
+        }
+        msg.add("shopList",shopList);
+
         msg.setCode(100);
         msg.setMsg("成功");
         return msg;

@@ -46,8 +46,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     @Autowired
     ShopBuyMapper shopBuyMapper;
 
-    @Autowired
-
     /**
      * @Description: 查询我的约会报名
      * @Author: JK

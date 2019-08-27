@@ -3,7 +3,6 @@ package com.meiyou.controller;
 import com.meiyou.service.AdminService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.ApiOperation;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +21,7 @@ public class AdminController {
 
     @Autowired
     AdminService adminService;
-    @RequestMapping(value = "adminLogin",method = RequestMethod.POST)
+    @RequestMapping(value = "/adminLogin",method = RequestMethod.POST)
     @ApiOperation("后台登录")
     public Msg adminLogin(String adminAccount, String adminPassword, HttpServletRequest request){
         Msg msg = adminService.adminLogin(adminAccount,adminPassword);

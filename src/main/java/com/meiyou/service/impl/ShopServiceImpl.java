@@ -3,14 +3,18 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
 import com.meiyou.model.ShopVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import java.util.List;
  * @author: Mr.Z
  * @create: 2019-08-21 17:38
  **/
+@CacheConfig(cacheNames = "shop")
 @Service
 public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
@@ -40,19 +45,21 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
+    @Transactional
+    @Cacheable()
     public Msg addShop(Shop shop, String token, Integer time, String password,
-                       Double longitude, Double latitude) {
-        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
-            return Msg.noLogin();
-        }
+                       Double longitude, Double latitude)  {
+//        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         Msg msg = new Msg();
         Date now = new Date();
         shop.setUpdateTime(now);
         shop.setCreateTime(now);
-        shop.setState(0);
+        shop.setState(StateEnum.INIT.getValue());
         //添加过期时间
-        Long millisecond = now.getTime()+24*60*60*1000*time;
+        Long millisecond = System.currentTimeMillis()+time*1000*60*60*24L;
         shop.setOutTime(new Date(millisecond));
 
         //获取用户密码和余额
@@ -121,17 +128,18 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
+    @CachePut(key = "#result.id")
     public Msg updateShop(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Integer status = shopMapper.selectByPrimaryKey(sid).getState();
-        if(status!=0){
+        if(status!=StateEnum.INIT.getValue()){
             return Msg.fail();
         }
         //设置状态为2，已失效
         Shop shop = new Shop();
-        shop.setState(2);
+        shop.setState(StateEnum.INVALID.getValue());
         shop.setUpdateTime(new Date());
 
         ShopExample shopExample = new ShopExample();
@@ -151,10 +159,11 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
+    @Cacheable()
     public Msg selectBySid(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);
@@ -186,13 +195,13 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     @Cacheable(value = "nearShop")
     public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
 
         //查找附近的key
-        List<GeoRadiusResponse> geoRadiusResponses = getGeoRadiusResponse(uid,longitude,latitude);
+        List<GeoRadiusResponse> geoRadiusResponses = getShopGeoRadiusResponse(uid,longitude,latitude);
 
         if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
             return Msg.fail();

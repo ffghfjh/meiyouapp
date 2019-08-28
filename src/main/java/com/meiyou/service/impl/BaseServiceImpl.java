@@ -4,6 +4,7 @@ import com.meiyou.mapper.*;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.model.ShopVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,11 @@ public class BaseServiceImpl {
     public String getRootMessage(String message){
         RootMessageExample rootMessageExample = new RootMessageExample();
         rootMessageExample.createCriteria().andNameEqualTo(message);
-        String result = rootMessageMapper.selectByExample(rootMessageExample).get(0).getValue();
-        return result;
+        List<RootMessage> rootMessages = rootMessageMapper.selectByExample(rootMessageExample);
+        if(rootMessages == null && rootMessages.size() == 0){
+            return null;
+        }
+        return rootMessages.get(0).getValue();
     }
 
     /**
@@ -80,19 +84,35 @@ public class BaseServiceImpl {
     }
 
     /**
-     * 查找附近的key
+     * 查找附近的ClubKey
      * @param uid
      * @param longitude
      * @param latitude
      * @return
      */
-    public List<GeoRadiusResponse> getGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+    public List<GeoRadiusResponse> getClubGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
         String range = getRootMessage("range");
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
         coordinate.setLatitude(latitude);
         coordinate.setLongitude(longitude);
         return RedisUtil.geoQueryClub(coordinate, Double.valueOf(range));
+    }
+
+    /**
+     * 查找附近的ShopKey
+     * @param uid
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public List<GeoRadiusResponse> getShopGeoRadiusResponse(Integer uid, Double longitude, Double latitude){
+        String range = getRootMessage("range");
+        Coordinate coordinate = new Coordinate();
+        coordinate.setKey(Integer.toString(uid));
+        coordinate.setLatitude(latitude);
+        coordinate.setLongitude(longitude);
+        return RedisUtil.geoQueryShop(coordinate, Double.valueOf(range));
     }
 
     /**
@@ -104,7 +124,7 @@ public class BaseServiceImpl {
 
         //查找报名每个会所的人数
         ClubBuyExample example = new ClubBuyExample();
-        example.createCriteria().andStateBetween(0,1).andClubIdEqualTo(club.getId());
+        example.createCriteria().andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue()).andClubIdEqualTo(club.getId());
         List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 
@@ -150,7 +170,7 @@ public class BaseServiceImpl {
 
         //查找报名每个会所的人数
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andStateBetween(0,1).andGuideIdEqualTo(shop.getId());
+        example.createCriteria().andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue()).andGuideIdEqualTo(shop.getId());
         List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 

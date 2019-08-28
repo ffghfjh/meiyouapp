@@ -9,7 +9,7 @@ public enum TimeTypeEnum {
     DAY(1,"一天"),
     WEEK(7,"一周"),
     MONTH(30,"一月"),
-    QUARTER(120,"一季"),
+    QUARTER(90,"一季"),
     YEAR(365,"一年");
 
     private int value;
@@ -27,7 +27,7 @@ public enum TimeTypeEnum {
      */
     public static TimeTypeEnum getTimeTypeByDesc(String desc){
         for(TimeTypeEnum timeTypeEnum : TimeTypeEnum.values()){
-            if(timeTypeEnum.getDesc() == desc){
+            if(timeTypeEnum.getDesc().equals(desc)){
                 return timeTypeEnum;
             }
         }

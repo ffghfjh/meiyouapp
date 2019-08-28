@@ -5,6 +5,7 @@ import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.ClubVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ClubBuyService;
 import com.meiyou.utils.Msg;
@@ -52,7 +53,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         Msg msg = new Msg();
         clubBuy.setCreateTime(new Date());
         clubBuy.setUpdateTime(new Date());
-        clubBuy.setState(0);
+        clubBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
         String ask_money = getRootMessage("ask_money");
@@ -107,9 +108,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     @Transactional
     @Override
     public Msg updateBuyClub(Integer uid,Integer cid,String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         //从系统数据表获取置顶费用
         String ask_money = getRootMessage("ask_money");
@@ -119,7 +120,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
-        clubBuy.setState(2);
+        clubBuy.setState(StateEnum.INVALID.getValue());
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
@@ -148,13 +149,13 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg updateClubBuyComplete(Integer uid, Integer cid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
-        clubBuy.setState(1);
+        clubBuy.setState(StateEnum.COMPLETE.getValue());
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
@@ -176,9 +177,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCidAndUid(Integer uid, Integer cid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
@@ -210,9 +211,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCid(Integer uid, Integer cid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者
@@ -265,9 +266,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg addClubStar(Integer uid, String token, Integer cid,Integer star) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
@@ -280,7 +281,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             return msg;
         }
         //判断订单状态是否完成(完成了才可以评星)
-        if(result.get(0).getState() != 1){
+        if(result.get(0).getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
         ClubStar clubStar = new ClubStar();

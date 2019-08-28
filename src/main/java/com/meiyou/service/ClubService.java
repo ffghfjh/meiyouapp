@@ -13,10 +13,10 @@ public interface ClubService {
     /**
      * 添加会所
      * @param club
-     * @param time 置顶天数
+     * @param timeType 置顶天数类型
      * @param password 支付密码
      */
-    Msg addClub(Club club,String token, Integer time, String password, Double longitude, Double latitude);
+    Msg addClub(Club club,String token, String timeType, String password, Double longitude, Double latitude);
 
     /**
      * 通过会所id取消发布指定的会所

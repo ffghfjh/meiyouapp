@@ -5,6 +5,7 @@ import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopBuyService;
 import com.meiyou.utils.Msg;
@@ -41,13 +42,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg addShopBuy(ShopBuy shopBuy, String token, Integer password) {
-        if(!RedisUtil.authToken(shopBuy.getBuyerId().toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(shopBuy.getBuyerId().toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         shopBuy.setCreateTime(new Date());
         shopBuy.setUpdateTime(new Date());
-        shopBuy.setState(0);
+        shopBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
         //String ask_money = getRootMessage("ask_money");
@@ -105,9 +106,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg addShopStar(Integer uid, String token, Integer sid, Integer star) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         ShopBuyExample example = new ShopBuyExample();
         example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
         List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
@@ -119,7 +120,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             return msg;
         }
         //判断订单状态是否完成(完成了才可以评星)
-        if(shopBuys.get(0).getState() != 1){
+        if(shopBuys.get(0).getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
 
@@ -148,9 +149,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg updateShopBuy(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
 //        从系统数据表获取置顶费用
 //        String ask_money = getRootMessage("ask_money");
@@ -165,7 +166,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //修改聘用表状态-->取消状态-2
         ShopBuy shopBuy = new ShopBuy();
-        shopBuy.setState(2);
+        shopBuy.setState(StateEnum.INVALID.getValue());
         shopBuy.setUpdateTime(new Date());
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
@@ -193,11 +194,11 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg updateShopBuyComplete(Integer uid, Integer sid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         ShopBuy shopBuy = new ShopBuy();
-        shopBuy.setState(1);
+        shopBuy.setState(StateEnum.COMPLETE.getValue());
         shopBuy.setUpdateTime(new Date());
 
         //修改购买表状态
@@ -219,9 +220,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectBySidAndUid(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
         shopBuyExample.createCriteria().andIdEqualTo(sid).andBuyerIdEqualTo(uid);
@@ -253,9 +254,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectBySid(Integer uid, Integer sid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者

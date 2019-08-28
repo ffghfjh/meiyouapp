@@ -1,6 +1,7 @@
 package com.meiyou.controller;
 
 import com.meiyou.pojo.Appointment;
+import com.meiyou.pojo.Tour;
 import com.meiyou.service.AppointmentManagementService;
 import com.meiyou.utils.LayuiDataUtil;
 import com.meiyou.utils.Page;
@@ -25,18 +26,38 @@ public class AppointmentManagementController {
     @Autowired
     private AppointmentManagementService appointmentManagementService;
 
+
     /**
-    * @Description: 查询所有的约会
+    * @Description: 分页查询所有的约会
     * @Author: JK
     * @Date: 2019/8/27
     */
-    @ApiOperation(value = "发布约会", notes = "发布约会", httpMethod = "POST")
-    @RequestMapping(value = "selectAllAppointment")
-    public Map<String,Object> selectAllAppointment(){
-        Page<Appointment> page = new Page<>();
-        List<Appointment> appointments = appointmentManagementService.selectAllAppointment();
-        page.setList(appointments);
-        return LayuiDataUtil.getLayuiData(page);
+    @ApiOperation(value = "分页查询所有的约会", notes = "分页查询所有的约会", httpMethod = "POST")
+    @RequestMapping(value = "selectAllAppointmentByPage")
+    public Map<String,Object> selectAllAppointment(Integer page, Integer limit){
+        Page<Appointment> page1 = new Page<>();
+        List<Appointment> list = appointmentManagementService.selectAllAppointment();
+        List<Appointment> appointments = appointmentManagementService.selectAllAppointmentByPage(page,limit);
+        page1.setList(appointments);
+        page1.setCount(list.size());
+        return LayuiDataUtil.getLayuiData(page1);
+    }
+
+
+    /**
+    * @Description: 分页查询所有的旅游
+    * @Author: JK
+    * @Date: 2019/8/27
+    */
+    @ApiOperation(value = "分页查询所有的旅游", notes = "分页查询所有的旅游", httpMethod = "POST")
+    @RequestMapping(value = "selectAllTourByPage")
+    public Map<String,Object> selectAllTourByPage(Integer page, Integer limit){
+        Page<Tour> page1 = new Page<>();
+        List<Tour> list = appointmentManagementService.selectAllTour();
+        List<Tour> tours = appointmentManagementService.selectAllTourByPage(page,limit);
+        page1.setList(tours);
+        page1.setCount(list.size());
+        return LayuiDataUtil.getLayuiData(page1);
     }
 
 }

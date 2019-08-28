@@ -3,6 +3,7 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
 import com.meiyou.model.ShopVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.Constants;
@@ -56,9 +57,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         Date now = new Date();
         shop.setUpdateTime(now);
         shop.setCreateTime(now);
-        shop.setState(0);
+        shop.setState(StateEnum.INIT.getValue());
         //添加过期时间
-        Long millisecond = now.getTime()+24*60*60*1000*time;
+        Long millisecond = System.currentTimeMillis()+time*1000*60*60*24L;
         shop.setOutTime(new Date(millisecond));
 
         //获取用户密码和余额
@@ -129,16 +130,16 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     @CachePut(key = "#result.id")
     public Msg updateShop(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Integer status = shopMapper.selectByPrimaryKey(sid).getState();
-        if(status!=0){
+        if(status!=StateEnum.INIT.getValue()){
             return Msg.fail();
         }
         //设置状态为2，已失效
         Shop shop = new Shop();
-        shop.setState(2);
+        shop.setState(StateEnum.INVALID.getValue());
         shop.setUpdateTime(new Date());
 
         ShopExample shopExample = new ShopExample();
@@ -160,9 +161,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     @Cacheable()
     public Msg selectBySid(Integer uid, String token, Integer sid) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);

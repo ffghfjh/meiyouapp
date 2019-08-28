@@ -10,6 +10,7 @@ import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,7 @@ public class ClubController {
     ClubBuyService clubBuyService;
 
     @PostMapping("/add")
-    @ApiOperation(value = "发布推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
+    @ApiOperation(value = "发布推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足,505-获取地理位置失败,506-传入的时间类型有错!")
     public Msg addClub(@RequestParam("publish_id") Integer publishId,
                        @RequestParam("token") String token,
                        @RequestParam("project_name") String projectName,
@@ -42,26 +43,26 @@ public class ClubController {
                        @RequestParam("project_address") String projectAddress,
                        @RequestParam("project_price") Integer projectPrice,
                        @RequestParam("market_price") Integer marketPrice,
-                       @RequestParam("time") Integer time,
+                       @RequestParam("timeType") String timeType,
                        @RequestParam("password") String password,
-//                       @RequestParam("files") MultipartFile[] files,
+                       @RequestParam("files") MultipartFile[] files,
                        Double longitude, Double latitude, HttpServletRequest request){
 
         //使用Hutool进行json操作
-//        JSONArray array = JSONUtil.createArray();
-//        for (MultipartFile file : files) {
-//            Msg msg = FileUploadUtil.uploadUtil(file, "club", request);
-//            if (msg.getCode() == 100) {
-//                array.add(msg.getExtend().get("path"));
-//            }
-//        }
-//        if (array.size() == 0) {
-//            return Msg.fail();
-//        }
+        JSONArray array = JSONUtil.createArray();
+        for (MultipartFile file : files) {
+            Msg msg = FileUploadUtil.uploadUtil(file, "club", request);
+            if (msg.getCode() == 100) {
+                array.add(msg.getExtend().get("path"));
+            }
+        }
+        if (array.size() == 0) {
+            return Msg.fail();
+        }
 
         Club club = new Club();
         club.setPublishId(publishId);
-//        club.setImgsUrl(array.toString());//以json数组的形式存图片
+        club.setImgsUrl(array.toString());//以json数组的形式存图片
         club.setProjectName(projectName);
         club.setProjectDesc(projectDesc);
         club.setProjectAddress(projectAddress);
@@ -69,7 +70,7 @@ public class ClubController {
         club.setProjectPrice(projectPrice);
         club.setMarketPrice(marketPrice);
 
-        return clubService.addClub(club,token,time,password,longitude,latitude);
+        return clubService.addClub(club,token,timeType,password,longitude,latitude);
     }
 
 

@@ -3,18 +3,24 @@ package com.meiyou;
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.myEnum.StateEnum;
+import com.meiyou.myEnum.TimeTypeEnum;
 import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.pojo.ClubBuyExample;
 import com.meiyou.pojo.Shop;
 import com.meiyou.service.ShopService;
+import com.meiyou.service.impl.BaseServiceImpl;
+import com.meiyou.utils.Msg;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,7 +30,7 @@ import java.util.List;
  **/
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ClubTests {
+public class ClubTests extends BaseServiceImpl {
 
     @Autowired
     ClubBuyMapper clubBuyMapper;
@@ -81,6 +87,40 @@ public class ClubTests {
         shopService.addShop(shop,token,5, pas, lo, la);
     }
 
+
+    @Test
+    public void enums(){
+        Integer days = 0;
+        String top_money = null;
+        String timeType = "一年";
+
+        TimeTypeEnum type = TimeTypeEnum.getTimeTypeByDesc(timeType);
+        if(type == null){
+            System.out.println(Msg.fail());
+        }
+        switch (type){
+            case DAY:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+            case WEEK:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+            case MONTH:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+            case QUARTER:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+            case YEAR:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+        }
+
+        //Long millisecond = days*1000*60*60*24L;
+        //Long second = days*1000*60*60*24;
+        System.out.println(days*1000*60*60*24L+"--"+days*1000*60*60*24);
+        System.out.println(days+","+top_money);
+    }
 
     @Test
     public void udate(){

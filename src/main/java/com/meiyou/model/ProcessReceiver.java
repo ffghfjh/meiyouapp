@@ -7,11 +7,13 @@ package com.meiyou.model;
  * @create: 2019-08-23 19:15
  **/
 import com.meiyou.config.QueueConfig;
+import com.meiyou.service.impl.UserServiceImpl;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -20,6 +22,8 @@ import java.util.concurrent.CountDownLatch;
 
 @Component
 public class ProcessReceiver implements ChannelAwareMessageListener, Serializable {
+    @Autowired
+    UserServiceImpl userService;
     public static CountDownLatch latch;
     private static Logger logger = LoggerFactory.getLogger(ProcessReceiver.class);
 
@@ -51,6 +55,8 @@ public class ProcessReceiver implements ChannelAwareMessageListener, Serializabl
         String realMessage = new String(message.getBody());
         logger.info("Received <" + realMessage + ">");
         System.out.println("收到消息");
+        int hid = Integer.parseInt(realMessage);
+        userService.redPackageOverdue(hid);
         if (Objects.equals(realMessage, FAIL_MESSAGE)) {
             throw new Exception("Some exception happened");
         }

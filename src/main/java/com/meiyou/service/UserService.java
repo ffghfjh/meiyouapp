@@ -121,4 +121,13 @@ public interface UserService {
      * 拉取用户资料
      */
     Msg getUserInfo(int uID,String token);
+
+    public void redPackageOverdue(int hid);
+
+    /**
+     * 账号拉取资料
+     * @param account
+     * @return
+     */
+    public Msg getOtherMsg(String account);
 }

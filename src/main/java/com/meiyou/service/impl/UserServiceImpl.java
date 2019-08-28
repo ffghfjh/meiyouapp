@@ -1,5 +1,6 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -8,11 +9,13 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.config.AliMQConfig;
+import com.meiyou.config.QueueConfig;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
+import com.meiyou.model.ExpirationMessagePostProcessor;
 import com.meiyou.model.WXUserInfo;
 import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
@@ -138,7 +141,7 @@ public class UserServiceImpl implements UserService {
 
 
                         User user = new User();
-                        String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                        String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                         user.setAccount(userAccount);
                         user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                         user.setBindAlipay(false);//未绑定支付宝
@@ -260,7 +263,7 @@ public class UserServiceImpl implements UserService {
             }else{
 
                 User user = new User();
-                String account = UUID.randomUUID().toString();//用户账号
+                String account = RandomUtil.randomNumbers(10);//用户账号
                 String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
                 user.setShareCode(shareCode);//邀请码
                 user.setAccount(account);
@@ -389,7 +392,7 @@ public class UserServiceImpl implements UserService {
 
                 WXUserInfo info = getWxUserInfo(access_token,openid);
                 User user = new User();
-                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -590,7 +593,10 @@ public class UserServiceImpl implements UserService {
             redPacket.setCreateTime(date);
             redPacket.setUpdateTime(date);
             if(redPacketMapper.insertSelective(redPacket)==1) {
-
+                long expiration = 86400000;//消息24小时后过期
+                System.out.println("发送红包，添加到延迟队列");
+                rabbitTemplate.convertAndSend(QueueConfig.DELAY_QUEUE_PER_MESSAGE_TTL_NAME,
+                        (Object) (String.valueOf(redPacket.getId())), new ExpirationMessagePostProcessor(expiration));
                 msg = Msg.success();
                 msg.add("hId",redPacket.getId());
                 return msg;
@@ -862,7 +868,7 @@ public class UserServiceImpl implements UserService {
 
 
                 User user = new User();
-                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -921,14 +927,57 @@ public class UserServiceImpl implements UserService {
             msg.add("bgImg",user.getBgPicture());
             msg.add("money",user.getMoney());
             msg.add("nickName",user.getNickname());
+            msg.add("header",user.getHeader());
             msg.add("account",user.getAccount());
             msg.add("uId",user.getId());
             msg.add("signature",user.getSignature());
+            msg.add("sex",user.getSex());
+            msg.add("age",user.getBirthday());
             return msg;
         }else {
             System.out.println("鉴权失败");
             return Msg.noLogin();
         }
+    }
+
+    @Override
+    @Transactional
+    public void redPackageOverdue(int hid) {
+        RedPacket redPacket = redPacketMapper.selectByPrimaryKey(hid);
+        if(redPacket!=null){
+            redPacket.setState(2);//2为过期
+            int sender_id  = redPacket.getSenderId();
+            redPacketMapper.updateByPrimaryKey(redPacket);
+            addMoney(sender_id,redPacket.getMoney());
+        }
+    }
+
+    @Override
+    public Msg getOtherMsg(String account) {
+        Msg msg;
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andAccountEqualTo(account);
+        List<User> users = userMapper.selectByExample(example);
+        if(users.size()>0){
+            User user = users.get(0);
+            msg = Msg.success();
+            msg.add("uId",user.getId());
+            msg.add("nickName",user.getNickname());
+            msg.add("sex",user.getSex());
+            msg.add("old",user.getBirthday());
+            msg.add("account",user.getAccount());
+            msg.add("bgImg",user.getBgPicture());
+            msg.add("header",user.getHeader());
+            msg.add("signature",user.getSignature());
+            return msg;
+        }else {
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("没有相关用户");
+            return msg;
+        }
+
     }
 
 

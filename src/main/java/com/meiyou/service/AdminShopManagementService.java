@@ -13,4 +13,6 @@ import java.util.List;
 public interface AdminShopManagementService {
 
     List<Shop> selectAll();
+
+    Shop selectBySid(Integer sid);
 }

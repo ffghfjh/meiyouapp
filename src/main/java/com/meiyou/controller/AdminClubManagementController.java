@@ -6,10 +6,7 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,13 +39,21 @@ public class AdminClubManagementController {
         return msg;
     }
 
-    @PostMapping("/findByCid")
-    @ApiOperation(value = "查找全部推拿会所",notes = "查找")
-    public Club findByCid(@RequestParam("cid") Integer cid){
+    @GetMapping("/findByCid")
+    @ApiOperation(value = "查找指定的推拿会所",notes = "查找")
+    public Msg findByCid(@RequestParam("cid") Integer cid){
+        System.out.println("cid:"+cid);
+        Msg msg = new Msg();
         Club club = service.selectByCid(cid);
         if(club == null){
-            return null;
+            msg.setMsg("没有找到");
+            msg.setCode(404);
+            return msg;
         }
-        return club;
+        System.out.println("club2:"+club);
+        msg.setCode(100);
+        msg.setMsg("成功");
+        msg.add("club",club);
+        return msg;
     }
 }

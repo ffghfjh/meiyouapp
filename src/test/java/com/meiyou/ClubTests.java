@@ -123,6 +123,12 @@ public class ClubTests extends BaseServiceImpl {
     }
 
     @Test
+    public void findss(){
+        Shop shop = shopMapper.selectByPrimaryKey(99);
+        System.out.println(shop);
+    }
+
+    @Test
     public void udate(){
         ClubBuy clubBuy = new ClubBuy();
         //clubBuy.setId(2);

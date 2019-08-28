@@ -1,5 +1,7 @@
 package com.meiyou.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -98,6 +100,7 @@ public class Appointment implements Serializable {
      *
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
@@ -106,6 +109,7 @@ public class Appointment implements Serializable {
      *
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     /**

@@ -1,6 +1,7 @@
 package com.meiyou.service;
 
 import com.meiyou.pojo.Appointment;
+import com.meiyou.pojo.Tour;
 
 import java.util.List;
 
@@ -17,4 +18,22 @@ public interface AppointmentManagementService {
      * @return
      */
     List<Appointment> selectAllAppointment();
+
+    /**
+     * 分页查询所有约会
+     * @return
+     */
+    List<Appointment> selectAllAppointmentByPage(Integer pageNo,Integer pageSize);
+
+
+    /**
+     * 查询所有的旅游
+     */
+    List<Tour> selectAllTour();
+
+    /**
+     * 分页查询所有旅游
+     * @return
+     */
+    List<Tour> selectAllTourByPage(Integer pageNo,Integer pageSize);
 }

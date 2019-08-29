@@ -2,7 +2,10 @@ package com.meiyou.controller;
 
 import com.meiyou.service.AdminService;
 import com.meiyou.service.RootMessageService;
+import com.meiyou.service.UserService;
+import com.meiyou.utils.LayuiDataUtil;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @program: meiyou
@@ -26,6 +30,8 @@ public class AdminController {
     AdminService adminService;
     @Autowired
     RootMessageService rootMessageService;
+    @Autowired
+    UserService userService;
 
     @RequestMapping(value = "adminLogin", method = RequestMethod.POST)
     @ApiOperation("后台登录")
@@ -200,11 +206,14 @@ public class AdminController {
 
     }
 
-    @RequestMapping(value="getUserInfo",method = RequestMethod.POST)
-    @ApiOperation("用户数据")
-    public Msg getUserInfo(){
-        Msg msg;
-        return Msg.success();
+    @RequestMapping(value="getUserInfo",method = RequestMethod.GET)
+    @ApiOperation("分页用户数据")
+    public Map<String,Object> getUserInfo(int page,int limit){
+        Page<Map<String,Object>> pages = new Page<Map<String, Object>>();
+        int count = userService.selAllUser().size();
+        pages.setCount(count);
+        pages.setList(userService.selUserInfoByPage(page,limit));
+        return LayuiDataUtil.getLayuiData(pages);
     }
 
 

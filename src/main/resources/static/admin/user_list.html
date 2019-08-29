@@ -41,22 +41,7 @@
       <xblock>
         <span class="x-right" style="line-height:40px" id="totality"></span>
       </xblock>
-      <table class="layui-table x-admin">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>手机号码</th>
-            <th>用户名</th>
-            <th>性别</th>
-            <th>年龄</th>
-            <th>昵称</th>
-            <th>创建时间</th>
-            <th>美金</th>
-             </tr>
-        </thead>
-        <tbody id="td">
-         
-        </tbody>
+      <table class="layui-table x-admin" id="users">
       </table>
       <div class="page">
         
@@ -69,20 +54,21 @@
 
         //第一个实例
         table.render({
-          elem: '#demo'
-          ,height: 312
-          ,url: '/demo/table/user/' //数据接口
+          elem: '#users'
+          ,height: 500
+          ,width:2000
+          ,url: 'getUserInfo' //数据接口
           ,page: true //开启分页
           ,cols: [[ //表头
             {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
-            ,{field: 'username', title: '用户名', width:80}
-            ,{field: 'sex', title: '性别', width:80, sort: true}
-            ,{field: 'city', title: '城市', width:80}
-            ,{field: 'sign', title: '签名', width: 177}
-            ,{field: 'experience', title: '积分', width: 80, sort: true}
-            ,{field: 'score', title: '评分', width: 80, sort: true}
-            ,{field: 'classify', title: '职业', width: 80}
-            ,{field: 'wealth', title: '财富', width: 135, sort: true}
+            ,{field: 'phone', title: '手机号', width:80}
+            ,{field: 'account', title: '账号', width:200, sort: true}
+            ,{field: 'sex', title: '性别', width: 80}
+            ,{field: 'nickName', title: '昵称', width: 200, sort: true}
+            ,{field: 'createTime', title: '创建时间', width: 200, sort: true}
+            ,{field: 'money', title: '美金', width: 80}
+            ,{field: 'close', title: '是否被封', width: 135, sort: true}
+            ,{field: 'verified', title: '是否激活', width: 135, sort: true}
           ]]
         });
 

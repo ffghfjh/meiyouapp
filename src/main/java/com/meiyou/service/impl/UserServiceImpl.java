@@ -981,13 +981,49 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String,String> selUserInfoByPage(int page, int number) {
+    public List<Map<String,Object>> selUserInfoByPage(int page, int number) {
+        List<Map<String,Object>> list = new ArrayList<>();
         UserExample example = new UserExample();
-        UserExample.Criteria criteria = example.createCriteria();
-        example.setPage(page);
-        example.setNumber(number);
+        example.setPageNo(page);
+        example.setPageSize(number);
+
         List<User> users = userMapper.selectByExample(example);
-        return null;
+        for(User user : users){
+            Map<String,Object> map = new HashMap<>();
+            AuthorizationExample example1 = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andUserIdEqualTo(user.getId());
+            criteria1.andIdentityTypeEqualTo(1);
+            List<Authorization> authorizations = authMapper.selectByExample(example1);
+            if(authorizations==null||authorizations.size()==0){
+                map.put("verified",false);
+                map.put("phone","未绑定");
+            }else{
+                map.put("verified",true);
+                Authorization authorization = authorizations.get(0);
+                map.put("phone",authorization.getIdentifier());
+            }
+            map.put("id",user.getId());
+            map.put("account",user.getAccount());
+            if(user.getSex()){
+                map.put("sex","女");
+            }
+            else {
+                map.put("sex","男");
+            }
+            map.put("age",user.getBirthday());
+            map.put("nickName",user.getNickname());
+            map.put("createTime",user.getCreateTime());
+            map.put("money",user.getMoney());
+            map.put("close",user.getBoolClose());
+            list.add(map);
+        }
+       return list;
+    }
+
+    @Override
+    public List<User> selAllUser() {
+       return userMapper.selectByExample(null);
     }
 
 

@@ -8,24 +8,23 @@ public class UserExample {
 
 
 
-    int page;
-    int number;
+    private Integer pageNo;
+    private Integer pageSize;
 
-
-    public int getNumber() {
-        return number;
+    public Integer getPageNo() {
+        return pageNo;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setPageNo(Integer pageNo) {
+        this.pageNo = pageNo;
     }
 
-    public int getPage() {
-        return page;
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 
     /**

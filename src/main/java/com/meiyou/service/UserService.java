@@ -5,6 +5,7 @@ import com.meiyou.utils.Msg;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 public interface UserService {
@@ -159,5 +160,11 @@ public interface UserService {
      * @param number
      * @return
      */
-    public Map<String,String> selUserInfoByPage(int page, int number);
+    public List<Map<String,Object>> selUserInfoByPage(int page, int number);
+
+    /**
+     * 查询所有用户数据
+     * @return
+     */
+    public List<User> selAllUser();
 }

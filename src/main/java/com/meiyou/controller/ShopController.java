@@ -73,7 +73,7 @@ public class ShopController {
         return shopBuyService.addShopStar(uid,token,sid,star);
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     @ApiOperation(value = "取消发布聘请同城导游",notes = "取消即更发布状态，实际数据不删除")
     public Msg updateShop(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,

@@ -84,7 +84,7 @@ public class ClubController {
     }
 
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     @ApiOperation(value = "取消发布推拿会所",notes = "取消即更发布状态，实际数据不删除")
     public Msg deleteClub(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,

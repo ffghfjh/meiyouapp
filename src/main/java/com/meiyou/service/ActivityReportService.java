@@ -18,6 +18,6 @@ public interface ActivityReportService {
      * @param type 举报类型
      * @return
      */
-    Msg report(int aid, int uid, int type);
+    Msg report(int aid, int uid, String type);
 
 }

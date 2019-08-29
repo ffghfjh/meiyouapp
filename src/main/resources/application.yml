@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-bp1msl568beq541b6ro.mysql.rds.aliyuncs.com:3306/meiyouapp?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://rm-bp1msl568beq541b6ro.mysql.rds.aliyuncs.com:3306/meiyouapp?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     username: root
     password: SHIlin24664266
     type: com.alibaba.druid.pool.DruidDataSource

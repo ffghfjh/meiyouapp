@@ -222,7 +222,7 @@ public class BaseServiceImpl {
         List<ClubStar> clubStars = clubStarMapper.selectByExample(clubStarExample);
 
         //没有人评论，默认为5星
-        if(clubStars.size() == 0 && clubStars ==null){
+        if(clubStars.isEmpty()){
             return 5;
         }
 
@@ -253,7 +253,7 @@ public class BaseServiceImpl {
         List<ShopStar> shopStars = shopStarMapper.selectByExample(example);
 
         //没有人评论，默认为5星
-        if(shopStars.size() == 0 && shopStars ==null){
+        if(shopStars.isEmpty()){
             return 5;
         }
 
@@ -270,5 +270,31 @@ public class BaseServiceImpl {
         }
         starNums = starNums/size;
         return starNums;
+    }
+
+    /**
+     * 算出集合内元素的和
+     * @param list
+     * @return
+     */
+    public Integer listSum(List<Integer> list){
+        Integer sum = 0;
+        if(list.isEmpty()){
+            return sum;
+        }
+        for(int i=0; i<list.size(); i++){
+            sum=sum+list.get(i);
+        }
+        return sum;
+    }
+
+
+    public Integer listsSum(List<List<Integer>> list){
+        Integer sum = 0;
+        if(list.isEmpty()){
+            return sum;
+        }
+
+        return sum;
     }
 }

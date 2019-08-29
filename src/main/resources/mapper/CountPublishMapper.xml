@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountPublishMapper">
+  <select id="nowPublishNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `shop` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `tour` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `appointment` where to_days(create_time) = to_days(now());
+  </select>
+
+  <select id="yesterdayPublishNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `shop` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `tour` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `appointment` where to_days(NOW()) - to_days(create_time) = 1;
+  </select>
+
+  <select id="nowWeekPublishNums" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM `club` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `shop` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `tour` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `appointment` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now());
+  </select>
+
+  <select id="nowMonthPublishNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `shop` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `tour` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `appointment` where Month(create_time)=Month(NOW());
+  </select>
+
+  <select id="lastMonthPublishNums" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM `club` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `shop` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `tour` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `appointment` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1;
+  </select>
+
+  <select id="nowYearPublishNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `shop` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `tour` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `appointment` where YEAR(create_time)=YEAR(NOW());
+  </select>
+
+  <select id="allPublishNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club`
+    UNION ALL
+    select COUNT(1) from `shop`
+    UNION ALL
+    select COUNT(1) from `tour`
+    UNION ALL
+    select COUNT(1) from `appointment`;
+  </select>
+
+</mapper>

@@ -33,11 +33,11 @@
 <div class="x-body-appointment">
     <div class="layui-row">
         <form class="layui-form layui-col-md12 x-so">
-            <input type="text" id="yUCount" placeholder="请输入用户ID"
+            <input type="text" id="publisherId" placeholder="请输入用户ID" name="publisherId"
                    autocomplete="off" class="layui-input">
-            <button class="layui-btn" id="select_btn">
+            <a class="layui-btn" data-type="reload" id="select_btn">
                 <i class="layui-icon">&#xe615;</i>
-            </button>
+            </a>
         </form>
     </div>
     <xblock1>
@@ -46,45 +46,36 @@
         <button class="layui-btn" id="success_audit">赴约成功</button>
         <span class="x-right" style="line-height:40px" id="totil"></span>
     </xblock1>
-    <table class="layui-table x-admin" id="appointmentTable" lay-filter="test"></table>
+    <table class="layui-table x-admin" lay-data="{id: 'appointmentTable'}" id="appointmentTable"></table>
 </div>
 
 <script type="text/html" id="incrementId">
     {{d.LAY_TABLE_INDEX+1}}
 </script>
 <script>
-    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function () {
-        var laydate = layui.laydate, //日期
-            laypage = layui.laypage, //分页
-            layer = layui.layer, //弹层
-            table = layui.table, //表格
-            carousel = layui.carousel, //轮播
-            upload = layui.upload, //上传
-            element = layui.element, //元素操作
-            slider = layui.slider //滑块
-
-
+    layui.use('table', function () {
+        var table = layui.table //表格
         //执行一个 table 实例
         table.render({
             elem: '#appointmentTable',
             limit: 10, //要传向后台的每页显示条数
             page: 1, //当前页数
-            url: 'http://localhost:8080/selectAllAppointmentByPage', //数据接口
-            //page: true, //开启分页
+            // 表格ID，必须设置，重载部分需要用到
+            url: 'http://localhost:8080/selectAllAppointmentByPublisherId', //数据接口
+
             page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
-                layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip' ]//自定义分页布局
-                ,limits:[10,20,30,40,50,60,70,80,90]
-                ,first: false //不显示首页
-                ,last: false //不显示尾页
-                ,prev: '上一页'
-                ,next: '下一页'
+                layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']//自定义分页布局
+                , limits: [10, 20, 30, 40, 50, 60, 70, 80, 90]
+                , first: false //不显示首页
+                , last: false //不显示尾页
+                , prev: '上一页'
+                , next: '下一页'
             },
             //toolbar: 'default', //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
             //totalRow: true, //开启合计行
-            method: 'post',
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
-                {type: 'numbers',title: '序号',templet: '#incrementId',fixed: 'left',width: 80},
+                {type: 'numbers', title: '序号', templet: '#incrementId', fixed: 'left', width: 80},
                 {field: 'id', title: '订单ID', width: 70, totalRowText: '合计：', align: 'center'},
                 {field: 'publisherId', width: 80, title: '发布人ID', align: 'center'},
                 {field: 'appointAddress', width: 100, title: '约会地点', align: 'center'},
@@ -95,57 +86,79 @@
                 {field: 'reward', width: 70, title: '悬赏金', align: 'center'},
                 {field: 'state', width: 60, title: '状态', align: 'center'},
                 {field: 'createTime', width: 145, title: '订单发布时间', align: 'center'},
-            ]]
+            ]],
+            page: true, //开启分页
+            id: 'appointmentTable'
+        });
+
+        // 执行搜索，表格重载
+        $('#select_btn').on('click', function () {
+            // 搜索条件
+            var userId = $("input[name='publisherId']").val();
+            table.reload('appointmentTable', {
+                where: {
+                    publisherId: userId
+                }
+            });
+        });
+
+        $('#not_audit').on('click', function () {
+            alert("已发布");
+            var table = layui.table; //表格
+            table.reload('appointmentTable', {
+                where: {
+                    state: 1
+                }
+            });
+        });
+
+        $('#not_audit').on('click', function () {
+            alert("已发布");
+            var table = layui.table; //表格
+            table.reload('appointmentTable', {
+                where: {
+                    state: 1
+                }
+            });
         });
 
 
-        //监听头工具栏事件
-        table.on('toolbar(test)', function (obj) {
-            var checkStatus = table.checkStatus(obj.config.id)
-                , data = checkStatus.data; //获取选中的数据
-            switch (obj.event) {
-                case 'add':
-                    layer.msg('添加');
-                    break;
-                case 'update':
-                    if (data.length === 0) {
-                        layer.msg('请选择一行');
-                    } else if (data.length > 1) {
-                        layer.msg('只能同时编辑一个');
-                    } else {
-                        layer.alert('编辑 [id]：' + checkStatus.data[0].id);
-                    }
-                    break;
-                case 'delete':
-                    if (data.length === 0) {
-                        layer.msg('请选择一行');
-                    } else {
-                        layer.msg('删除');
-                    }
-                    break;
-            }
-            ;
-        });
+    });
 
-        //监听行工具事件
-        table.on('tool(test)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
-            var data = obj.data //获得当前行数据
-                , layEvent = obj.event; //获得 lay-event 对应的值
-            if (layEvent === 'detail') {
-                layer.msg('查看操作');
-            } else if (layEvent === 'del') {
-                layer.confirm('真的删除行么', function (index) {
-                    obj.del(); //删除对应行（tr）的DOM结构
-                    layer.close(index);
-                    //向服务端发送删除指令
-                });
-            } else if (layEvent === 'edit') {
-                layer.msg('编辑操作');
-            }
-        });
-    }
 
-    );
+
+
+    /* //查询按钮事件
+     $('#select_btn').click(function() {
+         var publisherId = $('#yUCount').val();
+         alert("22222222")
+         $.ajax({
+             url: "http://localhost:8080/selectAllAppointmentByPublisherId",
+             type: 'POST',
+             data: {
+                 "publisherId":publisherId,
+                 "limit": 10, //要传向后台的每页显示条数
+                 "page": 1 //当前页数
+             },
+             success: function (data) {
+                 alert("1111111111")
+                 if (yUCount == null || yUCount == '') {
+                     layer.msg('查询失败,请检查查询条件', {
+                         icon : 2,
+                         time : 1000
+                         //2秒关闭（如果不配置，默认是3秒）
+                     });
+                     return false;
+                 }
+                 if (yUCount != null && yUCount != '') {
+                     var textName = "yUCount";
+                     var textValue = yUCount;
+                     get_all_user_info(1, textName, textValue);
+                     return false;
+                 }
+             }
+         });
+     });*/
     /*//查询所有用户
     function get_all_user_info(pn, textName, textValue) {
         var adminUser = localStorage.getItem("adminUser");
@@ -316,24 +329,7 @@
         $('.page').append(div);
     }
 
-    //查询按钮事件
-    $('#select_btn').click(function() {
-        var yUCount = $('#yUCount').val();
-        if (yUCount == null || yUCount == '') {
-            layer.msg('查询失败,请检查查询条件', {
-                icon : 2,
-                time : 1000
-            //2秒关闭（如果不配置，默认是3秒）
-            });
-            return false;
-        }
-        if (yUCount != null && yUCount != '') {
-            var textName = "yUCount";
-            var textValue = yUCount;
-            get_all_user_info(1, textName, textValue);
-            return false;
-        }
-    });
+
     $('#not_audit').click(function(){
         var str = $('#not_audit').html();
         var textName = "yState";

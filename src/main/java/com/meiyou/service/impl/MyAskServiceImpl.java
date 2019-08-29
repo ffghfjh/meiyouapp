@@ -1,14 +1,11 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
-import com.meiyou.model.ClubVO;
-import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,16 +49,18 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
      * @Date: 2019/8/26
      */
     @Override
-    public Msg selectMyAppointmentAsk(String uid, String token) {
+    public List<Object> selectMyAppointmentAsk(String uid, String token) {
         Msg msg = new Msg();
-        new Msg();
+        HashMap<String, Object> map = new HashMap<>();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            return Msg.noLogin();
+            ArrayList<Object> list = new ArrayList<>();
+            map.put("code",300);
+            map.put("msg","未登陆");
+            return list;
         }
         AppointAskExample appointAskExample = new AppointAskExample();
-        HashMap<String, Object> map = new HashMap<>();
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
         if (appointAsks != null && appointAsks.size() != 0) {
@@ -170,11 +169,15 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                         break;
                 }
             }
-            msg.setMsg("查询我的约会报名返回成功");
-            msg.setCode(100);
-            return msg.add("list", list);
+            map.put("msg","查询我的约会报名返回成功");
+            map.put("code",100);
+            list.add(map);
+            return list;
         }
-        return Msg.fail();
+        ArrayList<Object> list = new ArrayList<>();
+        map.put("msg","没有查询到数据");
+        map.put("code",200);
+        return list;
     }
 
     /**
@@ -183,16 +186,18 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     * @Date: 2019/8/26
     */
     @Override
-    public Msg selectMyTourAsk(String uid, String token) {
+    public List<Object> selectMyTourAsk(String uid, String token) {
         Msg msg = new Msg();
-        new Msg();
+        HashMap<String, Object> map = new HashMap<>();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            return Msg.noLogin();
+            ArrayList<Object> list = new ArrayList<>();
+            map.put("code",300);
+            map.put("msg","未登陆");
+            return list;
         }
         TourAskExample tourAskExample = new TourAskExample();
-        HashMap<String, Object> map = new HashMap<>();
         tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
         if (tourAsks != null && tourAsks.size() != 0) {
@@ -323,97 +328,85 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                         break;
                 }
             }
-            msg.setMsg("查询我的旅游报名返回成功");
-            msg.setCode(100);
-            return msg.add("list", list);
+            map.put("msg","查询我的旅游报名返回成功");
+            map.put("code",100);
+            list.add(map);
+            return list;
         }
-        return Msg.fail();
+        ArrayList<Object> list = new ArrayList<>();
+        map.put("msg","没有查询到数据");
+        map.put("code",200);
+        return list;
     }
 
-//    /**
-//     * 查找指定用户的会所购买记录
-//     * @param uid
-//     * @return
-//     */
-//    @Override
-//    @Cacheable(cacheNames = "buy")
-//    public Msg selectMyClubAsk(Integer uid,String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-//
-//        Msg msg = new Msg();
-//        //查找购买按摩会所的记录
-//        ClubBuyExample clubBuyExample = new ClubBuyExample();
-//        //购买者id为uid的购买记录
-//        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-//
-//        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-//
-//        if(result == null && result.size() ==0){
-//            msg.setCode(404);
-//            msg.setMsg("找不到指定的会所购买记录");
-//            return msg;
-//        }
-//
-//        //对查找出来的ClubBuy进行封装
-//        List<ClubVO> clubVOS = new ArrayList<>();
-//        for(ClubBuy c : result){
-//            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
-//
-//            ClubVO clubVO = setClubToClubVO(club);
-//            //设置购买者状态
-//            clubVO.setAskState(c.getState());
-//
-//            clubVOS.add(clubVO);
-//        }
-//
-//        //返回一个封装好的ClubVO类
-//        msg.add("clubVOS",clubVOS);
-//        msg.setMsg("成功");
-//        msg.setCode(100);
-//        return msg;
-//    }
-//
-//    /**
-//     * 查询用户聘请的全部导游记录
-//     * @param uid
-//     * @param token
-//     * @return
-//     */
-//    @Override
-//    public Msg selectMyShopAsk(Integer uid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-//
-//        //查找购买按摩会所的记录
-//        ShopBuyExample shopBuyExample = new ShopBuyExample();
-//        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-//        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
-//
-//        Msg msg = new Msg();
-//        if(result == null && result.size() ==0){
-//            msg.setCode(404);
-//            msg.setMsg("找不到用户的聘请记录");
-//        }
-//
-//        //对查找出来的ShopBuy进行封装
-//        List<ShopVO> shopVOS = new ArrayList<>();
-//        for(ShopBuy shopBuy : result){
-//            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
-//
-//            ShopVO shopVO = setShopToShopVO(shop);
-//            //设置购买者状态
-//            shopVO.setState(shopBuy.getState());
-//
-//            shopVOS.add(shopVO);
-//        }
-//
-//        //返回一个封装好的ShopVO类
-//        msg.add("shopVOS",shopVOS);
-//        msg.setMsg("成功");
-//        msg.setCode(100);
-//        return msg;
-//    }
+    /**
+     * 查找指定用户的会所购买记录
+     * @param uid
+     * @return
+     */
+    @Override
+    @Cacheable(cacheNames = "buy")
+    public List<ClubVO> selectMyClubAsk(Integer uid) {
+
+        Msg msg = new Msg();
+        //查找购买按摩会所的记录
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        //购买者id为uid的购买记录
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+
+        //对查找出来的ClubBuy进行封装
+        List<ClubVO> clubVOS = new ArrayList<>();
+        if(result.isEmpty()){
+            return clubVOS;
+        }
+
+        for(ClubBuy c : result){
+            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
+
+            ClubVO clubVO = setClubToClubVO(club);
+            //设置购买者状态
+            clubVO.setAskState(c.getState());
+
+            clubVOS.add(clubVO);
+        }
+
+        //返回一个封装好的ClubVO类
+        return clubVOS;
+    }
+
+    /**
+     * 查询用户聘请的全部导游记录
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<ShopVO> selectMyShopAsk(Integer uid) {
+
+        //查找购买按摩会所的记录
+        ShopBuyExample shopBuyExample = new ShopBuyExample();
+        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
+
+        //对查找出来的ShopBuy进行封装
+        List<ShopVO> shopVOS = new ArrayList<>();
+        if(result.isEmpty()){
+            return shopVOS;
+        }
+
+
+        for(ShopBuy shopBuy : result){
+            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
+
+            ShopVO shopVO = setShopToShopVO(shop);
+            //设置购买者状态
+            shopVO.setState(shopBuy.getState());
+
+            shopVOS.add(shopVO);
+        }
+
+        //返回一个封装好的ShopVO类
+        return shopVOS;
+    }
 }

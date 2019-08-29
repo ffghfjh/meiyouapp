@@ -1,7 +1,10 @@
 package com.meiyou.controller;
 
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: meiyou
@@ -30,11 +34,27 @@ public class MyAskController {
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名", httpMethod = "GET")
     @GetMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
+        if(!RedisUtil.authToken(uid,token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
-        List<Object> myAppointmentAsk = myAskService.selectMyAppointmentAsk(uid, token);
-        List<Object> myTourAsk = myAskService.selectMyTourAsk(uid, token);
-        msg.add("myAppointmentAsk",myAppointmentAsk);
-        msg.add("myTourAsk",myTourAsk);
+        myAskService.selectMyAppointmentAsk(uid, token);
+
+
+        List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));
+        if(clubVOS.isEmpty()){
+            msg.add("clubVOS",null);
+        }
+        msg.add("clubVOS",clubVOS);
+
+        List<ShopVO> shopVOS = myAskService.selectMyShopAsk(Integer.valueOf(uid));
+        if(clubVOS.isEmpty()){
+            msg.add("shopVOS",null);
+        }
+        msg.add("shopVOS",shopVOS);
+
+        msg.setCode(100);
+        msg.setMsg("成功");
         return msg;
     }
 }

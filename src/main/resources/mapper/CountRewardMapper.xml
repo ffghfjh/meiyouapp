@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountRewardMapper">
+  <select id="nowRewardNums" resultType="java.lang.Integer">
+    select reward from `tour` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select reward from `appointment` where to_days(create_time) = to_days(now());
+  </select>
+
+  <select id="yesterdayRewardNums" resultType="java.lang.Integer">
+    select reward from `tour` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select reward from `appointment` where to_days(NOW()) - to_days(create_time) = 1;
+  </select>
+
+  <select id="nowWeekRewardNums" resultType="java.lang.Integer">
+    SELECT reward FROM `tour` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT reward FROM `appointment` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now());
+  </select>
+
+  <select id="nowMonthRewardNums" resultType="java.lang.Integer">
+    select reward from `tour` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select reward from `appointment` where Month(create_time)=Month(NOW());
+  </select>
+
+  <select id="lastMonthRewardNums" resultType="java.lang.Integer">
+    SELECT reward FROM `tour` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT reward FROM `appointment` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1;
+  </select>
+
+  <select id="nowYearRewardNums" resultType="java.lang.Integer">
+    select reward from `tour` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select reward from `appointment` where YEAR(create_time)=YEAR(NOW());
+  </select>
+
+  <select id="allRewardNums" resultType="java.lang.Integer">
+    select reward from `tour`
+    UNION ALL
+    select reward from `appointment`;
+  </select>
+
+</mapper>

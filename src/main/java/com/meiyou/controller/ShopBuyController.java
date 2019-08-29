@@ -45,7 +45,7 @@ public class ShopBuyController {
         return shopBuyService.addShopStar(uid,token,cid,star);
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     @ApiOperation(value = "取消聘请的同城导游",notes = "取消即更发布状态，实际数据不删除")
     public Msg updateShop(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
@@ -53,7 +53,7 @@ public class ShopBuyController {
         return shopBuyService.updateShopBuy(uid, token, sid);
     }
 
-    @PutMapping("/updateComplete")
+    @PostMapping("/updateComplete")
     @ApiOperation(value = "更改购买景点商家的状态为已到店(已完成)",notes = "修改状态为已赴约(已完成)--->>1")
     public Msg updateShopBuyComplete(@RequestParam("uid") Integer uid,
                                      @RequestParam("token") String token,

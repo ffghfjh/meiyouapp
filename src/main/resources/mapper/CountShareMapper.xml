@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountShareMapper">
+  <select id="nowShareMoney" resultType="java.lang.Integer">
+    select share_money from `share` where to_days(create_time) = to_days(now());
+  </select>
+
+  <select id="yesterdayShareMoney" resultType="java.lang.Integer">
+    select share_money from `share` where to_days(NOW()) - to_days(create_time) = 1;
+  </select>
+
+  <select id="nowWeekShareMoney" resultType="java.lang.Integer">
+    SELECT share_money FROM `share` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now());
+  </select>
+
+  <select id="nowMonthShareMoney" resultType="java.lang.Integer">
+    select share_money from `share` where Month(create_time)=Month(NOW());
+  </select>
+
+  <select id="lastMonthShareMoney" resultType="java.lang.Integer">
+    SELECT share_money FROM `share` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1;
+  </select>
+
+  <select id="nowYearShareMoney" resultType="java.lang.Integer">
+    select share_money from `share` where YEAR(create_time)=YEAR(NOW());
+  </select>
+
+  <select id="allShareMoney" resultType="java.lang.Integer">
+    select share_money from `share`;
+  </select>
+
+</mapper>

@@ -1014,7 +1014,7 @@ public class UserServiceImpl implements UserService {
             }
             map.put("age",user.getBirthday());
             map.put("nickName",user.getNickname());
-            map.put("createTime",user.getCreateTime());
+            map.put("createTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getCreateTime()));
             map.put("money",user.getMoney());
             map.put("close",user.getBoolClose());
             list.add(map);

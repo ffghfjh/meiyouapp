@@ -8,11 +8,8 @@ import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.pojo.ClubBuyExample;
 import com.meiyou.pojo.Shop;
-import com.meiyou.service.CountPublishService;
-import com.meiyou.service.CountShareService;
+import com.meiyou.service.*;
 //import com.meiyou.service.MyAskService;
-import com.meiyou.service.MyAskService;
-import com.meiyou.service.ShopService;
 import com.meiyou.service.impl.BaseServiceImpl;
 import com.meiyou.utils.Msg;
 import org.junit.Test;
@@ -177,6 +174,15 @@ public class ClubTests extends BaseServiceImpl {
         System.out.println(integer+","+integer1);
     }
 
+    @Autowired
+    CountRewardService rewardService;
+
+    @Test
+    public void rewardSum(){
+        Integer integer = rewardService.nowRewardNums();
+        System.out.println(integer);
+    }
+
     @Test
     public void count(){
         List<Integer> integers = shareMapper.allShareMoney();
@@ -206,12 +212,24 @@ public class ClubTests extends BaseServiceImpl {
 
     @Test
     public void re(){
-        List<List<Integer>> lists2 = rewardMapper.lastMonthRewardNums();
-        List<List<Integer>> lists3 = rewardMapper.nowYearRewardNums();
-        List<List<Integer>> lists4 = rewardMapper.allRewardNums();
-        System.out.println(lists2.get(0));
-        System.out.println(lists3.get(0)+","+lists3.size());
-        System.out.println(lists4+","+lists4.size());
+//        List<List<Integer>> lists2 = rewardMapper.lastMonthRewardNums();
+//        List<List<Integer>> lists3 = rewardMapper.nowYearRewardNums();
+//        List<List<Integer>> lists4 = rewardMapper.allRewardNums();
+//        System.out.println(lists2.get(0));
+//        System.out.println(lists3.get(0)+","+lists3.size());
+        List<Integer> list = rewardMapper.nowRewardNums();
+        System.out.println(list);
+        List<Integer> list1 = rewardMapper.yesterdayRewardNums();
+        System.out.println(list1);
+        List<Integer> list2 = rewardMapper.nowWeekRewardNums();
+        System.out.println(list2);
+
+        Integer integer = rewardService.nowRewardNums();
+        System.out.println(integer);
+        Integer integer1 = rewardService.yesterdayRewardNums();
+        System.out.println(integer1);
+        Integer integer2 = rewardService.nowWeekRewardhNums();
+        System.out.println(integer2);
     }
 
     @Test

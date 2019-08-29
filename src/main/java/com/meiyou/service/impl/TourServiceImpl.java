@@ -733,10 +733,6 @@ public class TourServiceImpl implements TourService {
         msg.setCode(100);
         msg.setMsg("获取附近热门旅游成功");
         return msg.add("list",list);
-
-       /* Msg fail = Msg.fail();
-        msg.add("fail",fail);
-        return msg;*/
     }
 
 }

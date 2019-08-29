@@ -225,7 +225,7 @@ public class ActivityServiceImpl implements ActivityService {
         //范围半径
         String range = rootMessageService.getMessageByName("range");
         double radius = Double.parseDouble(range);
-        //从Redis获取附近的所有用户的动态
+        //从Redis获取附近的所有用户的动态id
         Coordinate coordinate = new Coordinate();
         coordinate.setKey(Integer.toString(uid));
         coordinate.setLongitude(longitude);
@@ -307,9 +307,7 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("aid", activity.getId());
             list.add(hashMap);
         }
-        for (HashMap<String, Object> hashMap : list) {
-
-        }
+        //对动态id从最新到最晚排序（按id递减排序）
         Collections.sort(list, new MyComparator());
         Msg msg = new Msg();
         msg.setCode(100);

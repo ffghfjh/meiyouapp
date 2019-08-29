@@ -1,5 +1,6 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -7,11 +8,13 @@ import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
+import com.meiyou.config.QueueConfig;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AliPayInfo;
+import com.meiyou.model.ExpirationMessagePostProcessor;
 import com.meiyou.model.WXUserInfo;
 import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
@@ -27,8 +30,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,11 +41,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Service
 @CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
@@ -62,6 +63,9 @@ public class UserServiceImpl implements UserService {
     ShareMapper shareMapper;
     @Autowired
     RedPacketMapper redPacketMapper;
+    @Autowired
+    AmqpTemplate rabbitTemplate;
+
 
 
     // 支付宝调用接口之前的初始化
@@ -133,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
 
                         User user = new User();
-                        String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                        String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                         user.setAccount(userAccount);
                         user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                         user.setBindAlipay(false);//未绑定支付宝
@@ -255,7 +259,7 @@ public class UserServiceImpl implements UserService {
             }else{
 
                 User user = new User();
-                String account = UUID.randomUUID().toString();//用户账号
+                String account = RandomUtil.randomNumbers(10);//用户账号
                 String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
                 user.setShareCode(shareCode);//邀请码
                 user.setAccount(account);
@@ -384,7 +388,7 @@ public class UserServiceImpl implements UserService {
 
                 WXUserInfo info = getWxUserInfo(access_token,openid);
                 User user = new User();
-                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -585,6 +589,10 @@ public class UserServiceImpl implements UserService {
             redPacket.setCreateTime(date);
             redPacket.setUpdateTime(date);
             if(redPacketMapper.insertSelective(redPacket)==1) {
+                long expiration = 86400000;//消息24小时后过期
+                System.out.println("发送红包，添加到延迟队列");
+                rabbitTemplate.convertAndSend(QueueConfig.DELAY_QUEUE_PER_MESSAGE_TTL_NAME,
+                        (Object) (String.valueOf(redPacket.getId())), new ExpirationMessagePostProcessor(expiration));
                 msg = Msg.success();
                 msg.add("hId",redPacket.getId());
                 return msg;
@@ -856,7 +864,7 @@ public class UserServiceImpl implements UserService {
 
 
                 User user = new User();
-                String userAccount = UUID.randomUUID().toString();//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -904,6 +912,128 @@ public class UserServiceImpl implements UserService {
         }
 
         return null;
+    }
+
+    @Override
+    public Msg getUserInfo(int uId, String token) {
+        Msg msg;
+        if(RedisUtil.authToken(String.valueOf(uId),token)){
+            User user = userMapper.selectByPrimaryKey(uId);
+            msg = Msg.success();
+            msg.add("bgImg",user.getBgPicture());
+            msg.add("money",user.getMoney());
+            msg.add("nickName",user.getNickname());
+            msg.add("header",user.getHeader());
+            msg.add("account",user.getAccount());
+            msg.add("uId",user.getId());
+            msg.add("signature",user.getSignature());
+            msg.add("sex",user.getSex());
+            msg.add("age",user.getBirthday());
+            return msg;
+        }else {
+            System.out.println("鉴权失败");
+            return Msg.noLogin();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void redPackageOverdue(int hid) {
+        RedPacket redPacket = redPacketMapper.selectByPrimaryKey(hid);
+        if(redPacket!=null){
+            redPacket.setState(2);//2为过期
+            int sender_id  = redPacket.getSenderId();
+            redPacketMapper.updateByPrimaryKey(redPacket);
+            addMoney(sender_id,redPacket.getMoney());
+        }
+    }
+
+    @Override
+    public Msg getOtherMsg(String account) {
+        Msg msg;
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andAccountEqualTo(account);
+        List<User> users = userMapper.selectByExample(example);
+        if(users.size()>0){
+            User user = users.get(0);
+            msg = Msg.success();
+            msg.add("uId",user.getId());
+            msg.add("nickName",user.getNickname());
+            msg.add("sex",user.getSex());
+            msg.add("old",user.getBirthday());
+            msg.add("account",user.getAccount());
+            msg.add("bgImg",user.getBgPicture());
+            msg.add("header",user.getHeader());
+            msg.add("signature",user.getSignature());
+            return msg;
+        }else {
+            msg = Msg.fail();
+            msg.setCode(1000);
+            msg.setMsg("没有相关用户");
+            return msg;
+        }
+
+    }
+
+    @Override
+    public List<Map<String,Object>> selUserInfoByPage(int page, int number) {
+        List<Map<String,Object>> list = new ArrayList<>();
+        UserExample example = new UserExample();
+        int offset = number*(page-1);
+        example.setPageNo(offset);
+        example.setPageSize(number);
+
+        List<User> users = userMapper.selectByExample(example);
+        for(User user : users){
+            Map<String,Object> map = new HashMap<>();
+            AuthorizationExample example1 = new AuthorizationExample();
+            AuthorizationExample.Criteria criteria1 = example1.createCriteria();
+            criteria1.andUserIdEqualTo(user.getId());
+            criteria1.andIdentityTypeEqualTo(1);
+            List<Authorization> authorizations = authMapper.selectByExample(example1);
+            if(authorizations==null||authorizations.size()==0){
+                map.put("verified",false);
+                map.put("phone","未绑定");
+            }else{
+                map.put("verified",true);
+                Authorization authorization = authorizations.get(0);
+                map.put("phone",authorization.getIdentifier());
+            }
+            map.put("id",user.getId());
+            map.put("account",user.getAccount());
+            if(user.getSex()){
+                map.put("sex","女");
+            }
+            else {
+                map.put("sex","男");
+            }
+            map.put("age",user.getBirthday());
+            map.put("nickName",user.getNickname());
+            map.put("createTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getCreateTime()));            map.put("money",user.getMoney());
+            map.put("close",user.getBoolClose());
+            list.add(map);
+        }
+       return list;
+    }
+
+    @Override
+    public List<User> selAllUser() {
+       return userMapper.selectByExample(null);
+    }
+
+    @Override
+    public User selUserInfoByAdmin(String account) {
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andAccountEqualTo(account);
+        List<User> users = userMapper.selectByExample(example);
+        if(users.size()>0){
+            User user = users.get(0);
+            return user;
+        }
+        return null;
+
     }
 
 

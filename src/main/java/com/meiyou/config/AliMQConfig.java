@@ -4,7 +4,6 @@ import com.meiyou.model.MqttComsumer;
 import com.meiyou.model.MqttPruducter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @program: meiyou

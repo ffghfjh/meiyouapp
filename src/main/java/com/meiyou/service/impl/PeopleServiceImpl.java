@@ -41,6 +41,7 @@ public class PeopleServiceImpl implements PeopleService {
                     map.put("qianming",user.getSignature());
                     map.put("img",user.getHeader());
                     map.put("uname",user.getNickname());
+                    map.put("bgImg",user.getBgPicture());
                     if(response.getDistance()<0.05){
                         map.put("distance",0.1);
                     }else{

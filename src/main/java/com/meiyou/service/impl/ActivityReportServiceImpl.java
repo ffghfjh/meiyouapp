@@ -1,6 +1,5 @@
 package com.meiyou.service.impl;
 
-import com.meiyou.mapper.ActivityReadMapper;
 import com.meiyou.mapper.ActivityReportMapper;
 import com.meiyou.pojo.ActivityReport;
 import com.meiyou.service.ActivityReportService;
@@ -25,14 +24,13 @@ public class ActivityReportServiceImpl implements ActivityReportService {
 
     /**
      * 动态举报
-     *
      * @param aid  动态id
      * @param uid  举报人id
      * @param type 举报类型
      * @return
      */
     @Override
-    public Msg report(int aid, int uid, int type) {
+    public Msg report(int aid, int uid, String type) {
 
         ActivityReport activityReport = new ActivityReport();
         activityReport.setActivityId(aid);

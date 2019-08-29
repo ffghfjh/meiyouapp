@@ -60,7 +60,7 @@
             <th>操作</th></tr>
         </thead>
         <tbody id="td">
-          
+          ``
         </tbody>
       </table>
       <div class="page">
@@ -124,9 +124,7 @@
       }
 
       function delAll (argument) {
-
         var data = tableCheck.getData();
-  
         layer.confirm('确认要删除吗？'+data,function(index){
             //捉到所有被选中的，发异步进行删除
             layer.msg('删除成功', {icon: 1});
@@ -145,9 +143,9 @@
     	  var adminUser = localStorage.getItem("adminUser");
     	  adminUser = JSON.parse(adminUser);
     	  if(adminUser ==null){
-    		  parent.location.href='login.html';
-    		  return false;
-    	  }
+          parent.location.href='login.html';
+          return false;
+        }
     	  $.ajax({
     		  url:'/meiyou/jubao/selectAllJuBao',
     		  type:'post',
@@ -182,7 +180,7 @@
     	  $('#td').empty();
     	  //数据信息展示 
     	  var list = data.extend.pageInfo.list;
-    	  $.each(list,function(i,item){
+    	  $.each(list, function(i,item){
     		  var tr = $('<tr></tr>');
     		  /* var td = $('<td></td>');
     		  var div = $('<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="'+item.z_id+'"></div>');
@@ -266,7 +264,7 @@
         		  get_all_user_info(data.extend.pageInfo.pages,zType,textName,textValue);
         		  return false;
         	  });
-    	  }else{
+    	  } else {
     		  xiayiye = $(' <a class="next">&gt;&gt;</a>');
         	  moye = $('<a class="num">末页</a>');
     	  }

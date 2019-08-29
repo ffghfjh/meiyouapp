@@ -25,7 +25,7 @@ public class ActivityReportController {
 
     @ApiOperation(value = "举报接口", notes = "aid为动态id，uid为举报人id，type为举报类型", httpMethod = "POST")
     @RequestMapping(value = "/report")
-    public Msg report(int aid, int uid, int type) {
+    public Msg report(int aid, int uid, String type) {
         return reportService.report(aid, uid, type);
     }
 

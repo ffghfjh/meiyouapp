@@ -397,8 +397,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if(result.isEmpty()){
             return shopVOS;
         }
-
-
         for(ShopBuy shopBuy : result){
             Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
 
@@ -408,7 +406,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             shopVOS.add(shopVO);
         }
-
         //返回一个封装好的ShopVO类
         return shopVOS;
     }

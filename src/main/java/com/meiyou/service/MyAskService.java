@@ -1,6 +1,10 @@
 package com.meiyou.service;
 
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.utils.Msg;
+
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -29,13 +33,12 @@ public interface MyAskService {
      * @param uid
      * @return
      */
-  //  Msg selectMyClubAsk(Integer uid, String token);
+    List<ClubVO> selectMyClubAsk(Integer uid);
 
     /**
      * 查询我的导游聘请
      * @param uid
-     * @param token
      * @return
      */
-   // Msg selectMyShopAsk(Integer uid, String token);
+    List<ShopVO> selectMyShopAsk(Integer uid);
 }

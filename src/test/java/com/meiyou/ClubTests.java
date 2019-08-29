@@ -1,14 +1,17 @@
 package com.meiyou;
 
-import com.meiyou.mapper.ClubBuyMapper;
-import com.meiyou.mapper.ClubMapper;
-import com.meiyou.mapper.ShopMapper;
+import com.meiyou.mapper.*;
+import com.meiyou.model.ClubVO;
 import com.meiyou.myEnum.StateEnum;
 import com.meiyou.myEnum.TimeTypeEnum;
 import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.pojo.ClubBuyExample;
 import com.meiyou.pojo.Shop;
+import com.meiyou.service.CountPublishService;
+import com.meiyou.service.CountShareService;
+//import com.meiyou.service.MyAskService;
+import com.meiyou.service.MyAskService;
 import com.meiyou.service.ShopService;
 import com.meiyou.service.impl.BaseServiceImpl;
 import com.meiyou.utils.Msg;
@@ -16,12 +19,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.DatabaseMetaData;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description:
@@ -126,6 +128,90 @@ public class ClubTests extends BaseServiceImpl {
     public void findss(){
         Shop shop = shopMapper.selectByPrimaryKey(99);
         System.out.println(shop);
+    }
+
+    @Autowired
+    CountUserMapper mapper;
+
+    @Autowired
+    CountShareMapper shareMapper;
+
+    @Autowired
+    CountShareService service;
+
+    @Autowired
+    CountPublishMapper publishMapper;
+
+    @Test
+    public void pub(){
+        List<Integer> integers = publishMapper.nowWeekPublishNums();
+        System.out.println(integers);
+    }
+
+    @Autowired
+    CountPublishService publishService;
+
+    @Test
+    public void pu(){
+        System.out.println(
+                publishService.nowPublishNums()
+                +","+
+                publishService.yesterdayPublishNums()
+                +","+
+                publishService.nowWeekPublishNums()
+                +","+
+                publishService.nowMonthPublishNums()
+                +","+
+                publishService.lastMonthPublishNums()
+                +","+
+                publishService.nowYearPublishNums()
+                +","+
+                publishService.allPublishNums()
+        );
+    }
+
+    @Test
+    public void shareSum(){
+        Integer integer = service.nowShareMoney();
+        Integer integer1 = service.nowWeekShareMoney();
+        System.out.println(integer+","+integer1);
+    }
+
+    @Test
+    public void count(){
+        List<Integer> integers = shareMapper.allShareMoney();
+        if(integers.isEmpty()){
+            System.out.println("没有就是0");
+        }
+        System.out.println(integers);
+    }
+
+    @Autowired
+    MyAskService myAskService;
+
+    @Test
+    public void ask(){
+        List<ClubVO> clubVOS = myAskService.selectMyClubAsk(100);
+        HashMap<String, Object> map = new HashMap<>();
+        if(clubVOS.isEmpty()){
+            map.put("clubVOS",null);
+            System.out.println(map);
+        }
+        map.put("clubVOS",clubVOS);
+        System.out.println(map);
+    }
+
+    @Autowired
+    CountRewardMapper rewardMapper;
+
+    @Test
+    public void re(){
+        List<List<Integer>> lists2 = rewardMapper.lastMonthRewardNums();
+        List<List<Integer>> lists3 = rewardMapper.nowYearRewardNums();
+        List<List<Integer>> lists4 = rewardMapper.allRewardNums();
+        System.out.println(lists2.get(0));
+        System.out.println(lists3.get(0)+","+lists3.size());
+        System.out.println(lists4+","+lists4.size());
     }
 
     @Test

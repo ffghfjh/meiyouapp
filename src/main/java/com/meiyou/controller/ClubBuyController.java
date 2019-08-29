@@ -35,7 +35,7 @@ public class ClubBuyController {
         return clubBuyService.addBuyClub(clubBuy,token,password);
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     @ApiOperation(value = "更改购买推拿会所的状态为取消购买",notes = "状态更改")
     public Msg updateClubBuy(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
@@ -43,7 +43,7 @@ public class ClubBuyController {
         return clubBuyService.updateBuyClub(uid, cid, token);
     }
 
-    @PutMapping("/updateComplete")
+    @PostMapping("/updateComplete")
     @ApiOperation(value = "更改购买推拿会所的状态为已到店(已完成)",notes = "修改状态为已到店(已完成)--->>1")
     public Msg updateClubBuyComplete(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,

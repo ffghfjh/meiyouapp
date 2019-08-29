@@ -330,90 +330,74 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         return Msg.fail();
     }
 
-//    /**
-//     * 查找指定用户的会所购买记录
-//     * @param uid
-//     * @return
-//     */
-//    @Override
-//    @Cacheable(cacheNames = "buy")
-//    public Msg selectMyClubAsk(Integer uid,String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-//
-//        Msg msg = new Msg();
-//        //查找购买按摩会所的记录
-//        ClubBuyExample clubBuyExample = new ClubBuyExample();
-//        //购买者id为uid的购买记录
-//        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-//
-//        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-//
-//        if(result == null && result.size() ==0){
-//            msg.setCode(404);
-//            msg.setMsg("找不到指定的会所购买记录");
-//            return msg;
-//        }
-//
-//        //对查找出来的ClubBuy进行封装
-//        List<ClubVO> clubVOS = new ArrayList<>();
-//        for(ClubBuy c : result){
-//            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
-//
-//            ClubVO clubVO = setClubToClubVO(club);
-//            //设置购买者状态
-//            clubVO.setAskState(c.getState());
-//
-//            clubVOS.add(clubVO);
-//        }
-//
-//        //返回一个封装好的ClubVO类
-//        msg.add("clubVOS",clubVOS);
-//        msg.setMsg("成功");
-//        msg.setCode(100);
-//        return msg;
-//    }
-//
-//    /**
-//     * 查询用户聘请的全部导游记录
-//     * @param uid
-//     * @param token
-//     * @return
-//     */
-//    @Override
-//    public Msg selectMyShopAsk(Integer uid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
-//
-//        //查找购买按摩会所的记录
-//        ShopBuyExample shopBuyExample = new ShopBuyExample();
-//        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
-//        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
-//
-//        Msg msg = new Msg();
-//        if(result == null && result.size() ==0){
-//            msg.setCode(404);
-//            msg.setMsg("找不到用户的聘请记录");
-//        }
-//
-//        //对查找出来的ShopBuy进行封装
-//        List<ShopVO> shopVOS = new ArrayList<>();
-//        for(ShopBuy shopBuy : result){
-//            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
-//
-//            ShopVO shopVO = setShopToShopVO(shop);
-//            //设置购买者状态
-//            shopVO.setState(shopBuy.getState());
-//
-//            shopVOS.add(shopVO);
-//        }
-//
-//        //返回一个封装好的ShopVO类
-//        msg.add("shopVOS",shopVOS);
-//        msg.setMsg("成功");
-//        msg.setCode(100);
-//        return msg;
-//    }
+    /**
+     * 查找指定用户的会所购买记录
+     * @param uid
+     * @return
+     */
+    @Override
+    @Cacheable(cacheNames = "buy")
+    public List<ClubVO> selectMyClubAsk(Integer uid) {
+
+        Msg msg = new Msg();
+        //查找购买按摩会所的记录
+        ClubBuyExample clubBuyExample = new ClubBuyExample();
+        //购买者id为uid的购买记录
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+
+        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+
+        //对查找出来的ClubBuy进行封装
+        List<ClubVO> clubVOS = new ArrayList<>();
+        if(result.isEmpty()){
+            return clubVOS;
+        }
+
+        for(ClubBuy c : result){
+            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
+
+            ClubVO clubVO = setClubToClubVO(club);
+            //设置购买者状态
+            clubVO.setAskState(c.getState());
+
+            clubVOS.add(clubVO);
+        }
+
+        //返回一个封装好的ClubVO类
+        return clubVOS;
+    }
+
+    /**
+     * 查询用户聘请的全部导游记录
+     * @param uid
+     * @return
+     */
+    @Override
+    public List<ShopVO> selectMyShopAsk(Integer uid) {
+
+        //查找购买按摩会所的记录
+        ShopBuyExample shopBuyExample = new ShopBuyExample();
+        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+        List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
+
+        //对查找出来的ShopBuy进行封装
+        List<ShopVO> shopVOS = new ArrayList<>();
+        if(result.isEmpty()){
+            return shopVOS;
+        }
+
+
+        for(ShopBuy shopBuy : result){
+            Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
+
+            ShopVO shopVO = setShopToShopVO(shop);
+            //设置购买者状态
+            shopVO.setState(shopBuy.getState());
+
+            shopVOS.add(shopVO);
+        }
+
+        //返回一个封装好的ShopVO类
+        return shopVOS;
+    }
 }

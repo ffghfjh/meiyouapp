@@ -8,7 +8,6 @@ import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
-import com.meiyou.config.AliMQConfig;
 import com.meiyou.config.QueueConfig;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
@@ -33,7 +32,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -43,11 +41,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Service
 @CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
@@ -1014,8 +1010,7 @@ public class UserServiceImpl implements UserService {
             }
             map.put("age",user.getBirthday());
             map.put("nickName",user.getNickname());
-            map.put("createTime",user.getCreateTime());
-            map.put("money",user.getMoney());
+            map.put("createTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getCreateTime()));            map.put("money",user.getMoney());
             map.put("close",user.getBoolClose());
             list.add(map);
         }

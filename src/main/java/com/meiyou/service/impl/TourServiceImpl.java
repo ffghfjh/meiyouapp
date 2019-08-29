@@ -205,11 +205,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         user.setMoney(balance);
 
-        UserExample userExample = new UserExample();
-        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
-        //更新报名者账户余额
-        userMapper.updateByExample(user, userExample);
-
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskerId(Integer.parseInt(uid));
         tourAsk.setAppointId(id);
@@ -222,10 +217,15 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
         if (tourAsks.size() >= 0){
-            msg.setCode(200);
+            msg.setCode(250);
             msg.setMsg("请勿重复报名");
             return msg;
         }
+
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
+        //更新报名者账户余额
+        userMapper.updateByExample(user, userExample);
 
         //旅游记录表中增加一条记录
         tourAskMapper.insertSelective(tourAsk);

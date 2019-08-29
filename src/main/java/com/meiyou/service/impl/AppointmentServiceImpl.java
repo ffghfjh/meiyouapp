@@ -207,7 +207,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1).andAppointIdEqualTo(id);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() >= 0){
+        if (appointAsks.size() > 0){
             msg.setCode(250);
             msg.setMsg("请勿重复报名");
             return msg;

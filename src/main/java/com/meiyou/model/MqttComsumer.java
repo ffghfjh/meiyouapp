@@ -181,7 +181,8 @@ public class MqttComsumer implements Serializable {
                              Date date = new Date();
                              videoChat.setGreateTime(date);
                              videoChat.setUpdateTime(date);
-                             if(videoChatMapper.insertSelective(videoChat)==1){  //写入通话记录成功
+                             int i = videoChatMapper.insertSelective(videoChat);
+                             if(i==1){  //写入通话记录成功
                                  //接受方token
                                  String token = aliyunVideoService.createToken(auth.getAppID(),mqttMessage.getSender(),auth.getChannelID(),auth.getChannelKey(),auth.getNonce(),auth.getTimestamp());
                                  AliRtcAuthInfo info = new AliRtcAuthInfo();
@@ -191,7 +192,7 @@ public class MqttComsumer implements Serializable {
                                  info.setNonce(auth.getNonce());
                                  info.setTimestamp(auth.getTimestamp());
                                  info.setUserId(mqttMessage.getSender());
-                                 info.setGslb(Constants.GSLB);
+                                 info.setmGslb(Constants.GSLB);
                                  //呼叫方
                                  String token1 = aliyunVideoService.createToken(auth.getAppID(),mqttMessage.getReceiver(),auth.getChannelID(),auth.getChannelKey(),auth.getNonce(),auth.getTimestamp());
                                  AliRtcAuthInfo info1 = new AliRtcAuthInfo();
@@ -201,7 +202,7 @@ public class MqttComsumer implements Serializable {
                                  info1.setNonce(auth.getNonce());
                                  info1.setTimestamp(auth.getTimestamp());
                                  info1.setUserId(mqttMessage.getSender());
-                                 info1.setGslb(Constants.GSLB);
+                                 info1.setmGslb(Constants.GSLB);
 
                                  //通知加入会话
                                  aliMQConfig.getProducter().sendMessage(MqttConstants.VIDEOCHAT,MqttConstants.JOIN,mqttMessage.getSender(),mqttMessage.getReceiver(),p2pClient+mqttMessage.getSender(),info);

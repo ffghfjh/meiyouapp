@@ -67,7 +67,11 @@ public class TourServiceImpl implements TourService {
         //获取发布金
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
-
+        if (password == null){
+            msg.setCode(1000);
+            msg.setMsg("请输入密码");
+            return msg;
+        }
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
             msg.setCode(1001);
@@ -179,7 +183,11 @@ public class TourServiceImpl implements TourService {
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-
+        if (password == null){
+            msg.setCode(1000);
+            msg.setMsg("请输入密码");
+            return msg;
+        }
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())) {
             msg.setCode(1001);

@@ -200,7 +200,15 @@ public class AdminController {
 
     }
 
-    
+    @RequestMapping(value="getUserInfo",method = RequestMethod.POST)
+    @ApiOperation("用户数据")
+    public Msg getUserInfo(){
+        Msg msg;
+        return Msg.success();
+    }
+
+
+
 
 
 }

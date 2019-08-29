@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountAskMapper">
+  <select id="nowAskNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club_buy` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `shop_buy` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `tour_ask` where to_days(create_time) = to_days(now())
+    UNION ALL
+    select COUNT(1) from `appoint_ask` where to_days(create_time) = to_days(now());
+  </select>
+
+  <select id="yesterdayAskNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club_buy` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `shop_buy` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `tour_ask` where to_days(NOW()) - to_days(create_time) = 1
+    UNION ALL
+    select COUNT(1) from `appoint_ask` where to_days(NOW()) - to_days(create_time) = 1;
+  </select>
+
+  <select id="nowWeekAskNums" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM `club_buy` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `shop_buy` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `tour_ask` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())
+    UNION ALL
+    SELECT COUNT(1) FROM `appoint_ask` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now());
+  </select>
+
+  <select id="nowMonthAskNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club_buy` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `shop_buy` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `tour_ask` where Month(create_time)=Month(NOW())
+    UNION ALL
+    select COUNT(1) from `appoint_ask` where Month(create_time)=Month(NOW());
+  </select>
+
+  <select id="lastMonthAskNums" resultType="java.lang.Integer">
+    SELECT COUNT(1) FROM `club_buy` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `shop_buy` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `tour_ask` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1
+    UNION ALL
+    SELECT COUNT(1) FROM `appoint_ask` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1;
+  </select>
+
+  <select id="nowYearAskNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club_buy` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `shop_buy` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `tour_ask` where YEAR(create_time)=YEAR(NOW())
+    UNION ALL
+    select COUNT(1) from `appoint_ask` where YEAR(create_time)=YEAR(NOW());
+  </select>
+
+  <select id="allAskNums" resultType="java.lang.Integer">
+    select COUNT(1) from `club_buy`
+    UNION ALL
+    select COUNT(1) from `shop_buy`
+    UNION ALL
+    select COUNT(1) from `tour_ask`
+    UNION ALL
+    select COUNT(1) from `appoint_ask`;
+  </select>
+
+</mapper>

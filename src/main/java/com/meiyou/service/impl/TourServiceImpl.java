@@ -205,6 +205,17 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         user.setMoney(balance);
 
+        //查询该报名者是否已经报名
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAskState0EqualTo(1)
+                .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        if (tourAsks.size() >= 0){
+            msg.setCode(250);
+            msg.setMsg("请勿重复报名");
+            return msg;
+        }
+
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
         //更新报名者账户余额
@@ -215,18 +226,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         tourAsk.setAppointId(id);
         tourAsk.setAskState0(1);
         tourAsk.setCreateTime(new Date());
-
-        //查询该报名者是否已经报名
-        TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAskState0EqualTo(1)
-                .andAppointIdEqualTo(id).andAskerIdEqualTo(Integer.parseInt(uid));
-        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
-        if (tourAsks.size() >= 0){
-            msg.setCode(200);
-            msg.setMsg("请勿重复报名");
-            return msg;
-        }
-
         //旅游记录表中增加一条记录
         tourAskMapper.insertSelective(tourAsk);
         //根据旅游订单表id查出该订单所有信息

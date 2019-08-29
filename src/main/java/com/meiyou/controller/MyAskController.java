@@ -8,11 +8,10 @@ import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: meiyou
@@ -32,7 +31,7 @@ public class MyAskController {
     * @Date: 2019/8/26
     */
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名", httpMethod = "GET")
-    @GetMapping(value = "/selectMyAppointmentAsk")
+    @PostMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
         if(!RedisUtil.authToken(uid,token)){
             return Msg.noLogin();

@@ -287,12 +287,14 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             User buyer = getUserByUid(shopBuy.getBuyerId());
 
             AskerVO askerVO = new AskerVO();
+
             askerVO.setId(buyer.getId());
             askerVO.setNickname(buyer.getNickname());
             askerVO.setHeader(buyer.getHeader());
             askerVO.setBirthday(buyer.getBirthday());
             askerVO.setSex(buyer.getSex());
             askerVO.setSignature(buyer.getSignature());
+
             askerVO.setAskState(shopBuy.getState());
 
             askerVOS.add(askerVO);

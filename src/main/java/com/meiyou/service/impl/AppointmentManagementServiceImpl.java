@@ -7,10 +7,14 @@ import com.meiyou.pojo.AppointmentExample;
 import com.meiyou.pojo.Tour;
 import com.meiyou.pojo.TourExample;
 import com.meiyou.service.AppointmentManagementService;
+import com.meiyou.utils.LayuiDataUtil;
+import com.meiyou.utils.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: meiyou
@@ -27,28 +31,65 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
     private TourMapper tourMapper;
 
     /**
-    * @Description: 查询所有约会
+    * @Description: 分页查询所有的约会，根据用户ID精准查询所有约会
     * @Author: JK
-    * @Date: 2019/8/28
+    * @Date: 2019/8/29
     */
     @Override
-    public List<Appointment> selectAllAppointment() {
-        return appointmentMapper.selectByExample(new AppointmentExample());
-    }
-
-    /**
-    * @Description: 分页查询所有约会
-    * @Author: JK
-    * @Date: 2019/8/27
-    */
-    @Override
-    public List<Appointment> selectAllAppointmentByPage(Integer pageNo,Integer pageSize) {
-        AppointmentExample appointmentExample = new AppointmentExample();
+    public Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId,Integer state) {
+        Page<Appointment> page = new Page<>();
         Integer offset = pageSize * (pageNo - 1);
+        AppointmentExample appointmentExample = new AppointmentExample();
+
+        if (publisherId != null){
+            appointmentExample.createCriteria().andPublisherIdEqualTo(publisherId);
+            List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
+            if (list.size() == 0){
+                Map<String, Object> map = new HashMap<>();
+                map.put("code",200);
+                map.put("msg","没有该用户");
+                return map;
+            }
+            appointmentExample.setPageNo(offset);
+            appointmentExample.setPageSize(pageSize);
+            List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
+            page.setCount(list.size());
+            page.setList(appointments);
+            return LayuiDataUtil.getLayuiData(page);
+        }
+
+        if (state != null){
+            appointmentExample.createCriteria().andStateEqualTo(state);
+            List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
+            if (list.size() == 0){
+                Map<String, Object> map = new HashMap<>();
+                map.put("code",200);
+                map.put("msg","没有该用户");
+                return map;
+            }
+            appointmentExample.setPageNo(offset);
+            appointmentExample.setPageSize(pageSize);
+            List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
+            page.setCount(list.size());
+            page.setList(appointments);
+            return LayuiDataUtil.getLayuiData(page);
+        }
+
+
+        List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
+        if (list.size() == 0){
+            Map<String, Object> map = new HashMap<>();
+            map.put("code",200);
+            map.put("msg","没有该用户");
+            return map;
+        }
+
         appointmentExample.setPageNo(offset);
         appointmentExample.setPageSize(pageSize);
         List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
-        return appointments;
+        page.setCount(list.size());
+        page.setList(appointments);
+        return LayuiDataUtil.getLayuiData(page);
     }
 
     /**

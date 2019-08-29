@@ -1,9 +1,9 @@
 package com.meiyou.service;
 
-import com.meiyou.pojo.Appointment;
 import com.meiyou.pojo.Tour;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: meiyou
@@ -14,16 +14,9 @@ import java.util.List;
 public interface AppointmentManagementService {
 
     /**
-     * 查询所有约会
-     * @return
+     * 分页查询所有的约会，根据用户ID精准查询所有约会
      */
-    List<Appointment> selectAllAppointment();
-
-    /**
-     * 分页查询所有约会
-     * @return
-     */
-    List<Appointment> selectAllAppointmentByPage(Integer pageNo,Integer pageSize);
+    Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId,Integer state);
 
 
     /**

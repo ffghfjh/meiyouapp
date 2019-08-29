@@ -1,14 +1,11 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
-import com.meiyou.model.ClubVO;
-import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,16 +49,18 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
      * @Date: 2019/8/26
      */
     @Override
-    public Msg selectMyAppointmentAsk(String uid, String token) {
+    public List<Object> selectMyAppointmentAsk(String uid, String token) {
         Msg msg = new Msg();
-        new Msg();
+        HashMap<String, Object> map = new HashMap<>();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            return Msg.noLogin();
+            ArrayList<Object> list = new ArrayList<>();
+            map.put("code",300);
+            map.put("msg","未登陆");
+            return list;
         }
         AppointAskExample appointAskExample = new AppointAskExample();
-        HashMap<String, Object> map = new HashMap<>();
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
         if (appointAsks != null && appointAsks.size() != 0) {
@@ -170,11 +169,15 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                         break;
                 }
             }
-            msg.setMsg("查询我的约会报名返回成功");
-            msg.setCode(100);
-            return msg.add("list", list);
+            map.put("msg","查询我的约会报名返回成功");
+            map.put("code",100);
+            list.add(map);
+            return list;
         }
-        return Msg.fail();
+        ArrayList<Object> list = new ArrayList<>();
+        map.put("msg","没有查询到数据");
+        map.put("code",200);
+        return list;
     }
 
     /**
@@ -183,16 +186,18 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     * @Date: 2019/8/26
     */
     @Override
-    public Msg selectMyTourAsk(String uid, String token) {
+    public List<Object> selectMyTourAsk(String uid, String token) {
         Msg msg = new Msg();
-        new Msg();
+        HashMap<String, Object> map = new HashMap<>();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
         if (!authToken) {
-            return Msg.noLogin();
+            ArrayList<Object> list = new ArrayList<>();
+            map.put("code",300);
+            map.put("msg","未登陆");
+            return list;
         }
         TourAskExample tourAskExample = new TourAskExample();
-        HashMap<String, Object> map = new HashMap<>();
         tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
         if (tourAsks != null && tourAsks.size() != 0) {
@@ -323,11 +328,15 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                         break;
                 }
             }
-            msg.setMsg("查询我的旅游报名返回成功");
-            msg.setCode(100);
-            return msg.add("list", list);
+            map.put("msg","查询我的旅游报名返回成功");
+            map.put("code",100);
+            list.add(map);
+            return list;
         }
-        return Msg.fail();
+        ArrayList<Object> list = new ArrayList<>();
+        map.put("msg","没有查询到数据");
+        map.put("code",200);
+        return list;
     }
 
     /**

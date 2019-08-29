@@ -143,7 +143,7 @@ public class TourServiceImpl implements TourService {
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id)
                         .andPublishIdEqualTo(tour.getPublishId());
-            tour.setState(5);
+            tour.setState(0);
             tour.setUpdateTime(new Date());
             i = tourMapper.updateByExample(tour, tourExample);
             if (i == 1) {

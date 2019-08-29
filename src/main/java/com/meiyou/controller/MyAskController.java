@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -30,8 +30,11 @@ public class MyAskController {
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名", httpMethod = "GET")
     @GetMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
-        Msg msg = myAskService.selectMyAppointmentAsk(uid, token);
-        Map<String, Object> map = msg.getExtend();
+        Msg msg = new Msg();
+        List<Object> myAppointmentAsk = myAskService.selectMyAppointmentAsk(uid, token);
+        List<Object> myTourAsk = myAskService.selectMyTourAsk(uid, token);
+        msg.add("myAppointmentAsk",myAppointmentAsk);
+        msg.add("myTourAsk",myTourAsk);
         return msg;
     }
 }

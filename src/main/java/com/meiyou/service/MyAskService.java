@@ -1,6 +1,6 @@
 package com.meiyou.service;
 
-import com.meiyou.utils.Msg;
+import java.util.List;
 
 /**
  * @program: meiyou
@@ -15,14 +15,14 @@ public interface MyAskService {
     * @Author: JK
     * @Date: 2019/8/26
     */
-    Msg selectMyAppointmentAsk(String uid, String token);
+    List<Object> selectMyAppointmentAsk(String uid, String token);
 
     /**
     * @Description: 查询我的旅游报名
     * @Author: JK
     * @Date: 2019/8/26
     */
-    Msg selectMyTourAsk(String uid, String token);
+    List<Object> selectMyTourAsk(String uid, String token);
 
     /**
      * 查询我的会所购买

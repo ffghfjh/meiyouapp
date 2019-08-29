@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @author: dengshilin
  * @create: 2019-08-24 08:54
  **/
-//@Configuration
+@Configuration
 public class AliMQConfig {
 
     @Value("${producerId}")

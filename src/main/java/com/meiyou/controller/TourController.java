@@ -25,6 +25,7 @@ public class TourController {
     @Autowired
     private TourService tourService;
 
+
     @ApiOperation(value = "发布旅游", notes = "发布旅游", httpMethod = "POST")
     @PostMapping(value = "/insertTour")
     public Msg insertTour(
@@ -174,6 +175,17 @@ public class TourController {
     public Msg selectHotTour(String uid, String token,double latitude, double longitude) {
         Msg msg = tourService.selectHotTour(uid, token, latitude, longitude);
         return msg;
+    }
+
+    /**
+    * @Description: 查询报名旅游的全部人员
+    * @Author: JK
+    * @Date: 2019/8/29
+    */
+    @ApiOperation(value = "查询报名旅游的全部人员", notes = "查询报名旅游的全部人员", httpMethod = "GET")
+    @GetMapping(value = "/selectAllTourById")
+    public Msg selectAllTourById(Integer uid, String token, Integer id) {
+        return tourService.selectAllTourById(uid, token,id);
     }
 
 }

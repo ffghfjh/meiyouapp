@@ -3,6 +3,7 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.TourAskMapper;
 import com.meiyou.mapper.TourMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AskerVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
@@ -28,7 +29,7 @@ import java.util.List;
  * @create: 2019-08-22 19:40
  **/
 @Service
-public class TourServiceImpl implements TourService {
+public class TourServiceImpl extends BaseServiceImpl implements TourService {
     @Autowired
     private UserMapper userMapper;
 
@@ -735,4 +736,61 @@ public class TourServiceImpl implements TourService {
         return msg.add("list",list);
     }
 
-}
+    /**
+    * @Description: 查询报名旅游的全部人员
+    * @Author: JK
+    * @Date: 2019/8/29
+    */
+    @Override
+    public Msg selectAllTourById(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
+
+            Msg msg = new Msg();
+            //判断访问者是否为发布者
+            Integer publishId = tourMapper.selectByPrimaryKey(id).getPublishId();
+            if (publishId != uid) {
+                msg.setCode(506);
+                msg.setMsg("没有访问权限");
+                return msg;
+            }
+
+            //查找购买按摩会所的记录
+        TourAskExample tourAskExample = new TourAskExample();
+        //购买者了id为cid的所有购买记录
+        tourAskExample.createCriteria().andIdEqualTo(id);
+
+        List<TourAsk> tours = tourAskMapper.selectByExample(tourAskExample);
+
+        if (tours == null && tours.size() == 0) {
+                msg.setCode(404);
+                msg.setMsg("找不到指定的导游聘请记录");
+                return msg;
+            }
+
+            //对查找出来的ClubBuy进行封装
+            List<AskerVO> askerVOS = new ArrayList<>();
+            for (TourAsk c : tours) {
+                User buyer = getUserByUid(c.getAskerId());
+
+                AskerVO askerVO = new AskerVO();
+                askerVO.setId(buyer.getId());
+                askerVO.setNickname(buyer.getNickname());
+                askerVO.setHeader(buyer.getHeader());
+                askerVO.setBirthday(buyer.getBirthday());
+                askerVO.setSex(buyer.getSex());
+                askerVO.setSignature(buyer.getSignature());
+                askerVO.setAskState(c.getAskState0());
+
+                askerVOS.add(askerVO);
+            }
+
+            //返回一个封装好的askerVO类
+            msg.add("askerVOS", askerVOS);
+            msg.setMsg("成功");
+            msg.setCode(100);
+            return msg;
+        }
+    }
+

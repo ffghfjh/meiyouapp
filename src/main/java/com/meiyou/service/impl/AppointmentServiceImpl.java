@@ -3,14 +3,15 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AskerVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.service.RootMessageService;
-import com.meiyou.utils.RootMessageUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import java.util.List;
  * @create: 2019-08-21 14:12
  **/
 @Service
-public class AppointmentServiceImpl implements AppointmentService {
+public class AppointmentServiceImpl extends BaseServiceImpl implements AppointmentService {
     @Autowired
     private AppointmentMapper appointmentMapper;
     @Autowired
@@ -737,4 +738,60 @@ public class AppointmentServiceImpl implements AppointmentService {
         return msg.add("list",list);
     }
 
+    /**
+    * @Description: 查询报名约会的全部人员
+    * @Author: JK
+    * @Date: 2019/8/29
+    */
+    @Override
+    public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
+
+        Msg msg = new Msg();
+        //判断访问者是否为发布者
+        Integer publishId = appointmentMapper.selectByPrimaryKey(id).getPublisherId();
+        if (publishId != uid) {
+            msg.setCode(506);
+            msg.setMsg("没有访问权限");
+            return msg;
+        }
+
+        //查找购买按摩会所的记录
+        AppointAskExample appointAskExample = new AppointAskExample();
+        //购买者了id为cid的所有购买记录
+        appointAskExample.createCriteria().andIdEqualTo(id);
+
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+
+        if (appointAsks == null && appointAsks.size() == 0) {
+            msg.setCode(404);
+            msg.setMsg("找不到指定的导游聘请记录");
+            return msg;
+        }
+
+        //对查找出来的ClubBuy进行封装
+        List<AskerVO> askerVOS = new ArrayList<>();
+        for (AppointAsk c : appointAsks) {
+            User buyer = getUserByUid(c.getAskerId());
+
+            AskerVO askerVO = new AskerVO();
+            askerVO.setId(buyer.getId());
+            askerVO.setNickname(buyer.getNickname());
+            askerVO.setHeader(buyer.getHeader());
+            askerVO.setBirthday(buyer.getBirthday());
+            askerVO.setSex(buyer.getSex());
+            askerVO.setSignature(buyer.getSignature());
+            askerVO.setAskState(c.getAskState());
+
+            askerVOS.add(askerVO);
+        }
+
+        //返回一个封装好的askerVO类
+        msg.add("askerVOS", askerVOS);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
 }

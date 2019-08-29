@@ -65,4 +65,9 @@ public interface AppointmentService {
      * 查看热门约会
      */
     Msg selectHotAppointment(String uid,String token,double latitude, double longitude);
+
+    /**
+     * 查询报名约会的全部人员
+     */
+    Msg selectAllAppointmentById(Integer uid,String token,Integer id);
 }

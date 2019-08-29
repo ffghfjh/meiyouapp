@@ -689,6 +689,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             //获取用户id
             Integer publisherId = tour.getPublishId();
             User user = userMapper.selectByPrimaryKey(publisherId);
+
             HashMap<String, Object> map = new HashMap<>();
 
             if (state == 1 || state == 2){

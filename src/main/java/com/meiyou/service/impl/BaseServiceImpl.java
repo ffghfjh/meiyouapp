@@ -288,13 +288,4 @@ public class BaseServiceImpl {
         return sum;
     }
 
-
-    public Integer listsSum(List<List<Integer>> list){
-        Integer sum = 0;
-        if(list.isEmpty()){
-            return sum;
-        }
-
-        return sum;
-    }
 }

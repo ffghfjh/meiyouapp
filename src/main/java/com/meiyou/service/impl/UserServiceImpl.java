@@ -8,7 +8,6 @@ import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
-import com.meiyou.config.AliMQConfig;
 import com.meiyou.config.QueueConfig;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
@@ -1014,7 +1013,7 @@ public class UserServiceImpl implements UserService {
             }
             map.put("age",user.getBirthday());
             map.put("nickName",user.getNickname());
-            map.put("createTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getCreateTime()));
+            map.put("createTime",user.getCreateTime());
             map.put("money",user.getMoney());
             map.put("close",user.getBoolClose());
             list.add(map);

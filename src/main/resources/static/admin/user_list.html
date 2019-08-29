@@ -45,11 +45,8 @@
       <xblock>
         <span class="x-right" style="line-height:40px" id="totality"></span>
       </xblock>
-      <table class="layui-table x-admin" id="users">
-      </table>
-      <div class="page">
-        
-      </div>
+
+      <table class="layui-table x-admin" id="users"></table>
     </div>
     <script>
 
@@ -59,22 +56,20 @@
         //第一个实例
         table.render({
           elem: '#users'
-          ,height: 500
-          ,width:2000
           ,url: 'getUserInfo' //数据接口
           ,page: true //开启分页
           ,cols: [[ //表头
             //{type: 'checkbox', fixed: 'left'},
-            {type: 'numbers', title: '序号', templet: '#incrementId', fixed: 'left', width: 80},
-            {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
-            ,{field: 'phone', title: '手机号', width:80}
-            ,{field: 'account', title: '账号', width:200, sort: true}
-            ,{field: 'sex', title: '性别', width: 80}
-            ,{field: 'nickName', title: '昵称', width: 200, sort: true}
-            ,{field: 'createTime', title: '创建时间', width: 200, sort: true}
-            ,{field: 'money', title: '美金', width: 80}
-            ,{field: 'close', title: '是否被封', width: 135, sort: true}
-            ,{field: 'verified', title: '是否激活', width: 135, sort: true}
+            {type: 'numbers', title: '序号', templet: '#incrementId', fixed: 'left', width: 50,fixed: 'left',align: 'center'},
+            {field: 'id', title: 'ID', width:50,align: 'center'}
+            ,{field: 'phone', title: '手机号', width:120,align: 'center'}
+            ,{field: 'account', title: '账号', width:255,align: 'center'}
+            ,{field: 'sex', title: '性别', width: 60,align: 'center'}
+            ,{field: 'nickName', title: '昵称', width: 80,align: 'center'}
+            ,{field: 'createTime', title: '创建时间', width: 145,align: 'center'}
+            ,{field: 'money', title: '美金', width: 80,align: 'center'}
+            ,{field: 'close', title: '是否被封', width: 80,align: 'center'}
+            ,{field: 'verified', title: '是否激活', width: 80,align: 'center'}
           ]]
         });
 

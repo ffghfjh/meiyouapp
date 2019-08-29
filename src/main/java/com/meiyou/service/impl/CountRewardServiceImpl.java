@@ -20,37 +20,43 @@ public class CountRewardServiceImpl extends BaseServiceImpl implements CountRewa
 
     @Override
     public Integer nowRewardNums() {
-        List<List<Integer>> lists = mapper.nowRewardNums();
-        return null;
+        List<Integer> list = mapper.nowRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer yesterdayRewardNums() {
-        return null;
+        List<Integer> list = mapper.yesterdayRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer nowWeekRewardhNums() {
-        return null;
+        List<Integer> list = mapper.nowWeekRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer nowMonthRewardNums() {
-        return null;
+        List<Integer> list = mapper.nowMonthRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer lastMonthRewardNums() {
-        return null;
+        List<Integer> list = mapper.lastMonthRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer nowYearRewardNums() {
-        return null;
+        List<Integer> list = mapper.nowYearRewardNums();
+        return listSum(list);
     }
 
     @Override
     public Integer allRewardNums() {
-        return null;
+        List<Integer> list = mapper.allRewardNums();
+        return listSum(list);
     }
 }

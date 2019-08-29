@@ -41,9 +41,9 @@
         </form>
     </div>
     <xblock1>
-        <button class="layui-btn" id="not_audit" onclick="state1()">已发布</button>
-        <button class="layui-btn" id="audit" onclick="state3">准备赴约</button>
-        <button class="layui-btn" id="success_audit" onclick="state5">赴约成功</button>
+        <button class="layui-btn" id="not_audit">已发布</button>
+        <button class="layui-btn" id="audit">准备赴约</button>
+        <button class="layui-btn" id="success_audit">赴约成功</button>
         <span class="x-right" style="line-height:40px" id="totil"></span>
     </xblock1>
     <table class="layui-table x-admin" lay-data="{id: 'appointmentTable'}" id="appointmentTable"></table>
@@ -101,18 +101,31 @@
                 }
             });
         });
+
+        $('#not_audit').on('click', function () {
+            alert("已发布");
+            var table = layui.table; //表格
+            table.reload('appointmentTable', {
+                where: {
+                    state: 1
+                }
+            });
+        });
+
+        $('#not_audit').on('click', function () {
+            alert("已发布");
+            var table = layui.table; //表格
+            table.reload('appointmentTable', {
+                where: {
+                    state: 1
+                }
+            });
+        });
+
+
     });
 
-    //已发布
-    function state1(){
-        alert("已发布")
-        var table = layui.table //表格
-        table.reload('testReload', {
-            where: {
-                state: 1,
-            }
-        });
-    }
+
 
 
     /* //查询按钮事件

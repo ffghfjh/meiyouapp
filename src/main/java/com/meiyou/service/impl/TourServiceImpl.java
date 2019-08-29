@@ -67,7 +67,11 @@ public class TourServiceImpl implements TourService {
         //获取发布金
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
-
+        if (password == null){
+            msg.setCode(1000);
+            msg.setMsg("请输入密码");
+            return msg;
+        }
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())){
             msg.setCode(1001);
@@ -179,7 +183,11 @@ public class TourServiceImpl implements TourService {
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-
+        if (password == null){
+            msg.setCode(1000);
+            msg.setMsg("请输入密码");
+            return msg;
+        }
         //判断用户输入密码是否正确
         if (!password.equals(user.getPayWord())) {
             msg.setCode(1001);
@@ -669,6 +677,7 @@ public class TourServiceImpl implements TourService {
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
         }
+        ArrayList<Object> list = new ArrayList<>();
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
@@ -681,7 +690,7 @@ public class TourServiceImpl implements TourService {
             Integer publisherId = tour.getPublishId();
             User user = userMapper.selectByPrimaryKey(publisherId);
             HashMap<String, Object> map = new HashMap<>();
-            ArrayList<Object> list = new ArrayList<>();
+
             if (state == 1 || state == 2){
                 String nickname = user.getNickname();
                 String header = user.getHeader();
@@ -720,12 +729,10 @@ public class TourServiceImpl implements TourService {
                 list.add(map);
 
             }
-            msg.setCode(100);
-            msg.setMsg("获取附近热门旅游成功");
-            return msg.add("list",list);
         }
-        Msg fail = Msg.fail();
-        msg.add("fail",fail);
-        return msg;
+        msg.setCode(100);
+        msg.setMsg("获取附近热门旅游成功");
+        return msg.add("list",list);
     }
+
 }

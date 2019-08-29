@@ -33,8 +33,8 @@ public class AppointmentManagementController {
     @ApiOperation(value = "根据用户ID查询所有约会", notes = "根据用户ID查询所有约会", httpMethod = "POST")
     @RequestMapping(value = "selectAllAppointmentByPublisherId")
     public Map<String,Object> selectAllAppointmentByPublisherId(Integer page, Integer limit,
-                                                                Integer publisherId){
-        return  appointmentManagementService.selectAllAppointmentByPublisherId(page, limit, publisherId);
+                                                                Integer publisherId,Integer state){
+        return  appointmentManagementService.selectAllAppointmentByPublisherId(page, limit, publisherId,state);
     }
 
 

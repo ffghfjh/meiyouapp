@@ -6,9 +6,7 @@ import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyPublishService;
 import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -84,6 +82,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             String header = user.getHeader();
             String birthday = user.getBirthday();
             String signature = user.getSignature();
+            Integer id = appointment.getId();
             String appointContext = appointment.getAppointContext();
             String appointTime = appointment.getAppointTime();
             String appointAddress = appointment.getAppointAddress();
@@ -93,6 +92,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             map.put("nickname",nickname);
             map.put("header",header);
             map.put("birthday",birthday);
+            map.put("id",id);
             map.put("appointContext",appointContext);
             map.put("appointTime",appointTime);
             map.put("appointAddress",appointAddress);
@@ -156,6 +156,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             String header = user.getHeader();
             String birthday = user.getBirthday();
             String signature = user.getSignature();
+            Integer id = tour.getId();
             String goMessage = tour.getGoMessage();
             String startAddress = tour.getStartAddress();
             String endAddress = tour.getEndAddress();
@@ -166,6 +167,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             map.put("nickname",nickname);
             map.put("header",header);
             map.put("birthday",birthday);
+            map.put("id",id);
             map.put("goMessage",goMessage);
             map.put("startAddress",startAddress);
             map.put("endAddress",endAddress);

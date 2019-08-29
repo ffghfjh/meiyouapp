@@ -43,14 +43,16 @@ public class MyPublishController {
         List<ClubVO> clubList = myPublishService.selectClubByUid(Integer.valueOf(uid), token);
         if(clubList.isEmpty()){
             msg.add("clubList",null);
+        }else {
+            msg.add("clubList",clubList);
         }
-        msg.add("clubList",clubList);
 
         List<ShopVO> shopList = myPublishService.selectShopByUid(Integer.valueOf(uid), token);
         if(shopList.isEmpty()){
             msg.add("shopList",null);
+        }else {
+            msg.add("shopList",shopList);
         }
-        msg.add("shopList",shopList);
 
         msg.setCode(100);
         msg.setMsg("成功");

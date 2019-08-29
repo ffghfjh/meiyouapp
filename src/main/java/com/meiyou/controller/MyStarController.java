@@ -39,14 +39,16 @@ public class MyStarController {
         List<StarVo> clubStarVos = starService.selectClubStar(uid);
         if(clubStarVos.isEmpty()){
             msg.add("starVos",null);
+        }else {
+            msg.add("clubStarVos",clubStarVos);
         }
-        msg.add("clubStarVos",clubStarVos);
 
         List<StarVo> shopStarVos = starService.selectShopStar(uid);
         if(shopStarVos.isEmpty()){
             msg.add("shopStarVos",null);
+        }else {
+            msg.add("shopStarVos",shopStarVos);
         }
-        msg.add("shopStarVos",shopStarVos);
 
 
         msg.setMsg("成功");

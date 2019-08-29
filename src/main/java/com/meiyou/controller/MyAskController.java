@@ -44,14 +44,16 @@ public class MyAskController {
         List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));
         if(clubVOS.isEmpty()){
             msg.add("clubVOS",null);
+        }else {
+            msg.add("clubVOS",clubVOS);
         }
-        msg.add("clubVOS",clubVOS);
 
         List<ShopVO> shopVOS = myAskService.selectMyShopAsk(Integer.valueOf(uid));
         if(clubVOS.isEmpty()){
             msg.add("shopVOS",null);
+        }else {
+            msg.add("shopVOS",shopVOS);
         }
-        msg.add("shopVOS",shopVOS);
 
         msg.setCode(100);
         msg.setMsg("成功");

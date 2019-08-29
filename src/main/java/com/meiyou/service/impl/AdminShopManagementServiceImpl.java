@@ -25,6 +25,11 @@ public class AdminShopManagementServiceImpl implements AdminShopManagementServic
         return findAll();
     }
 
+    @Override
+    public Shop selectBySid(Integer sid) {
+        return shopMapper.selectByPrimaryKey(sid);
+    }
+
     /**
      * 查找全部发布的同城导游
      * @return

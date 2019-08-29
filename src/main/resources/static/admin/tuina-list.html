@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="./css/font.css">
 <link rel="stylesheet" href="./css/xadmin.css">
 <script type="text/javascript"
-	src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	src="/admin/js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="./lib/layui/layui.js"
 	charset="utf-8"></script>
 <script type="text/javascript" src="./js/xadmin.js"></script>
@@ -33,9 +33,9 @@
 	<div class="x-body">
 		<div class="layui-row">
 			<form class="layui-form layui-col-md12 x-so">
-				<input type="text" id="tUCount" placeholder="请输入按摩会所Id"
+				<input type="text" id="Club_id" placeholder="请输入按摩会所Id"
 					autocomplete="off" class="layui-input">
-				<button class="layui-btn" id="select_btn" onclick="findByCid()">
+				<button type="button" class="layui-btn" id="select-btn" onclick="findByCid()">
 					<i class="layui-icon">&#xe615;</i>
 				</button>
 			</form>
@@ -125,22 +125,21 @@
 			});
 		}
 
-		var cid = document.getElementById("tUCount").value;
 		function findByCid() {
+			var cid = $("#Club_id").val();
+			console.log(cid);
 			$.ajax({
 				"url":"/admin/findByCid",
-				"type":"POST",
+				"type":"GET",
 				"data":"cid="+cid,
 				"dataType":"json",
-				success:function(club) {
-					console.log(club);
-					if (club != null) {
-						// var list = data.extend["club"];
-						console.log(list);
+				success:function(Msg) {
+					if (Msg.code == 100) {
+						var list = Msg.extend["club"];
 						$("#club-list").empty();
 						var html = '<tr>'
 								+ '<td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>'
-								+ '<td>'+(i+1)+'</td>'
+								+ '<td>1</td>'
 								+ '<td>#{id}</td>'
 								+ '<td>#{publishId}</td>'
 								+ '<td>#{projectName}</td>'
@@ -168,7 +167,7 @@
 						$("#club-list").append(html);
 						$(".add-def:eq(0)").hide();
 					} else {
-						alert(data.msg);
+						alert(Msg.msg);
 					}
 				}
 			});

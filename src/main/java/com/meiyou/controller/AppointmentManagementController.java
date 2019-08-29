@@ -1,6 +1,5 @@
 package com.meiyou.controller;
 
-import com.meiyou.pojo.Appointment;
 import com.meiyou.pojo.Tour;
 import com.meiyou.service.AppointmentManagementService;
 import com.meiyou.utils.LayuiDataUtil;
@@ -26,21 +25,16 @@ public class AppointmentManagementController {
     @Autowired
     private AppointmentManagementService appointmentManagementService;
 
-
     /**
-    * @Description: 分页查询所有的约会
+    * @Description: 分页查询所有的约会，根据用户ID精准查询所有约会
     * @Author: JK
-    * @Date: 2019/8/27
+    * @Date: 2019/8/29
     */
-    @ApiOperation(value = "分页查询所有的约会", notes = "分页查询所有的约会", httpMethod = "POST")
-    @RequestMapping(value = "selectAllAppointmentByPage")
-    public Map<String,Object> selectAllAppointment(Integer page, Integer limit){
-        Page<Appointment> page1 = new Page<>();
-        List<Appointment> list = appointmentManagementService.selectAllAppointment();
-        List<Appointment> appointments = appointmentManagementService.selectAllAppointmentByPage(page,limit);
-        page1.setList(appointments);
-        page1.setCount(list.size());
-        return LayuiDataUtil.getLayuiData(page1);
+    @ApiOperation(value = "根据用户ID查询所有约会", notes = "根据用户ID查询所有约会", httpMethod = "POST")
+    @RequestMapping(value = "selectAllAppointmentByPublisherId")
+    public Map<String,Object> selectAllAppointmentByPublisherId(Integer page, Integer limit,
+                                                                Integer publisherId){
+        return  appointmentManagementService.selectAllAppointmentByPublisherId(page, limit, publisherId);
     }
 
 

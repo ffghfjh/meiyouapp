@@ -87,6 +87,26 @@
 				]]
 			});
 		});
+
+
+		//查询按钮事件
+		$('#select_btn').click(function() {
+			var yUCount = $('#yUCount').val();
+			if (yUCount == null || yUCount == '') {
+				layer.msg('查询失败,请检查查询条件', {
+					icon : 2,
+					time : 1000
+					//2秒关闭（如果不配置，默认是3秒）
+				});
+				return false;
+			}
+			if (yUCount != null && yUCount != '') {
+				var textName = "yUCount";
+				var textValue = yUCount;
+				get_all_user_info(1, textName, textValue);
+				return false;
+			}
+		});
 	</script>
 
 	<script>

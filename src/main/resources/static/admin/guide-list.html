@@ -4,8 +4,8 @@
 <title>欢迎页面-X-admin2.1</title>
 <meta name="renderer" content="webkit">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<meta name="viewport"
-	content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+<!--<meta name="viewport"-->
+<!--	content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />-->
 <link rel="stylesheet" href="./css/font.css">
 <link rel="stylesheet" href="./css/xadmin.css">
 <script type="text/javascript"
@@ -28,14 +28,14 @@
 		</span> <a class="layui-btn layui-btn-small"
 			style="line-height: 1.6em; margin-top: 3px; float: right"
 			href="javascript:location.replace(location.href);" title="刷新"> 
-			<i class="layui-icon" style="line-height: 30px"></i></a>
+			<i class="layui-icon" style="line-height: 50px"></i></a>
 	</div>
 	<div class="x-body">
 		<div class="layui-row">
 			<form class="layui-form layui-col-md12 x-so">
-				<input type="text" id="gUCount" placeholder="请输入用户名"
+				<input type="text" id="gUCount" placeholder="请输入景点商家id"
 					autocomplete="off" class="layui-input">
-				<button class="layui-btn" id="select_btn">
+				<button type="button" class="layui-btn" id="select_btn" onclick="selectBySid()">
 					<i class="layui-icon">&#xe615;</i>
 				</button>
 			</form>
@@ -70,7 +70,7 @@
 		<div class="page"></div>
 	</div>
 
-	<script type="text/javascript">
+	<script>
 		function showShopList() {
 			$.ajax({
 				url:"/admin/findAllShop",
@@ -106,6 +106,49 @@
 
 							$("#shop-list").append(html);
 						}
+						$(".add-def:eq(0)").hide();
+					} else {
+						alert(Msg.msg);
+					}
+				}
+			});
+		}
+
+		function selectBySid() {
+			var sid = $("#gUCount").val();
+			$.ajax({
+				"url": "/admin/findBySid",
+				"type": "GET",
+				"data": "sid=" + sid,
+				"dataType": "json",
+				success: function (Msg) {
+					if (Msg.code == 100) {
+						var list = Msg.extend["shop"];
+						$("#shop-list").empty();
+						var html = '<tr>'
+								+ '<td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>'
+								+ '<td>1</td>'
+								+ '<td>#{id}</td>'
+								+ '<td>#{publishId}</td>'
+								+ '<td>#{serviceArea}</td>'
+								+ '<td>#{travelTime}</td>'
+								+ '<td>#{charge}</td>'
+								+ '<td>#{outTime}</td>'
+								+ '<td>#{state}</td>'
+								+ '<td>#{createTime}</td>'
+								+ '<td><a class="btn btn-xs add-del btn-info" onclick="deleteByPid(#{pid})"><span class="fa fa-trash-o"></span> 删除</a></td>'
+								+ '</tr>';
+
+						html = html.replace(/#{id}/g, list.id);
+						html = html.replace(/#{publishId}/g, list.publishId);
+						html = html.replace(/#{serviceArea}/g, list.serviceArea);
+						html = html.replace(/#{travelTime}/g, list.travelTime);
+						html = html.replace(/#{charge}/g, list.charge);
+						html = html.replace(/#{outTime}/g, list.outTime);
+						html = html.replace(/#{state}/g, list.state);
+						html = html.replace(/#{createTime}/g, list.createTime);
+
+						$("#shop-list").append(html);
 						$(".add-def:eq(0)").hide();
 					} else {
 						alert(Msg.msg);

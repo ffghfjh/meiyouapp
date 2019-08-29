@@ -677,6 +677,7 @@ public class TourServiceImpl implements TourService {
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
         }
+        ArrayList<Object> list = new ArrayList<>();
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
@@ -689,7 +690,7 @@ public class TourServiceImpl implements TourService {
             Integer publisherId = tour.getPublishId();
             User user = userMapper.selectByPrimaryKey(publisherId);
             HashMap<String, Object> map = new HashMap<>();
-            ArrayList<Object> list = new ArrayList<>();
+
             if (state == 1 || state == 2){
                 String nickname = user.getNickname();
                 String header = user.getHeader();
@@ -728,12 +729,14 @@ public class TourServiceImpl implements TourService {
                 list.add(map);
 
             }
-            msg.setCode(100);
-            msg.setMsg("获取附近热门旅游成功");
-            return msg.add("list",list);
         }
-        Msg fail = Msg.fail();
+        msg.setCode(100);
+        msg.setMsg("获取附近热门旅游成功");
+        return msg.add("list",list);
+
+       /* Msg fail = Msg.fail();
         msg.add("fail",fail);
-        return msg;
+        return msg;*/
     }
+
 }

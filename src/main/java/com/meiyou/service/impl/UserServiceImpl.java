@@ -984,7 +984,8 @@ public class UserServiceImpl implements UserService {
     public List<Map<String,Object>> selUserInfoByPage(int page, int number) {
         List<Map<String,Object>> list = new ArrayList<>();
         UserExample example = new UserExample();
-        example.setPageNo(page);
+        int offset = number*(page-1);
+        example.setPageNo(offset);
         example.setPageSize(number);
 
         List<User> users = userMapper.selectByExample(example);
@@ -1024,6 +1025,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> selAllUser() {
        return userMapper.selectByExample(null);
+    }
+
+    @Override
+    public User selUserInfoByAdmin(String account) {
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andAccountEqualTo(account);
+        List<User> users = userMapper.selectByExample(example);
+        User user = users.get(0);
+
+
+        return null;
     }
 
 

@@ -167,4 +167,11 @@ public interface UserService {
      * @return
      */
     public List<User> selAllUser();
+
+    /**
+     * 管理员拉取用户资料
+     * @param account
+     * @return
+     */
+    public User selUserInfoByAdmin(String account);
 }

@@ -980,6 +980,16 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Map<String,String> selUserInfoByPage(int page, int number) {
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        example.setPage(page);
+        example.setNumber(number);
+        List<User> users = userMapper.selectByExample(example);
+        return null;
+    }
+
 
     @Override
     public Msg selRedPackage(int id) {

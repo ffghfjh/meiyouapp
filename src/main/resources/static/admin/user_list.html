@@ -63,192 +63,221 @@
       </div>
     </div>
     <script>
-      layui.use('laydate', function(){
-        var laydate = layui.laydate;
-        
-        //执行一个laydate实例
-        laydate.render({
-          elem: '#start' //指定元素
+
+      layui.use('table', function(){
+        var table = layui.table;
+
+        //第一个实例
+        table.render({
+          elem: '#demo'
+          ,height: 312
+          ,url: '/demo/table/user/' //数据接口
+          ,page: true //开启分页
+          ,cols: [[ //表头
+            {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
+            ,{field: 'username', title: '用户名', width:80}
+            ,{field: 'sex', title: '性别', width:80, sort: true}
+            ,{field: 'city', title: '城市', width:80}
+            ,{field: 'sign', title: '签名', width: 177}
+            ,{field: 'experience', title: '积分', width: 80, sort: true}
+            ,{field: 'score', title: '评分', width: 80, sort: true}
+            ,{field: 'classify', title: '职业', width: 80}
+            ,{field: 'wealth', title: '财富', width: 135, sort: true}
+          ]]
         });
 
-        //执行一个laydate实例
-        laydate.render({
-          elem: '#end' //指定元素
-        });
       });
 
-      function delAll (argument) {
 
-        var data = tableCheck.getData();
-  
-        layer.confirm('确认要删除吗？'+data,function(index){
-            //捉到所有被选中的，发异步进行删除
-            layer.msg('删除成功', {icon: 1});
-            $(".layui-form-checked").not('.header').parents('tr').remove();
-        });
-      }
-      
-      $(function(){
-    	  get_all_user_info(1);
-      });
-      
-      //查询所有用户 
-      function get_all_user_info(pn,textName,textValue){
-    	  var adminUser = localStorage.getItem("adminUser");
-    	  adminUser = JSON.parse(adminUser);
-    	  if(adminUser ==null){
-    		  parent.location.href='login.html';
-    		  return false;
-    	  }
-    	  $.ajax({
-    		  url:'/meiyou/admin/selectuserInfo',
-    		  type:'post',
-    		  data:'pn='+pn+"&"+textName+"="+textValue,
-    		  headers: {
-    		        Accept: "application/json; charset=utf-8",
-    		        headerId:adminUser.aId,
-    		        headerToken:adminUser.token
-    		    },
-    		  success:function(data){
-    			  console.log(data);
-    			  if(data.code==100){
-    				  //展示数据 
-    				  show_info(data,textName,textValue);
-    			  }else if(data.code==200){
-    				  //账号被挤出 
-    			  }else if(data.code==300){
-    				  //登录信息过去请重新登录 
-    				  layer.msg('登录信息过期，请重新登录',{
-     						icon: 1,
-     						time: 1000 //2秒关闭（如果不配置，默认是3秒）
-     						}, function(){
-     							parent.location.href = "login.html";
-     						}); 
-    			  }
-    		  }
-    	  });
-      }
-      
-      //用户信息展示
-      function show_info(data,textName,textValue){
-    	  
-    	  //清空之前的数据
-    	  $('#td').empty();
-    	  //数据信息展示 
-    	  var list = data.extend.pageInfo.list;
-    	  $.each(list,function(i,item){
-    		  var tr = $('<tr></tr>');
-        	  var tdId = $('<td></td>').append(item.uId);
-        	  var tduPhone = $('<td></td>').append(item.uPhone);
-        	  //var tduImg = $('<td></td>').append($('<img src="'+item.uImg+'" width="50" height="50">'));
-        	  var tduCount = $('<td></td>').append(item.uCount);
-        	  var tduSex = $('<td></td>').append(item.uSex);
-        	  var tduOld = $('<td></td>').append(item.uOld);
-        	  var tduName = $('<td></td>').append(item.uName);
-        	  var tduTime = $('<td></td>').append(item.uTime);
-        	  var tduMeijin = $('<td></td>').append(item.uMeijin);
-        	  tr.append(tdId).append(tduPhone).append(tduCount).append(tduSex)
-        	  .append(tduOld).append(tduName).append(tduTime).append(tduMeijin);
-        	  $('#td').append(tr);
-    	  });
-    	  $('#totality').empty();
-    	  $('#totality').append('共有数据：'+data.extend.pageInfo.total+"条");
-    	  //分页操作
-    	  $('.page').empty();
-    	  var div = $('<div></div>');
-    	  //判断是否是首页 
-    	  var shouyea;
-    	  var shangyiye;
-    	  if(data.extend.pageInfo.pageNum==1){
-    		  shouyea = $('<a class="num">首页</a>');
-        	  shangyiye = $('<a class="prev">&lt;&lt;</a>');
-    	  }else{
-    		  shouyea = $('<a class="num" href="">首页</a>');
-        	  shangyiye = $('<a class="prev" href="">&lt;&lt;</a>');
-    		  shouyea.click(function(){
-        		  get_all_user_info(1,textName,textValue);
-        		  return false;
-        	  });
-    		  shangyiye.click(function(){
-    			  get_all_user_info(data.extend.pageInfo.pageNum-1,textName.textValue);
-    			  return false;
-        	  });
-    	  }
-    	  div.append(shouyea).append(shangyiye);
-    	  $.each(data.extend.pageInfo.navigatepageNums,function(i,item){
-    		  var a;
-    		  if(item == data.extend.pageInfo.pageNum){
-    			  a = $('<span class="current"></span>').append(item);
-    		  }else{
-    			  a = $(' <a class="num" href=""></a>').append(item);
-    			  a.click(function(){
-    				  get_all_user_info(item,textName,textValue);
-    				  return false;
-    			  });
-    		  }
-    		  div.append(a);
-    	  });
-    	  //判断是否还有 下一页 
-    	  var xiayiye;
-    	  var moye;
-    	  if(data.extend.pageInfo.hasNextPage){
-    		  xiayiye = $(' <a class="next" href="">&gt;&gt;</a>');
-        	  moye = $('<a class="num" href="">末页</a>');
-    		  xiayiye.click(function(){
-    			  get_all_user_info(data.extend.pageInfo.pageNum+1,textName.textValue);
-    			  return false;
-        	  });
-        	  moye.click(function(){
-        		  get_all_user_info(data.extend.pageInfo.pages,textName,textValue);
-        		  return false;
-        	  });
-    	  }else{
-    		  xiayiye = $(' <a class="next">&gt;&gt;</a>');
-        	  moye = $('<a class="num">末页</a>');
-    	  }
-    	  div.append(xiayiye).append(moye); 
-    	  $('.page').append(div);
-      }
-      
-     //查询按钮事件
-		$('#select_btn').click(function() {
-			var uCount = $('#uCount').val();
-			if (uCount == null || uCount == '') {
-				layer.msg('查询失败,请检查查询条件', {
-					icon : 2,
-					time : 1000
-				//2秒关闭（如果不配置，默认是3秒）
-				});
-				return false;
-			}
-			if (uCount != null && uCount != '') {
-				var textName = "uCount";
-				var textValue = uCount;
-				get_all_user_info(1, textName, textValue);
-				return false;
-			}
-		});
-     
-		/***
-		获取url地址上参数
-		 */
-		function getUrlParam(url, name) {
-			var pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
-			var matcher = pattern.exec(url);
-			var items = null;
-			if (matcher != null) {
-				try {
-					items = decodeURIComponent(decodeURIComponent(matcher[1]));
-				} catch (e) {
-					try {
-						items = decodeURIComponent(matcher[1]);
-					} catch (e) {
-						items = matcher[1];
-					}
-				}
-			}
-			return items;
-		}
+
+
+
+     //  layui.use('laydate', function(){
+     //    var laydate = layui.laydate;
+     //
+     //    //执行一个laydate实例
+     //    laydate.render({
+     //      elem: '#start' //指定元素
+     //    });
+     //
+     //    //执行一个laydate实例
+     //    laydate.render({
+     //      elem: '#end' //指定元素
+     //    });
+     //  });
+     //
+     //  function delAll (argument) {
+     //
+     //    var data = tableCheck.getData();
+     //
+     //    layer.confirm('确认要删除吗？'+data,function(index){
+     //        //捉到所有被选中的，发异步进行删除
+     //        layer.msg('删除成功', {icon: 1});
+     //        $(".layui-form-checked").not('.header').parents('tr').remove();
+     //    });
+     //  }
+     //
+     //  $(function(){
+    	//   get_all_user_info(1);
+     //  });
+     //
+     //  //查询所有用户
+     //  function get_all_user_info(pn,textName,textValue){
+    	//   var adminUser = localStorage.getItem("adminUser");
+    	//   adminUser = JSON.parse(adminUser);
+    	//   if(adminUser ==null){
+    	// 	  parent.location.href='login.html';
+    	// 	  return false;
+    	//   }
+    	//   $.ajax({
+    	// 	  url:'/meiyou/admin/selectuserInfo',
+    	// 	  type:'post',
+    	// 	  data:'pn='+pn+"&"+textName+"="+textValue,
+    	// 	  headers: {
+    	// 	        Accept: "application/json; charset=utf-8",
+    	// 	        headerId:adminUser.aId,
+    	// 	        headerToken:adminUser.token
+    	// 	    },
+    	// 	  success:function(data){
+    	// 		  console.log(data);
+    	// 		  if(data.code==100){
+    	// 			  //展示数据
+    	// 			  show_info(data,textName,textValue);
+    	// 		  }else if(data.code==200){
+    	// 			  //账号被挤出
+    	// 		  }else if(data.code==300){
+    	// 			  //登录信息过去请重新登录
+    	// 			  layer.msg('登录信息过期，请重新登录',{
+     // 						icon: 1,
+     // 						time: 1000 //2秒关闭（如果不配置，默认是3秒）
+     // 						}, function(){
+     // 							parent.location.href = "login.html";
+     // 						});
+    	// 		  }
+    	// 	  }
+    	//   });
+     //  }
+     //
+     //  //用户信息展示
+     //  function show_info(data,textName,textValue){
+    	//
+    	//   //清空之前的数据
+    	//   $('#td').empty();
+    	//   //数据信息展示
+    	//   var list = data.extend.pageInfo.list;
+    	//   $.each(list,function(i,item){
+    	// 	  var tr = $('<tr></tr>');
+     //    	  var tdId = $('<td></td>').append(item.uId);
+     //    	  var tduPhone = $('<td></td>').append(item.uPhone);
+     //    	  //var tduImg = $('<td></td>').append($('<img src="'+item.uImg+'" width="50" height="50">'));
+     //    	  var tduCount = $('<td></td>').append(item.uCount);
+     //    	  var tduSex = $('<td></td>').append(item.uSex);
+     //    	  var tduOld = $('<td></td>').append(item.uOld);
+     //    	  var tduName = $('<td></td>').append(item.uName);
+     //    	  var tduTime = $('<td></td>').append(item.uTime);
+     //    	  var tduMeijin = $('<td></td>').append(item.uMeijin);
+     //    	  tr.append(tdId).append(tduPhone).append(tduCount).append(tduSex)
+     //    	  .append(tduOld).append(tduName).append(tduTime).append(tduMeijin);
+     //    	  $('#td').append(tr);
+    	//   });
+    	//   $('#totality').empty();
+    	//   $('#totality').append('共有数据：'+data.extend.pageInfo.total+"条");
+    	//   //分页操作
+    	//   $('.page').empty();
+    	//   var div = $('<div></div>');
+    	//   //判断是否是首页
+    	//   var shouyea;
+    	//   var shangyiye;
+    	//   if(data.extend.pageInfo.pageNum==1){
+    	// 	  shouyea = $('<a class="num">首页</a>');
+     //    	  shangyiye = $('<a class="prev">&lt;&lt;</a>');
+    	//   }else{
+    	// 	  shouyea = $('<a class="num" href="">首页</a>');
+     //    	  shangyiye = $('<a class="prev" href="">&lt;&lt;</a>');
+    	// 	  shouyea.click(function(){
+     //    		  get_all_user_info(1,textName,textValue);
+     //    		  return false;
+     //    	  });
+    	// 	  shangyiye.click(function(){
+    	// 		  get_all_user_info(data.extend.pageInfo.pageNum-1,textName.textValue);
+    	// 		  return false;
+     //    	  });
+    	//   }
+    	//   div.append(shouyea).append(shangyiye);
+    	//   $.each(data.extend.pageInfo.navigatepageNums,function(i,item){
+    	// 	  var a;
+    	// 	  if(item == data.extend.pageInfo.pageNum){
+    	// 		  a = $('<span class="current"></span>').append(item);
+    	// 	  }else{
+    	// 		  a = $(' <a class="num" href=""></a>').append(item);
+    	// 		  a.click(function(){
+    	// 			  get_all_user_info(item,textName,textValue);
+    	// 			  return false;
+    	// 		  });
+    	// 	  }
+    	// 	  div.append(a);
+    	//   });
+    	//   //判断是否还有 下一页
+    	//   var xiayiye;
+    	//   var moye;
+    	//   if(data.extend.pageInfo.hasNextPage){
+    	// 	  xiayiye = $(' <a class="next" href="">&gt;&gt;</a>');
+     //    	  moye = $('<a class="num" href="">末页</a>');
+    	// 	  xiayiye.click(function(){
+    	// 		  get_all_user_info(data.extend.pageInfo.pageNum+1,textName.textValue);
+    	// 		  return false;
+     //    	  });
+     //    	  moye.click(function(){
+     //    		  get_all_user_info(data.extend.pageInfo.pages,textName,textValue);
+     //    		  return false;
+     //    	  });
+    	//   }else{
+    	// 	  xiayiye = $(' <a class="next">&gt;&gt;</a>');
+     //    	  moye = $('<a class="num">末页</a>');
+    	//   }
+    	//   div.append(xiayiye).append(moye);
+    	//   $('.page').append(div);
+     //  }
+     //
+     // //查询按钮事件
+		// $('#select_btn').click(function() {
+		// 	var uCount = $('#uCount').val();
+		// 	if (uCount == null || uCount == '') {
+		// 		layer.msg('查询失败,请检查查询条件', {
+		// 			icon : 2,
+		// 			time : 1000
+		// 		//2秒关闭（如果不配置，默认是3秒）
+		// 		});
+		// 		return false;
+		// 	}
+		// 	if (uCount != null && uCount != '') {
+		// 		var textName = "uCount";
+		// 		var textValue = uCount;
+		// 		get_all_user_info(1, textName, textValue);
+		// 		return false;
+		// 	}
+		// });
+     //
+		// /***
+		// 获取url地址上参数
+		//  */
+		// function getUrlParam(url, name) {
+		// 	var pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
+		// 	var matcher = pattern.exec(url);
+		// 	var items = null;
+		// 	if (matcher != null) {
+		// 		try {
+		// 			items = decodeURIComponent(decodeURIComponent(matcher[1]));
+		// 		} catch (e) {
+		// 			try {
+		// 				items = decodeURIComponent(matcher[1]);
+		// 			} catch (e) {
+		// 				items = matcher[1];
+		// 			}
+		// 		}
+		// 	}
+		// 	return items;
+		// }
     </script>
     <script>var _hmt = _hmt || []; (function() {
         var hm = document.createElement("script");

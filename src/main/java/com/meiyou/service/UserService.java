@@ -5,6 +5,7 @@ import com.meiyou.utils.Msg;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public interface UserService {
     //支付宝登录
@@ -152,5 +153,11 @@ public interface UserService {
      */
     public Msg getOtherMsg(String account);
 
- 
+    /**
+     * 分页拉取用户资料
+     * @param page
+     * @param number
+     * @return
+     */
+    public Map<String,String> selUserInfoByPage(int page, int number);
 }

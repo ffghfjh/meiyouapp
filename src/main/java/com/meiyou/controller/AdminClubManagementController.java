@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description:
@@ -17,7 +18,6 @@ import java.util.List;
  **/
 @RestController
 @Api(value = "管理员按摩会所控制器",tags = "用来查看整个按摩会所情况")
-@RequestMapping("/admin")
 public class AdminClubManagementController {
 
     @Autowired
@@ -55,5 +55,16 @@ public class AdminClubManagementController {
         msg.setMsg("成功");
         msg.add("club",club);
         return msg;
+    }
+
+    /**
+     * @Description: 分页查询所有的推拿会所
+     * @Author: JK
+     * @Date: 2019/8/29
+     */
+    @ApiOperation(value = "分页查询所有的推拿会所", notes = "分页查询所有的推拿会所", httpMethod = "POST")
+    @RequestMapping(value = "selectAllClubByPage")
+    public Map<String,Object> selectAllClubByPage(Integer page, Integer limit, Integer publisherId, Integer state){
+        return service.selectAllClubByPage(page,limit,publisherId,state);
     }
 }

@@ -1,11 +1,14 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
+import com.meiyou.model.ClubVO;
+import com.meiyou.model.ShopVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -394,8 +397,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if(result.isEmpty()){
             return shopVOS;
         }
-
-
         for(ShopBuy shopBuy : result){
             Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
 
@@ -405,7 +406,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             shopVOS.add(shopVO);
         }
-
         //返回一个封装好的ShopVO类
         return shopVOS;
     }

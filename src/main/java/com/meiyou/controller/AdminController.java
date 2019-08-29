@@ -1,5 +1,6 @@
 package com.meiyou.controller;
 
+import com.meiyou.pojo.User;
 import com.meiyou.service.AdminService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
@@ -8,6 +9,7 @@ import com.meiyou.utils.Msg;
 import com.meiyou.utils.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -214,6 +216,26 @@ public class AdminController {
         pages.setCount(count);
         pages.setList(userService.selUserInfoByPage(page,limit));
         return LayuiDataUtil.getLayuiData(pages);
+    }
+
+
+    @RequestMapping(value = "getUserInfoByAccount",method = RequestMethod.GET)
+    @ApiOperation(("账号获取用户信息"))
+    public Msg getUserInfoByAccount(String account,HttpServletRequest req){
+        if(authAdmin(req)){
+            Msg msg = Msg.success();
+            User user = userService.selUserInfoByAdmin(account);
+            if(user!=null){
+                msg.add("user",user);
+                return msg;
+            }else{
+                msg.setCode(1000);
+                return msg;
+            }
+        }
+        else{
+            return Msg.noLogin();
+        }
     }
 
 

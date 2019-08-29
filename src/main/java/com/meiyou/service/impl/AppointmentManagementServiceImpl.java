@@ -36,7 +36,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
     * @Date: 2019/8/29
     */
     @Override
-    public Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId,Integer state) {
+    public Map<String,Object> selectAllAppointmentByPage(Integer pageNo, Integer pageSize, Integer publisherId,Integer state) {
         Page<Appointment> page = new Page<>();
         Integer offset = pageSize * (pageNo - 1);
         AppointmentExample appointmentExample = new AppointmentExample();
@@ -47,7 +47,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
             if (list.size() == 0){
                 Map<String, Object> map = new HashMap<>();
                 map.put("code",200);
-                map.put("msg","没有该用户");
+                map.put("msg","没有数据");
                 return map;
             }
             appointmentExample.setPageNo(offset);
@@ -64,7 +64,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
             if (list.size() == 0){
                 Map<String, Object> map = new HashMap<>();
                 map.put("code",200);
-                map.put("msg","没有该用户");
+                map.put("msg","没有数据");
                 return map;
             }
             appointmentExample.setPageNo(offset);
@@ -80,7 +80,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
         if (list.size() == 0){
             Map<String, Object> map = new HashMap<>();
             map.put("code",200);
-            map.put("msg","没有该用户");
+            map.put("msg","没有数据");
             return map;
         }
 
@@ -92,28 +92,66 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
         return LayuiDataUtil.getLayuiData(page);
     }
 
-    /**
-    * @Description: 查询所有的旅游
-    * @Author: JK
-    * @Date: 2019/8/28
-    */
-    @Override
-    public List<Tour> selectAllTour() {
-        return tourMapper.selectByExample(new TourExample());
-    }
 
     /**
-    * @Description: 分页查询所有旅游
+    * @Description: 分页查询所有的旅游
     * @Author: JK
     * @Date: 2019/8/28
     */
     @Override
-    public List<Tour> selectAllTourByPage(Integer pageNo, Integer pageSize) {
-        TourExample tourExample = new TourExample();
+    public Map<String,Object> selectAllTourByPage(Integer pageNo, Integer pageSize,Integer publisherId,Integer state) {
+        Page<Tour> page = new Page<>();
         Integer offset = pageSize * (pageNo - 1);
+        TourExample tourExample = new TourExample();
+
+        if (publisherId != null){
+            tourExample.createCriteria().andPublishIdEqualTo(publisherId);
+            List<Tour> list = tourMapper.selectByExample(tourExample);
+            if (list.size() == 0){
+                Map<String, Object> map = new HashMap<>();
+                map.put("code",200);
+                map.put("msg","没有数据");
+                return map;
+            }
+            tourExample.setPageNo(offset);
+            tourExample.setPageSize(pageSize);
+            List<Tour> tours = tourMapper.selectByExample(tourExample);
+            page.setCount(list.size());
+            page.setList(tours);
+            return LayuiDataUtil.getLayuiData(page);
+        }
+
+        if (state != null){
+            tourExample.createCriteria().andStateEqualTo(state);
+            List<Tour> list = tourMapper.selectByExample(tourExample);
+            if (list.size() == 0){
+                Map<String, Object> map = new HashMap<>();
+                map.put("code",200);
+                map.put("msg","没有数据");
+                return map;
+            }
+            tourExample.setPageNo(offset);
+            tourExample.setPageSize(pageSize);
+            List<Tour> appointments = tourMapper.selectByExample(tourExample);
+            page.setCount(list.size());
+            page.setList(appointments);
+            return LayuiDataUtil.getLayuiData(page);
+        }
+
+
+        List<Tour> list = tourMapper.selectByExample(tourExample);
+        if (list.size() == 0){
+            Map<String, Object> map = new HashMap<>();
+            map.put("code",200);
+            map.put("msg","没有数据");
+            return map;
+        }
+
         tourExample.setPageNo(offset);
         tourExample.setPageSize(pageSize);
-        List<Tour> tours = tourMapper.selectByExample(tourExample);
-        return tours;
+        List<Tour> appointments = tourMapper.selectByExample(tourExample);
+        page.setCount(list.size());
+        page.setList(appointments);
+        return LayuiDataUtil.getLayuiData(page);
     }
 }

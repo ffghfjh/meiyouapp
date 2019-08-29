@@ -4,6 +4,7 @@ import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ClubStarMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AskerVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
@@ -233,24 +234,29 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         if(result == null && result.size() ==0){
             msg.setCode(404);
-            msg.setMsg("找不到指定的会所购买记录");
+            msg.setMsg("找不到指定的导游聘请记录");
             return msg;
         }
 
         //对查找出来的ClubBuy进行封装
-        List<ClubVO> clubVOS = new ArrayList<>();
+        List<AskerVO> askerVOS = new ArrayList<>();
         for(ClubBuy c : result){
-            Club club = clubMapper.selectByPrimaryKey(c.getClubId());
+            User buyer = getUserByUid(c.getBuyerId());
 
-            ClubVO clubVO = setClubToClubVO(club);
-            //设置购买者状态
-            clubVO.setAskState(c.getState());
+            AskerVO askerVO = new AskerVO();
+            askerVO.setId(buyer.getId());
+            askerVO.setNickname(buyer.getNickname());
+            askerVO.setHeader(buyer.getHeader());
+            askerVO.setBirthday(buyer.getBirthday());
+            askerVO.setSex(buyer.getSex());
+            askerVO.setSignature(buyer.getSignature());
+            askerVO.setAskState(c.getState());
 
-            clubVOS.add(clubVO);
+            askerVOS.add(askerVO);
         }
 
-        //返回一个封装好的ClubVO类
-        msg.add("clubVOS",clubVOS);
+        //返回一个封装好的askerVO类
+        msg.add("askerVOS",askerVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;

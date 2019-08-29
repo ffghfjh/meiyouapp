@@ -29,7 +29,7 @@ public class ReportTest {
         ActivityReport activityReport = new ActivityReport();
         activityReport.setActivityId(1);
         activityReport.setReporterId(1);
-        activityReport.setType(1);
+        activityReport.setType("举报测试");
         activityReport.setCreateTime(new Date());
         activityReport.setUpdateTeim(new Date());
         int insert = activityReportMapper.insert(activityReport);

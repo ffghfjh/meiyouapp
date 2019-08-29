@@ -21,4 +21,6 @@ public interface ActivityReadService {
 
     //谁看过我的动态
     Msg whoHasSeenMe(int uid);
+
+
 }

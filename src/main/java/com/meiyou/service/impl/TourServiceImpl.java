@@ -205,12 +205,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         user.setMoney(balance);
 
-        TourAsk tourAsk = new TourAsk();
-        tourAsk.setAskerId(Integer.parseInt(uid));
-        tourAsk.setAppointId(id);
-        tourAsk.setAskState0(1);
-        tourAsk.setCreateTime(new Date());
-
         //查询该报名者是否已经报名
         TourAskExample tourAskExample = new TourAskExample();
         tourAskExample.createCriteria().andAskState0EqualTo(1)
@@ -227,6 +221,11 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //更新报名者账户余额
         userMapper.updateByExample(user, userExample);
 
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskerId(Integer.parseInt(uid));
+        tourAsk.setAppointId(id);
+        tourAsk.setAskState0(1);
+        tourAsk.setCreateTime(new Date());
         //旅游记录表中增加一条记录
         tourAskMapper.insertSelective(tourAsk);
         //根据旅游订单表id查出该订单所有信息

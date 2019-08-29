@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountSincerityMapper">
+  <select id="nowSincerityNums" resultType="java.lang.Integer">
+    select count(1) from `tour` where to_days(create_time) = to_days(now()) AND pay_type = 1
+    UNION ALL
+    select count(1) from `appointment` where to_days(create_time) = to_days(now()) AND pay_type = 1;
+  </select>
+
+  <select id="yesterdaySincerityNums" resultType="java.lang.Integer">
+    select count(1) from `tour` where to_days(NOW()) - to_days(create_time) = 1 AND pay_type = 1
+    UNION ALL
+    select count(1) from `appointment` where to_days(NOW()) - to_days(create_time) = 1 AND pay_type = 1;
+  </select>
+
+  <select id="nowWeekSincerityNums" resultType="java.lang.Integer">
+    SELECT count(1) FROM `tour` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now()) AND pay_type = 1
+    UNION ALL
+    SELECT count(1) FROM `appointment` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now()) AND pay_type = 1;
+  </select>
+
+  <select id="nowMonthSincerityNums" resultType="java.lang.Integer">
+    select count(1) from `tour` where Month(create_time)=Month(NOW()) AND pay_type = 1
+    UNION ALL
+    select count(1) from `appointment` where Month(create_time)=Month(NOW()) AND pay_type = 1;
+  </select>
+
+  <select id="lastMonthSincerityNums" resultType="java.lang.Integer">
+    SELECT count(1) FROM `tour` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1 AND pay_type = 1
+    UNION ALL
+    SELECT count(1) FROM `appointment` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1 AND pay_type = 1;
+  </select>
+
+  <select id="nowYearSincerityNums" resultType="java.lang.Integer">
+    select count(1) from `tour` where YEAR(create_time)=YEAR(NOW()) AND pay_type = 1
+    UNION ALL
+    select count(1) from `appointment` where YEAR(create_time)=YEAR(NOW()) AND pay_type = 1;
+  </select>
+
+  <select id="allSincerityNums" resultType="java.lang.Integer">
+    select count(1) from `tour` where pay_type = 1
+    UNION ALL
+    select count(1) from `appointment` where pay_type = 1;
+  </select>
+
+</mapper>

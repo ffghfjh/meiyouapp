@@ -12,6 +12,7 @@ import com.meiyou.service.*;
 //import com.meiyou.service.MyAskService;
 import com.meiyou.service.impl.BaseServiceImpl;
 import com.meiyou.utils.Msg;
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,5 +243,19 @@ public class ClubTests extends BaseServiceImpl {
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(7).andBuyerIdEqualTo(9);
         clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
+    }
+
+    @Autowired
+    CountSincerityService sincerityService;
+
+    @Test
+    public void sin(){
+        System.out.println(sincerityService.nowSincerityNums());
+        System.out.println(sincerityService.yesterdaySincerityNums());
+        System.out.println(sincerityService.nowWeekSincerityNums());
+        System.out.println(sincerityService.nowMonthSincerityNums());
+        System.out.println(sincerityService.lastMonthSincerityNums());
+        System.out.println(sincerityService.nowYearSincerityNums());
+        System.out.println(sincerityService.allSincerityNums());
     }
 }

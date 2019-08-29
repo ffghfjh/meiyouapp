@@ -138,7 +138,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id)
                         .andPublisherIdEqualTo(appointment.getPublisherId());
-            appointment.setState(5);
+            appointment.setState(0);
             appointment.setUpdateTime(new Date());
             i = appointmentMapper.updateByExample(appointment, example);
             if (i == 1) {

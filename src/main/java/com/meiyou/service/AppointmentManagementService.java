@@ -16,7 +16,7 @@ public interface AppointmentManagementService {
     /**
      * 分页查询所有的约会，根据用户ID精准查询所有约会
      */
-    Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId);
+    Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId,Integer state);
 
 
     /**

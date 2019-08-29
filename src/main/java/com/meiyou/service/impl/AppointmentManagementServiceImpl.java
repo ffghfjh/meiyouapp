@@ -36,7 +36,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
     * @Date: 2019/8/29
     */
     @Override
-    public Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId) {
+    public Map<String,Object> selectAllAppointmentByPublisherId(Integer pageNo, Integer pageSize, Integer publisherId,Integer state) {
         Page<Appointment> page = new Page<>();
         Integer offset = pageSize * (pageNo - 1);
         AppointmentExample appointmentExample = new AppointmentExample();
@@ -57,6 +57,25 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
             page.setList(appointments);
             return LayuiDataUtil.getLayuiData(page);
         }
+
+        if (state != null){
+            appointmentExample.createCriteria().andStateEqualTo(state);
+            List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
+            if (list.size() == 0){
+                Map<String, Object> map = new HashMap<>();
+                map.put("code",200);
+                map.put("msg","没有该用户");
+                return map;
+            }
+            appointmentExample.setPageNo(offset);
+            appointmentExample.setPageSize(pageSize);
+            List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
+            page.setCount(list.size());
+            page.setList(appointments);
+            return LayuiDataUtil.getLayuiData(page);
+        }
+
+
         List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
         if (list.size() == 0){
             Map<String, Object> map = new HashMap<>();

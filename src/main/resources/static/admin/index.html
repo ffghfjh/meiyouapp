@@ -251,7 +251,17 @@
     })();
     </script>
     <script type="text/javascript">
-    
+
+          $.ajax({
+              url:"authAdmin",
+              type:"get",
+              success:function(res){
+                  if(!res){
+                      location.href='login.html';
+                  }
+              }
+              }
+          );
           //退出 
           $("#exit").click(function(){
         	  //取出本地保存的信息，转成json对象 

@@ -41,36 +41,32 @@
     </div>
     
     <script type="text/javascript">
+
           $('#pass').click(function(){
         	  var quantity = $('#upd_chengyijin').val();
         	  if(!quantity){
-        		  layer.msg('请填写数据', { 
+        		  layer.msg('请填写数据', {
  						icon: 2,
  						time: 500 //2秒关闭（如果不配置，默认是3秒）
  						}, function(){
- 							
+
  						});
         		  return false;
         	  }
-        	  var adminUser = localStorage.getItem("adminUser");
-        	  adminUser = JSON.parse(adminUser);
-        	  if(adminUser ==null){
- 	       		  parent.location.href='login.html';
- 	       		  return false;
-        	  }
         	  $.ajax({
-        		  url:'/meiyou/shuju/updateCYJgetMeijin',
-        		  type:'POST',
-        		  data:"quantity="+quantity,
-        		  headers:{
-         		        Accept: "application/json; charset=utf-8",
-         		        headerId:adminUser.aId,
-         		        headerToken:adminUser.token
-         		  },
+        		  url:'updSincerity_money',
+        		  type:'GET',
+        		  data:"money="+quantity,
         		  success:function(data){
-        			  parent.location.href="essential_data.html";
+        		      if(data){
+        		          alert('修改成功')
+                          parent.location.reload();
+                      }else {
+        		          alert('修改失败');
+                      }
         		  }
         	  });
           });
-    </script>  
+    </script>
+  </body>
 </html>

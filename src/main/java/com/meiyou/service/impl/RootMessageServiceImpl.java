@@ -94,8 +94,10 @@ public class RootMessageServiceImpl implements RootMessageService {
     @Override
     public Msg updateMessageByName(String name, String value) {
         RootMessage message = new RootMessage();
+
         message.setName(name);
         message.setValue(value);
+        message.setUpdateTime(new Date());
         int i = rootMessageMapper.updateMessageByName(message);
         if (i == 0) {
             return Msg.fail();
@@ -119,7 +121,9 @@ public class RootMessageServiceImpl implements RootMessageService {
     //拉取所有系统参数
     @Override
     public Msg listMessage() {
+
         List<RootMessage> rootMessages = rootMessageMapper.selectByExample(null);
+        System.out.println("查询系统参数哦"+rootMessages.size());
         if (rootMessages.isEmpty()) {
             return Msg.fail();
         }

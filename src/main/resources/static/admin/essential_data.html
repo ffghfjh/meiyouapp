@@ -27,8 +27,7 @@
                                         <li class="layui-col-xs2" id="chenyijin">
                                             <a href="javascript:;" class="x-admin-backlog-body">
                                                 <h3>诚意金</h3>
-                                                <p>
-                                                    <cite></cite></p>
+                                                <p><cite></cite></p>
                                             </a>
                                         </li>
                                         <li class="layui-col-xs2" id="fabujin">
@@ -52,16 +51,69 @@
                                                     <cite></cite></p>
                                             </a>
                                         </li>
-                                        <li class="layui-col-xs2" id="zhidingfei">
+                                        <li class="layui-col-xs2" id="range">
                                             <a href="javascript:;" class="x-admin-backlog-body">
-                                                <h3>置顶费用</h3>
+                                                <h3>附近公里数</h3>
                                                 <p>
                                                     <cite></cite></p>
                                             </a>
                                         </li>
                                         <li class="layui-col-xs2" id="tonghuafei">
                                             <a href="javascript:;" class="x-admin-backlog-body">
-                                                <h3>视频语音收取费用</h3>
+                                                <h3>视频语音通话费用</h3>
+                                                <p><cite></cite></p>
+                                            </a>
+                                           </li></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </fieldset>  
+        <fieldset class="layui-elem-field">
+            <legend>基础数据设置</legend>
+            <div class="layui-field-box">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <div class="layui-carousel x-admin-carousel x-admin-backlog" lay-anim="" lay-indicator="inside" lay-arrow="none" style="width: 100%; height: 90px;">
+                                <div carousel-item="">
+                                    <ul class="layui-row layui-col-space10 layui-this">
+                                        <li class="layui-col-xs2" id="onday">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>一天</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="onzhou">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>一周</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="onmonth">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>一月</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="ohji">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>一季</h3>
+                                                <p>
+                                                    <cite></cite></p>
+                                            </a>
+                                        </li>
+                                        <li class="layui-col-xs2" id="onyer">
+                                            <a href="javascript:;" class="x-admin-backlog-body">
+                                                <h3>一年</h3>
                                                 <p>
                                                     <cite></cite></p>
                                             </a>
@@ -73,8 +125,7 @@
                     </div>
                 </div>
             </div>
-           
-        </fieldset>  
+        </fieldset>
         <font color="red">*</font>请点击想要修改的数据
     </div>
     </body>
@@ -87,34 +138,13 @@
     
          //获取基础数据 
          function get_essential_data(){
-        	 var adminUser = localStorage.getItem("adminUser");
-       	     adminUser = JSON.parse(adminUser);
-       	     if(adminUser ==null){
-	       		  parent.location.href='login.html';
-	       		  return false;
-       	     }
         	 $.ajax({
-        		 url:"/meiyou/shuju/getalldata",
-        		 type:"post",
-        		 headers: {
-       		        Accept: "application/json; charset=utf-8",
-       		        headerId:adminUser.aId,
-       		        headerToken:adminUser.token
-       		      },
+        		 url:"getAllValue",
+        		 type:"get",
         		 success:function(data){
         			 if(data.code==100){
 	        			 console.log(data);
 	        			 show_info(data);
-	        		 }else if(data.code==200){
-	        			 
-	        		 }else if(data.code==300){
-	        			//登录时间过期
-           			  layer.msg('登录信息过期，请重新登录',{
-      						icon: 1,
-      						time: 1000 //2秒关闭（如果不配置，默认是3秒）
-      						}, function(){
-      							parent.location.href = "login.html";
-      						});
 	        		 }
         		 }
         	 });
@@ -122,26 +152,40 @@
          
          //展示数据
          function show_info(data){
-        	 var list = data.extend.list;
+        	 var list = data.extend.msgList;
         	 $.each(list,function(i,val){
-        		 if(val.jName==="chenyijin"){
-        			 $('#chenyijin').find("cite").append(val.jValue);
+        		 if(val.name==="sincerity_money"){
+        			 $('#chenyijin').find("cite").append(val.value);
         		 }
-        		 if(val.jName==="fabujin"){
-        			 $('#fabujin').find("cite").append(val.jValue);
+        		 if(val.name==="publish_money"){
+        			 $('#fabujin').find("cite").append(val.value);
         		 }
-        		 if(val.jName==="tixian"){
-        			 $('#tixianlv').find("cite").append(val.jValue);
+        		 if(val.name==="cash"){
+        			 $('#tixianlv').find("cite").append(val.value);
         		 }
-        		 if(val.jName==="fenxiangjin"){
-        			 $('#fenxiangjin').find("cite").append(val.jValue);
+        		 if(val.name==="share_money"){
+        			 $('#fenxiangjin').find("cite").append(val.value);
         		 }
-        		 if(val.jName==="zhiding"){
-        			 $('#zhidingfei').find("cite").append(val.jValue);
+        		 if(val.name==="video_money"){
+        			 $('#tonghuafei').find("cite").append(val.value);
         		 }
-        		 if(val.jName==="tonghuafei"){
-        			 $('#tonghuafei').find("cite").append(val.jValue);
-        		 }
+        		 if(val.name == "range"){
+                     $('#range').find("cite").append(val.value);
+                 }
+                 if(val.name == "一年"){
+                     $('#onyer').find("cite").append(val.value);
+                 }
+                 if(val.name == "一季"){
+                     $('#ohji').find("cite").append(val.value);
+                 }
+                 if(val.name == "一月"){
+                     $('#onmonth').find("cite").append(val.value);
+                 }
+                 if(val.name == "一周"){
+                     $('#onzhou').find("cite").append(val.value);
+                 }if(val.name == "一天"){
+                     $('#onday').find("cite").append(val.value);
+                 }
         	 });
          }
          
@@ -169,5 +213,33 @@
          $('#tonghuafei').click(function(){
         	 x_admin_show('视屏语音通话费','update_tonghuafei.html',600,185);
          });
+
+
+
+         //修改数据
+         $('#onday').click(function(){
+             x_admin_show('一天','update_onday.html',600,185);
+         });
+
+         $('#onzhou').click(function(){
+             x_admin_show('一周','update_onzhou.html',600,185);
+         });
+
+         $('#onmonth').click(function(){
+             x_admin_show('一月','update_onmonth.html',600,185);
+         });
+
+         $('#ohji').click(function(){
+             x_admin_show('一季','update_ohji.html',600,185);
+         });
+
+         $('#onyer').click(function(){
+             x_admin_show('一年','update_onyer.html',600,185);
+         });
+
+         $('#range').click(function(){
+             x_admin_show('附近公里数','update_range.html',600,185);
+         });
+
     </script>
 </html>

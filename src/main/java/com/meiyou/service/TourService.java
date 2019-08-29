@@ -65,4 +65,9 @@ public interface TourService {
      * 查看热门约会
      */
     Msg selectHotTour(String uid,String token,double latitude, double longitude);
+
+    /**
+     * 查询报名旅游的全部人员
+     */
+    Msg selectAllTourById(Integer uid,String token,Integer id);
 }

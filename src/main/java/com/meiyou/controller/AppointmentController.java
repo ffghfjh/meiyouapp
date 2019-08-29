@@ -196,4 +196,16 @@ public class AppointmentController {
         Msg msg = appointmentService.selectHotAppointment(uid, token, latitude, longitude);
         return msg;
     }
+
+
+    /**
+     * @Description: 查询报名约会的全部人员
+     * @Author: JK
+     * @Date: 2019/8/29
+     */
+    @ApiOperation(value = "查询报名约会的全部人员", notes = "查询报名约会的全部人员", httpMethod = "GET")
+    @GetMapping(value = "/selectAllAppointmentById")
+    public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
+        return appointmentService.selectAllAppointmentById(uid, token, id);
+    }
 }

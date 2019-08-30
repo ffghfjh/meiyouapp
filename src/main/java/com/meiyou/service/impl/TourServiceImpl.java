@@ -690,6 +690,11 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             Integer state = tour.getState();
             //获取用户id
             Integer publisherId = tour.getPublishId();
+
+            //如果发布者等于报名者，则跳出本次循环
+            if (publisherId == Integer.parseInt(uid)){
+                continue;
+            }
             User user = userMapper.selectByPrimaryKey(publisherId);
             System.out.println("hzy---yonghu id" + user.getId());
 

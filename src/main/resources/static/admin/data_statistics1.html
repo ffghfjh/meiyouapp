@@ -118,50 +118,46 @@
     		 dateType: "json",
     		 success:function(Msg){
     			 if(Msg.code==100){
-    				 show_info(Msg);
+    			     var userNums = Msg.extend["userNums"]
+    				 show_info(userNums);
+                     var shareMoney = Msg.extend["shareMoney"]
+                         show_info(shareMoney);
+                     var publishNums = Msg.extend["publishNums"]
+                         show_info(publishNums);
+                     var rewardMoney = Msg.extend["rewardMoney"]
+                         show_info(rewardMoney);
+                     var sincerityMoney = Msg.extend["sincerityMoney"]
+                         show_info(sincerityMoney);
+                     var publishMoney = Msg.extend["publishMoney"]
+                         show_info(publishMoney);
+                     var rechargeMoney = Msg.extend["rechargeMoney"]
+                         show_info(rechargeMoney);
+                     var cashMoney = Msg.extend["cashMoney"]
+                         show_info(cashMoney);
+                     var videoMoney = Msg.extend["videoMoney"]
+                         show_info(videoMoney);
+                     var askNums = Msg.extend["askNums"]
+                         show_info(askNums);
        		     }
     		}
     	 }); 
      }
      
-     function show_info(Msg){
-    	 console.log(Msg);
-    	 // for(var k in Msg.extend){
-         //     var userNums = Msg.extend[k];
-         //     var td1 = $('<td></td>').html(userNums[0]);
-         //     var td2 = $('<td></td>').html(userNums[1]);
-         //     var td3 = $('<td></td>').html(userNums[2]);
-         //     var td4 = $('<td></td>').html(userNums[3]);
-         //     var td5 = $('<td></td>').html(userNums[4]);
-         //     var td6 = $('<td></td>').html(userNums[5]);
-         //     var td7 = $('<td></td>').html(userNums[6]);
-         //
-         // }
+     function show_info(data){
+    	 console.log(data);
          var list=["user","share","publish","reward","sincerity","publishMoney","recharge","cash","video","ask"];
-    	 for(var i=0;i<list;i++){
-             var userNums = Msg.extend[i];
-             var td1 = $('<td></td>').html(userNums[0]);
-             var td2 = $('<td></td>').html(userNums[1]);
-             var td3 = $('<td></td>').html(userNums[2]);
-             var td4 = $('<td></td>').html(userNums[3]);
-             var td5 = $('<td></td>').html(userNums[4]);
-             var td6 = $('<td></td>').html(userNums[5]);
-             var td7 = $('<td></td>').html(userNums[6]);
+    	 for(var i=0;i<list.length;i++){
+             var td1 = $('<td></td>').html(data[0]);
+             var td2 = $('<td></td>').html(data[1]);
+             var td3 = $('<td></td>').html(data[2]);
+             var td4 = $('<td></td>').html(data[3]);
+             var td5 = $('<td></td>').html(data[4]);
+             var td6 = $('<td></td>').html(data[5]);
+             var td7 = $('<td></td>').html(data[6]);
 
              $(list[i]).append(td1).append(td2).append(td3)
                  .append(td4).append(td5).append(td6).append(td7);
          }
-
-		 // var userNums = Msg.extend["userNums"];
-		 // var td1 = $('<td></td>').html(userNums[0]);
-		 // var td2 = $('<td></td>').html(userNums[1]);
-		 // var td3 = $('<td></td>').html(userNums[2]);
-		 // var td4 = $('<td></td>').html(userNums[3]);
-		 // var td5 = $('<td></td>').html(userNums[4]);
-		 // var td6 = $('<td></td>').html(userNums[5]);
-		 // var td7 = $('<td></td>').html(userNums[6]);
-		 // $("#user").append(td1).append(td2).append(td3)
-		 // .append(td4).append(td5).append(td6).append(td7);
 
 
      }

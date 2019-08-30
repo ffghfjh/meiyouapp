@@ -145,7 +145,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     @Cacheable(cacheNames = "buy")
     public List<ClubVO> selectMyClubAsk(Integer uid) {
 
-        Msg msg = new Msg();
         //查找购买按摩会所的记录
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         //购买者id为uid的购买记录
@@ -196,7 +195,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ShopVO shopVO = setShopToShopVO(shop);
             //设置购买者状态
-            shopVO.setState(shopBuy.getState());
+            shopVO.setAskState(shopBuy.getState());
 
             shopVOS.add(shopVO);
         }

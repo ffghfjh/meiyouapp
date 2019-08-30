@@ -9,7 +9,6 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -97,7 +96,7 @@ public class AppointmentController {
      * @Date: 2019/8/22
      */
     @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "GET")
-    @GetMapping(value = "/selectAppointAskList")
+    @PostMapping(value = "/selectAppointAskList")
     public Msg selectAppointAskList(String uid,Integer appointId,String token) {
         Msg msg = appointmentService.selectAppointAskList(uid,appointId,token);
         return msg;
@@ -191,7 +190,7 @@ public class AppointmentController {
      * @Date: 2019/8/24
      */
     @ApiOperation(value = "查看热门约会", notes = "查看热门约会", httpMethod = "GET")
-    @GetMapping(value = "/selectHotAppointment")
+    @PostMapping(value = "/selectHotAppointment")
     public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
         Msg msg = appointmentService.selectHotAppointment(uid, token, latitude, longitude);
         return msg;
@@ -204,7 +203,7 @@ public class AppointmentController {
      * @Date: 2019/8/29
      */
     @ApiOperation(value = "查询报名约会的全部人员", notes = "查询报名约会的全部人员", httpMethod = "GET")
-    @GetMapping(value = "/selectAllAppointmentById")
+    @PostMapping(value = "/selectAllAppointmentById")
     public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
         return appointmentService.selectAllAppointmentById(uid, token, id);
     }

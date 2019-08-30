@@ -696,8 +696,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 continue;
             }
             User user = userMapper.selectByPrimaryKey(publisherId);
-            System.out.println("hzy---yonghu id" + user.getId());
-
             HashMap<String, Object> map = new HashMap<>();
 
             if (state == 1 || state == 2){

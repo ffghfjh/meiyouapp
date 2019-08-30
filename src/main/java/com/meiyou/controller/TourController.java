@@ -6,7 +6,6 @@ import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,7 +76,7 @@ public class TourController {
      * @Date: 2019/8/22
      */
     @ApiOperation(value = "查询所有报名某个旅游的人员信息", notes = "查询所有报名某个旅游的人员信息", httpMethod = "GET")
-    @GetMapping(value = "/selectTourAskList")
+    @PostMapping(value = "/selectTourAskList")
     public Msg selectTourAskList(String uid,Integer appointId,String token) {
         Msg msg = tourService.selectTourAskList(uid,appointId,token);
         return msg;
@@ -171,7 +170,7 @@ public class TourController {
      * @Date: 2019/8/24
      */
     @ApiOperation(value = "查看热门旅游", notes = "查看热门旅游", httpMethod = "GET")
-    @GetMapping(value = "/selectHotTour")
+    @PostMapping(value = "/selectHotTour")
     public Msg selectHotTour(String uid, String token,double latitude, double longitude) {
         Msg msg = tourService.selectHotTour(uid, token, latitude, longitude);
         return msg;
@@ -183,7 +182,7 @@ public class TourController {
     * @Date: 2019/8/29
     */
     @ApiOperation(value = "查询报名旅游的全部人员", notes = "查询报名旅游的全部人员", httpMethod = "GET")
-    @GetMapping(value = "/selectAllTourById")
+    @PostMapping(value = "/selectAllTourById")
     public Msg selectAllTourById(Integer uid, String token, Integer id) {
         return tourService.selectAllTourById(uid, token,id);
     }

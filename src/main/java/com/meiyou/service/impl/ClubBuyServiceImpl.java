@@ -232,7 +232,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
 
-        if(result == null && result.size() ==0){
+        if(result.isEmpty()){
             msg.setCode(404);
             msg.setMsg("找不到指定的导游聘请记录");
             return msg;

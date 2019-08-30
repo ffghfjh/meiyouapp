@@ -72,7 +72,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                 Integer appointId = ask.getAppointId();
                 Integer askState = ask.getAskState();
                 Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(appointId);
+                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
                 String header = null;
                 String appointContext = null;
                 String appointTime = null;
@@ -209,7 +209,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                 Integer appointId = ask.getAppointId();
                 Integer askState = ask.getAskState0();
                 Tour tour = tourMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(appointId);
+                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
                 String header = null;
                 String goMessage = null;
                 String startAddress = null;

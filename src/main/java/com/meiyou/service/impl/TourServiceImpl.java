@@ -370,8 +370,8 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //旅游报名表中2是被选中状态
         tourAsk.setAskState0(2);
         tourAsk.setUpdateTime(new Date());
-        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
-        System.out.println(i1);
+        int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
         TourAskExample tourAskExample1 = new TourAskExample();
         tourAskExample1.createCriteria().andAskState0EqualTo(1)
                 .andAskerIdNotEqualTo(askerId);

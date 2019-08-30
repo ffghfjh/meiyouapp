@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,28 @@ public class CountShareServiceImpl extends BaseServiceImpl implements CountShare
 
     @Autowired
     CountShareMapper mapper;
+
+    @Override
+    public List<Integer> countShareMoney() {
+        Integer nowMoney = nowShareMoney();
+        Integer yesterdayMoney = yesterdayShareMoney();
+        Integer nowWeekMoney = nowWeekShareMoney();
+        Integer nowMonthMoney = nowMonthShareMoney();
+        Integer lastMonthMoney = lastMonthShareMoney();
+        Integer nowYearMoney = nowYearShareMoney();
+        Integer allMoney = allShareMoney();
+
+        List<Integer> videoList = new ArrayList<>();
+        videoList.add(nowMoney);
+        videoList.add(yesterdayMoney);
+        videoList.add(nowWeekMoney);
+        videoList.add(nowMonthMoney);
+        videoList.add(lastMonthMoney);
+        videoList.add(nowYearMoney);
+        videoList.add(allMoney);
+
+        return videoList;
+    }
 
     @Override
     public Integer nowShareMoney() {

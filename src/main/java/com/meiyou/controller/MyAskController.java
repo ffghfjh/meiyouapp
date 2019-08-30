@@ -30,14 +30,17 @@ public class MyAskController {
     * @Author: JK
     * @Date: 2019/8/26
     */
-    @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名", httpMethod = "GET")
+    @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名")
     @PostMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
-        if(!RedisUtil.authToken(uid,token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid,token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
-        myAskService.selectMyAppointmentAsk(uid, token);
+        List<Object> appointmentList = myAskService.selectMyAppointmentAsk(uid, token);
+        List<Object> tourList = myAskService.selectMyTourAsk(uid, token);
+        msg.add("appointmentList",appointmentList);
+        msg.add("tourList",tourList);
 
 
         List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));

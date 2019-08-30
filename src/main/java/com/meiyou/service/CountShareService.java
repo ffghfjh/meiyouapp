@@ -9,6 +9,8 @@ import java.util.List;
  **/
 public interface CountShareService {
 
+    List<Integer> countShareMoney();
+
     Integer nowShareMoney();
 
     Integer yesterdayShareMoney();

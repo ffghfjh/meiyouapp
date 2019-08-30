@@ -5,6 +5,7 @@ import com.meiyou.service.CountAskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +18,28 @@ public class CountAskServiceImpl extends BaseServiceImpl implements CountAskServ
 
     @Autowired
     CountAskMapper mapper;
+
+    @Override
+    public List<Integer> countAskNums() {
+        Integer nowNums = nowAskNums();
+        Integer yesterdayNums = yesterdayAskNums();
+        Integer nowWeekNums = nowWeekAskNums();
+        Integer nowMonthNums = nowMonthAskNums();
+        Integer lastMonthNums = lastMonthAskNums();
+        Integer nowYearNums = nowYearAskNums();
+        Integer allNums = allAskNums();
+
+        List<Integer> askList = new ArrayList<>();
+        askList.add(nowNums);
+        askList.add(yesterdayNums);
+        askList.add(nowWeekNums);
+        askList.add(nowMonthNums);
+        askList.add(lastMonthNums);
+        askList.add(nowYearNums);
+        askList.add(allNums);
+
+        return askList;
+    }
 
     @Override
     public Integer nowAskNums() {

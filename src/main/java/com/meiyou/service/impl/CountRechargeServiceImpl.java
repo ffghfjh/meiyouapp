@@ -5,6 +5,7 @@ import com.meiyou.service.CountRechargeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +18,28 @@ public class CountRechargeServiceImpl extends BaseServiceImpl implements CountRe
 
     @Autowired
     CountRechargeMapper mapper;
+
+    @Override
+    public List<Integer> countRechargeNums() {
+        Integer nowNums = nowRechargeNums();
+        Integer yesterdayNums = yesterdayRechargeNums();
+        Integer nowWeekNums = nowWeekRechargeNums();
+        Integer nowMonthNums = nowMonthRechargeNums();
+        Integer lastMonthNums = lastMonthRechargeNums();
+        Integer nowYearNums = nowYearRechargeNums();
+        Integer allNums = allRechargeNums();
+
+        List<Integer> rechargeList = new ArrayList<>();
+        rechargeList.add(nowNums);
+        rechargeList.add(yesterdayNums);
+        rechargeList.add(nowWeekNums);
+        rechargeList.add(nowMonthNums);
+        rechargeList.add(lastMonthNums);
+        rechargeList.add(nowYearNums);
+        rechargeList.add(allNums);
+
+        return rechargeList;
+    }
 
     @Override
     public Integer nowRechargeNums() {

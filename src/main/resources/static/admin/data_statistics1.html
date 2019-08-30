@@ -118,46 +118,126 @@
     		 dateType: "json",
     		 success:function(Msg){
     			 if(Msg.code==100){
-    			     var userNums = Msg.extend["userNums"]
-    				 show_info(userNums);
-                     var shareMoney = Msg.extend["shareMoney"]
-                         show_info(shareMoney);
-                     var publishNums = Msg.extend["publishNums"]
-                         show_info(publishNums);
-                     var rewardMoney = Msg.extend["rewardMoney"]
-                         show_info(rewardMoney);
-                     var sincerityMoney = Msg.extend["sincerityMoney"]
-                         show_info(sincerityMoney);
-                     var publishMoney = Msg.extend["publishMoney"]
-                         show_info(publishMoney);
-                     var rechargeMoney = Msg.extend["rechargeMoney"]
-                         show_info(rechargeMoney);
-                     var cashMoney = Msg.extend["cashMoney"]
-                         show_info(cashMoney);
-                     var videoMoney = Msg.extend["videoMoney"]
-                         show_info(videoMoney);
-                     var askNums = Msg.extend["askNums"]
-                         show_info(askNums);
+    				 show_info(Msg);
        		     }
     		}
     	 }); 
      }
      
-     function show_info(data){
-    	 console.log(data);
-         var list=["user","share","publish","reward","sincerity","publishMoney","recharge","cash","video","ask"];
-    	 for(var i=0;i<list.length;i++){
-             var td1 = $('<td></td>').html(data[0]);
-             var td2 = $('<td></td>').html(data[1]);
-             var td3 = $('<td></td>').html(data[2]);
-             var td4 = $('<td></td>').html(data[3]);
-             var td5 = $('<td></td>').html(data[4]);
-             var td6 = $('<td></td>').html(data[5]);
-             var td7 = $('<td></td>').html(data[6]);
+     function show_info(Msg){
+    	 console.log(Msg);
+    	 var userNums = Msg.extend["userNums"];
+         var shareMoney = Msg.extend["shareMoney];
+         var publishNums= Msg.extend["publishNums"];
+         var rewardMoney= Msg.extend["rewardMoney"];
+         var sincerityMoney = Msg.extend["sincerityMoney"];
+         var publishMoney= Msg.extend["publishMoney"];
+         var rechargeMoney = Msg.extend["rechargeMoney"];
+         var cashMoney = Msg.extend["cashMoney"];
+         var videoMoney = Msg.extend["videoMoney"];
+         var askNums = Msg.extend["askNums"];
 
-             $(list[i]).append(td1).append(td2).append(td3)
-                 .append(td4).append(td5).append(td6).append(td7);
-         }
+         var list=["#user","#share","#publish","#reward","#sincerity","#publishMoney","#recharge","#cash","#video","#ask"];
+         var td1 = $('<td></td>').html(userNums[0]);
+         var td2 = $('<td></td>').html(userNums[1]);
+         var td3 = $('<td></td>').html(userNums[2]);
+         var td4 = $('<td></td>').html(userNums[3]);
+         var td5 = $('<td></td>').html(userNums[4]);
+         var td6 = $('<td></td>').html(userNums[5]);
+         var td7 = $('<td></td>').html(userNums[6]);
+         $("#user").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(shareMoney[0]);
+         var td2 = $('<td></td>').html(shareMoney[1]);
+         var td3 = $('<td></td>').html(shareMoney[2]);
+         var td4 = $('<td></td>').html(shareMoney[3]);
+         var td5 = $('<td></td>').html(shareMoney[4]);
+         var td6 = $('<td></td>').html(shareMoney[5]);
+         var td7 = $('<td></td>').html(shareMoney[6]);
+         $("#share").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(publishNums[0]);
+         var td2 = $('<td></td>').html(publishNums[1]);
+         var td3 = $('<td></td>').html(publishNums[2]);
+         var td4 = $('<td></td>').html(publishNums[3]);
+         var td5 = $('<td></td>').html(publishNums[4]);
+         var td6 = $('<td></td>').html(publishNums[5]);
+         var td7 = $('<td></td>').html(publishNums[6]);
+         $("#publish").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(rewardMoney[0]);
+         var td2 = $('<td></td>').html(rewardMoney[1]);
+         var td3 = $('<td></td>').html(rewardMoney[2]);
+         var td4 = $('<td></td>').html(rewardMoney[3]);
+         var td5 = $('<td></td>').html(rewardMoney[4]);
+         var td6 = $('<td></td>').html(rewardMoney[5]);
+         var td7 = $('<td></td>').html(rewardMoney[6]);
+         $("#reward").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(sincerityMoney[0]);
+         var td2 = $('<td></td>').html(sincerityMoney[1]);
+         var td3 = $('<td></td>').html(sincerityMoney[2]);
+         var td4 = $('<td></td>').html(sincerityMoney[3]);
+         var td5 = $('<td></td>').html(sincerityMoney[4]);
+         var td6 = $('<td></td>').html(sincerityMoney[5]);
+         var td7 = $('<td></td>').html(sincerityMoney[6]);
+         $("#sincerity").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(publishMoney[0]);
+         var td2 = $('<td></td>').html(publishMoney[1]);
+         var td3 = $('<td></td>').html(publishMoney[2]);
+         var td4 = $('<td></td>').html(publishMoney[3]);
+         var td5 = $('<td></td>').html(publishMoney[4]);
+         var td6 = $('<td></td>').html(publishMoney[5]);
+         var td7 = $('<td></td>').html(publishMoney[6]);
+         $("#publishMoney").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(rechargeMoney[0]);
+         var td2 = $('<td></td>').html(rechargeMoney[1]);
+         var td3 = $('<td></td>').html(rechargeMoney[2]);
+         var td4 = $('<td></td>').html(rechargeMoney[3]);
+         var td5 = $('<td></td>').html(rechargeMoney[4]);
+         var td6 = $('<td></td>').html(rechargeMoney[5]);
+         var td7 = $('<td></td>').html(rechargeMoney[6]);
+         $("#recharge").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(cashMoney[0]);
+         var td2 = $('<td></td>').html(cashMoney[1]);
+         var td3 = $('<td></td>').html(cashMoney[2]);
+         var td4 = $('<td></td>').html(cashMoney[3]);
+         var td5 = $('<td></td>').html(cashMoney[4]);
+         var td6 = $('<td></td>').html(cashMoney[5]);
+         var td7 = $('<td></td>').html(cashMoney[6]);
+         $("#cash").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(videoMoney[0]);
+         var td2 = $('<td></td>').html(videoMoney[1]);
+         var td3 = $('<td></td>').html(videoMoney[2]);
+         var td4 = $('<td></td>').html(videoMoney[3]);
+         var td5 = $('<td></td>').html(videoMoney[4]);
+         var td6 = $('<td></td>').html(videoMoney[5]);
+         var td7 = $('<td></td>').html(videoMoney[6]);
+         $("#video").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
+         var td1 = $('<td></td>').html(askNums[0]);
+         var td2 = $('<td></td>').html(askNums[1]);
+         var td3 = $('<td></td>').html(askNums[2]);
+         var td4 = $('<td></td>').html(askNums[3]);
+         var td5 = $('<td></td>').html(askNums[4]);
+         var td6 = $('<td></td>').html(askNums[5]);
+         var td7 = $('<td></td>').html(askNums[6]);
+         $("#ask").append(td1).append(td2).append(td3)
+             .append(td4).append(td5).append(td6).append(td7);
+
 
 
      }

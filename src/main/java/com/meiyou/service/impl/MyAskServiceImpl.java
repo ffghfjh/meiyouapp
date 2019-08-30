@@ -26,8 +26,6 @@ import java.util.List;
 @Service
 public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     @Autowired
-    private UserMapper userMapper;
-    @Autowired
     private AppointAskMapper appointAskMapper;
     @Autowired
     private AppointmentMapper appointmentMapper;
@@ -163,6 +161,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ClubVO clubVO = setClubToClubVO(club);
             //设置购买者状态
+            clubVO.setId(c.getId());
             clubVO.setAskState(c.getState());
 
             clubVOS.add(clubVO);
@@ -195,6 +194,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ShopVO shopVO = setShopToShopVO(shop);
             //设置购买者状态
+            shopVO.setId(shopBuy.getId());
             shopVO.setAskState(shopBuy.getState());
 
             shopVOS.add(shopVO);

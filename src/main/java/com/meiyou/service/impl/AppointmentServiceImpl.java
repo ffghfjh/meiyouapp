@@ -498,12 +498,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 //金额退还后账户余额
                 float balance = money + askMoneyValue;
 
-                User user1 = new User();
-                UserExample userExample = new UserExample();
-                userExample.createCriteria().andIdEqualTo(askerId);
-                user1.setMoney(balance);
-                user1.setUpdateTime(new Date());
-                i1 = userMapper.updateByExampleSelective(user1, userExample);
                 if (i1 != 1){
                     return Msg.fail();
                 }
@@ -515,6 +509,14 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 appointAsk1.setAskState(0);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
+
+                User user1 = new User();
+                UserExample userExample = new UserExample();
+                userExample.createCriteria().andIdEqualTo(askerId);
+                user1.setMoney(balance);
+                user1.setUpdateTime(new Date());
+                i1 = userMapper.updateByExampleSelective(user1, userExample);
+
                 if (i2 != 1){
                     return Msg.fail();
                 }
@@ -550,6 +552,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             //修改金额
             i1 = userMapper.updateByExampleSelective(user1, userExample);
 
+            if (i1 != 1){
+                return Msg.fail();
+            }
 
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(2)
@@ -563,6 +568,48 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
             appointment.setState(2);
+            appointment.setUpdateTime(new Date());
+            int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
+
+            int i = i1 + i2 + i3;
+            if (i == 3) {
+                return Msg.success();
+            }
+        }
+
+        if (state == 4) {
+            Integer confirmId = appointment.getConfirmId();
+            //根据报名者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(confirmId);
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取报名金的金额
+            String askMoneyName = "ask_money";
+            int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
+            //金额退还后账户余额
+            float balance = money + askMoneyValue;
+
+            User user1 = new User();
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(confirmId);
+            user1.setMoney(balance);
+            user1.setUpdateTime(new Date());
+            //修改金额
+            i1 = userMapper.updateByExampleSelective(user1, userExample);
+
+
+            AppointAskExample appointAskExample = new AppointAskExample();
+            appointAskExample.createCriteria().andAskStateEqualTo(6)
+                    .andAppointIdEqualTo(id);
+            AppointAsk appointAsk = new AppointAsk();
+            //退还报名金后，报名者状态从2变成3
+            appointAsk.setAskState(3);
+            appointAsk.setUpdateTime(new Date());
+            i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+
+            AppointmentExample appointmentExample = new AppointmentExample();
+            appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(4);
+            appointment.setState(1);
             appointment.setUpdateTime(new Date());
             int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 

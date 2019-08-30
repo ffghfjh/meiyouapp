@@ -1,7 +1,9 @@
 package com.meiyou.service;
 
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 
 import java.util.List;
 
@@ -20,14 +22,14 @@ public interface MyAskService {
     * @Author: JK
     * @Date: 2019/8/26
     */
-    List<Object> selectMyAppointmentAsk(String uid, String token);
+    List<AppointmentVO> selectMyAppointmentAsk(String uid, String token);
 
     /**
     * @Description: 查询我的旅游报名
     * @Author: JK
     * @Date: 2019/8/26
     */
-    List<Object> selectMyTourAsk(String uid, String token);
+    List<TourVO> selectMyTourAsk(String uid, String token);
 
     /**
      * 查询我的会所购买

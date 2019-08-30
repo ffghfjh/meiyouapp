@@ -21,6 +21,7 @@ public class AppointmentVO implements Serializable {
     private String appointTime;
     private String appointAddress;
     private Integer state;
+    private Integer askState;
     private List<String> askerHeader;
 
     @Override
@@ -36,6 +37,7 @@ public class AppointmentVO implements Serializable {
                 ", appointTime='" + appointTime + '\'' +
                 ", appointAddress='" + appointAddress + '\'' +
                 ", state=" + state +
+                ", askState=" + askState +
                 ", askerHeader=" + askerHeader +
                 '}';
     }
@@ -118,6 +120,14 @@ public class AppointmentVO implements Serializable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getAskState() {
+        return askState;
+    }
+
+    public void setAskState(Integer askState) {
+        this.askState = askState;
     }
 
     public List<String> getAskerHeader() {

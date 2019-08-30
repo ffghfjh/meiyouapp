@@ -12,6 +12,14 @@ import com.meiyou.model.LayuiTableJson;
 public interface UserReportService {
 
     /**
+     * 屏蔽被举报人
+     * @param uid
+     * @param type
+     * @return
+     */
+    LayuiTableJson hideReportedPersonById(int page, int limit, int uid, int type);
+
+    /**
      * 获得所有用户举报信息
      * @return
      */

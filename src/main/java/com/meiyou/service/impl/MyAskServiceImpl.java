@@ -72,7 +72,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                 Integer appointId = ask.getAppointId();
                 Integer askState = ask.getAskState();
                 Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(appointId);
+                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
                 String header = null;
                 String appointContext = null;
                 String appointTime = null;
@@ -209,7 +209,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
                 Integer appointId = ask.getAppointId();
                 Integer askState = ask.getAskState0();
                 Tour tour = tourMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(appointId);
+                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
                 String header = null;
                 String goMessage = null;
                 String startAddress = null;
@@ -397,8 +397,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if(result.isEmpty()){
             return shopVOS;
         }
-
-
         for(ShopBuy shopBuy : result){
             Shop shop = shopMapper.selectByPrimaryKey(shopBuy.getGuideId());
 
@@ -408,7 +406,6 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             shopVOS.add(shopVO);
         }
-
         //返回一个封装好的ShopVO类
         return shopVOS;
     }

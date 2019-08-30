@@ -8,11 +8,10 @@ import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: meiyou
@@ -31,27 +30,41 @@ public class MyAskController {
     * @Author: JK
     * @Date: 2019/8/26
     */
-    @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名", httpMethod = "GET")
-    @GetMapping(value = "/selectMyAppointmentAsk")
+    @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名")
+    @PostMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
-        if(!RedisUtil.authToken(uid,token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid,token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
-        myAskService.selectMyAppointmentAsk(uid, token);
+        List<Object> appointmentList = myAskService.selectMyAppointmentAsk(uid, token);
+        if(appointmentList.isEmpty()){
+            msg.add("appointmentList",null);
+        }else {
+            msg.add("appointmentList",appointmentList);
+        }
+
+        List<Object> tourList = myAskService.selectMyTourAsk(uid, token);
+        if(tourList.isEmpty()){
+            msg.add("tourList",null);
+        }else {
+            msg.add("tourList",tourList);
+        }
 
 
         List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));
         if(clubVOS.isEmpty()){
             msg.add("clubVOS",null);
+        }else {
+            msg.add("clubVOS",clubVOS);
         }
-        msg.add("clubVOS",clubVOS);
 
         List<ShopVO> shopVOS = myAskService.selectMyShopAsk(Integer.valueOf(uid));
         if(clubVOS.isEmpty()){
             msg.add("shopVOS",null);
+        }else {
+            msg.add("shopVOS",shopVOS);
         }
-        msg.add("shopVOS",shopVOS);
 
         msg.setCode(100);
         msg.setMsg("成功");

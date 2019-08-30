@@ -76,7 +76,7 @@ public class MqttMessageFactory {
             authinfo.put("mNonce",info.getNonce());
             authinfo.put("mTimestamp",info.getNonce());
             authinfo.put("mToken",info.getToken());
-            authinfo.put("mGslb",info.getGslb());
+            authinfo.put("mGslb",info.getmGslb());
             jsonObject.put("authInfo",authinfo);
         }else {
             jsonObject.put("authInfo",null);

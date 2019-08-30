@@ -1,8 +1,10 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyPublishService;
 import com.meiyou.utils.Msg;
@@ -44,73 +46,61 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @Date: 2019/8/22
      */
     @Override
-    public List<Object> selectAppointmentList(String uid, String token) {
-        Msg msg = new Msg();
-
+    public List<AppointmentVO> selectAppointmentList(String uid, String token) {
+        List<AppointmentVO> appointmentVOS = new ArrayList<>();
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
-        ArrayList<Object> arrayList = new ArrayList<>();
+
+        if(appointments.isEmpty() && appointments ==null){
+            return appointmentVOS;
+        }
+
         for (Appointment appointment : appointments) {
 
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1).andAppointIdEqualTo(appointment.getId());
             List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-            HashMap<String, Object> map = new HashMap<>();
-            int size = 0;
-            Integer state = appointment.getState();
-            if (appointment.getState() == 2){
-                ArrayList<Object> arrayList1 = new ArrayList<>();
+
+            AppointmentVO appointmentVO = new AppointmentVO();
+
+            if(appointAsks.isEmpty() && appointAsks == null){
+                appointmentVO.setNums(0);
+                appointmentVO.setAskerHeader(null);
+            }else {
+                //获取报名者头像集合
+                List<String> askerHears = new ArrayList<>();
                 for (AppointAsk appointAsk : appointAsks) {
                     Integer askerId = appointAsk.getAskerId();
-                    User user = userMapper.selectByPrimaryKey(askerId);
+                    User user = getUserByUid(askerId);
                     String askerHeader = user.getHeader();
-                    arrayList1.add(askerHeader);
-                    map.put("arrayList1",arrayList1);
+                    askerHears.add(askerHeader);
                 }
-                //获取报名的总人数
-                size = appointAsks.size();
-                map.put("size", size);
-                state = appointment.getState();
-                map.put("state",state);
+                appointmentVO.setAskerHeader(askerHears);
+                appointmentVO.setNums(appointAsks.size());
             }
+
             //获取用户id
             Integer publisherId = appointment.getPublisherId();
-            User user = userMapper.selectByPrimaryKey(publisherId);
+            User user = getUserByUid(publisherId);
 
-            String nickname = user.getNickname();
-            String header = user.getHeader();
-            String birthday = user.getBirthday();
-            String signature = user.getSignature();
-            Integer id = appointment.getId();
-            String appointContext = appointment.getAppointContext();
-            String appointTime = appointment.getAppointTime();
-            String appointAddress = appointment.getAppointAddress();
-            String askerHeader = null;
+            //封装发布者信息
+            appointmentVO.setPublishBirthday(user.getBirthday());
+            appointmentVO.setPublishHeader(user.getHeader());
+            appointmentVO.setPublishNickName(user.getNickname());
+            appointmentVO.setPublishSignature(user.getSignature());
 
+            //封装约会信息
+            appointmentVO.setId(appointment.getId());
+            appointmentVO.setAppointAddress(appointment.getAppointAddress());
+            appointmentVO.setAppointContext(appointment.getAppointContext());
+            appointmentVO.setAppointTime(appointment.getAppointTime());
+            appointmentVO.setState(appointment.getState());
 
-            map.put("nickname",nickname);
-            map.put("header",header);
-            map.put("birthday",birthday);
-            map.put("id",id);
-            map.put("appointContext",appointContext);
-            map.put("appointTime",appointTime);
-            map.put("appointAddress",appointAddress);
-            map.put("signature",signature);
-            map.put("size",size);
-            map.put("askerHeader",askerHeader);
-            map.put("state",state);
-            arrayList.add(map);
+            appointmentVOS.add(appointmentVO);
         }
 
-        if (appointments != null && appointments.size() != 0) {
-            return arrayList;
-        }
-
-        msg.setCode(200);
-        msg.setMsg("没找到");
-        arrayList.add(msg);
-        return arrayList;
+        return appointmentVOS;
     }
 
     /**
@@ -119,74 +109,64 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
      * @Date: 2019/8/26
      */
     @Override
-    public List<Object> selectTourList(String uid, String token) {
-        Msg msg = new Msg();
-
+    public List<TourVO> selectTourList(String uid, String token) {
+        List<TourVO> tourVOS = new ArrayList<>();
         TourExample tourExample = new TourExample();
         tourExample.createCriteria().andPublishIdEqualTo(Integer.parseInt(uid));
         List<Tour> tours = tourMapper.selectByExample(tourExample);
-        ArrayList<Object> arrayList = new ArrayList<>();
+
+        if(tours.isEmpty() && tours ==null){
+            return tourVOS;
+        }
+
         for (Tour tour : tours) {
             TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1).andAppointIdEqualTo(tour.getId());
             List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
-            HashMap<String, Object> map = new HashMap<>();
-            int size = 0;
-            Integer state = tour.getState();
-            if (tour.getState() == 2){
-                ArrayList<Object> arrayList1 = new ArrayList<>();
+
+            TourVO tourVO = new TourVO();
+
+            if(tourAsks.isEmpty() && tourAsks == null){
+                tourVO.setAskerHeader(null);
+                tourVO.setNums(0);
+            }else {
+                //获取报名者头像集合
+                List<String> askerHears = new ArrayList<>();
                 for (TourAsk tourAsk : tourAsks) {
                     Integer askerId = tourAsk.getAskerId();
-                    User user = userMapper.selectByPrimaryKey(askerId);
+                    User user = getUserByUid(askerId);
                     String askerHeader = user.getHeader();
-                    arrayList1.add(askerHeader);
-                    map.put("arrayList1",arrayList1);
+                    askerHears.add(askerHeader);
                 }
-                //获取报名的总人数
-                size = tourAsks.size();
-                map.put("size", size);
-                state = tour.getState();
-                map.put("state",state);
+
+                //添加报名者头像
+                tourVO.setAskerHeader(askerHears);
+                //添加报名的总人数
+                tourVO.setNums(tourAsks.size());
             }
+
             //获取用户id
             Integer publisherId = tour.getPublishId();
-            User user = userMapper.selectByPrimaryKey(publisherId);
+            User user = getUserByUid(publisherId);
 
-            String nickname = user.getNickname();
-            String header = user.getHeader();
-            String birthday = user.getBirthday();
-            String signature = user.getSignature();
-            Integer id = tour.getId();
-            String goMessage = tour.getGoMessage();
-            String startAddress = tour.getStartAddress();
-            String endAddress = tour.getEndAddress();
-            String goTime = tour.getGoTime();
-            String askerHeader = null;
+            //封装发布者信息
+            tourVO.setPublishBirthday(user.getBirthday());
+            tourVO.setPublishHeader(user.getHeader());
+            tourVO.setPublishNickName(user.getNickname());
+            tourVO.setPublishSignature(user.getSignature());
 
+            //封装旅游信息
+            tourVO.setId(tour.getId());
+            tourVO.setStartAddress(tour.getStartAddress());
+            tourVO.setEndAddress(tour.getEndAddress());
+            tourVO.setGoMessage(tour.getGoMessage());
+            tourVO.setGoTime(tour.getGoTime());
+            tourVO.setState(tour.getState());
 
-            map.put("nickname",nickname);
-            map.put("header",header);
-            map.put("birthday",birthday);
-            map.put("id",id);
-            map.put("goMessage",goMessage);
-            map.put("startAddress",startAddress);
-            map.put("endAddress",endAddress);
-            map.put("goTime",goTime);
-            map.put("signature",signature);
-            map.put("size",size);
-            map.put("askerHeader",askerHeader);
-            map.put("state",state);
-            arrayList.add(map);
+            tourVOS.add(tourVO);
         }
 
-        if (tours != null && tours.size() != 0) {
-            return arrayList;
-        }
-
-        msg.setCode(200);
-        msg.setMsg("没找到");
-        arrayList.add(msg);
-        return arrayList;
+        return tourVOS;
     }
 
     /**

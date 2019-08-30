@@ -1,5 +1,8 @@
 package com.meiyou.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -130,6 +133,7 @@ public class User implements Serializable {
      *
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**
@@ -138,6 +142,7 @@ public class User implements Serializable {
      *
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     /**

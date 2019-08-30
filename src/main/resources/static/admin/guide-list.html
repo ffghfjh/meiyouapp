@@ -1,402 +1,134 @@
 <html class="x-admin-sm">
 <head>
-<meta charset="UTF-8">
-<title>欢迎页面-X-admin2.1</title>
-<meta name="renderer" content="webkit">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<!--<meta name="viewport"-->
-<!--	content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />-->
-<link rel="stylesheet" href="./css/font.css">
-<link rel="stylesheet" href="./css/xadmin.css">
-<script type="text/javascript"
-	src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript" src="./lib/layui/layui.js"
-	charset="utf-8"></script>
-<script type="text/javascript" src="./js/xadmin.js"></script>
-<script type="text/javascript" src="./js/cookie.js"></script>
-<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
-<!--[if lt IE 9]>
-      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+	<meta charset="UTF-8">
+	<title>欢迎页面-X-admin2.1</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		  content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+	<link rel="stylesheet" href="./css/font.css">
+	<link rel="stylesheet" href="./css/xadmin.css">
+	<script type="text/javascript"
+			src="./js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="./lib/layui/layui.js"
+			charset="utf-8"></script>
+	<script type="text/javascript" src="./js/xadmin.js"></script>
+	<script type="text/javascript" src="./js/cookie.js"></script>
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]>
+	<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
 </head>
 
-<body onload="showShopList()">
-	<div class="x-nav">
+<body>
+<div class="x-nav">
 		<span class="layui-breadcrumb"> <a href="">首页</a> <a href="">演示</a>
 			<a> <cite>导航元素</cite></a>
 		</span> <a class="layui-btn layui-btn-small"
-			style="line-height: 1.6em; margin-top: 3px; float: right"
-			href="javascript:location.replace(location.href);" title="刷新"> 
-			<i class="layui-icon" style="line-height: 50px"></i></a>
+				   style="line-height: 1.6em; margin-top: 3px; float: right"
+				   href="javascript:location.replace(location.href);" title="刷新">
+	<i class="layui-icon" style="line-height: 30px">&#xe669;</i></a>
+</div>
+<div class="x-body-appointment">
+	<div class="layui-row">
+		<form class="layui-form layui-col-md12 x-so">
+			<input type="text" name="publisherId" id="publisherId" placeholder="请输入用户ID"
+				   autocomplete="off" class="layui-input">
+			<a class="layui-btn" data-type="reload" id="select_btn">
+				<i class="layui-icon">&#xe615;</i>
+			</a>
+		</form>
 	</div>
-	<div class="x-body">
-		<div class="layui-row">
-			<form class="layui-form layui-col-md12 x-so">
-				<input type="text" id="gUCount" placeholder="请输入景点商家id"
-					autocomplete="off" class="layui-input">
-				<button type="button" class="layui-btn" id="select_btn" onclick="selectBySid()">
-					<i class="layui-icon">&#xe615;</i>
-				</button>
-			</form>
-		</div>
-		<xblock> 
-        <button class="layui-btn" id="not_audit">已发布</button>
-        <button class="layui-btn" id="audit">准备赴约</button>
-        <button class="layui-btn" id="success_audit">接待成功</button>
-        <span class="x-right" style="line-height:40px" id="totil"></span>
-		</xblock>
-		<table class="layui-table x-admin">
-			<thead>
-				<tr>
-					<th>
-						<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-					</th>
-					<th>ID</th>
-					<th>导游ID</th>
-					<th>发布人ID</th>
-					<th>服务区域</th>
-					<th>出行时间</th>
-					<th>每小时收费</th>
-					<th>过期时间</th>
-					<th>状态</th>
-					<th>发布时间</th>
-					<th>操作</th>
-				</tr>
-			</thead>
-			<tbody id="shop-list">
-			</tbody>
-		</table>
-		<div class="page"></div>
-	</div>
+	<xblock1>
+		<button class="layui-btn" id="not_audit">已发布</button>
+		<button class="layui-btn" id="success_audit">赴约成功</button>
+		<span class="x-right" style="line-height:40px" id="totil"></span>
+	</xblock1>
+	<table class="layui-table x-admin" id="shopTable" lay-filter="test"></table>
+</div>
 
-	<script>
-		function showShopList() {
-			$.ajax({
-				url:"/admin/findAllShop",
-				type:"POST",
-				dataType:"json",
-				success:function(Msg) {
-					if (Msg.code == 100) {
-						var list = Msg.extend["shops"];
-						$("#shop-list").empty();
-						for (var i = 0; i < list.length; i++) {
-							var html = '<tr>'
-									+ '<td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>'
-									+ '<td>'+(i+1)+'</td>'
-									+ '<td>#{id}</td>'
-									+ '<td>#{publishId}</td>'
-									+ '<td>#{serviceArea}</td>'
-									+ '<td>#{travelTime}</td>'
-									+ '<td>#{charge}</td>'
-									+ '<td>#{outTime}</td>'
-									+ '<td>#{state}</td>'
-									+ '<td>#{createTime}</td>'
-									+ '<td><a class="btn btn-xs add-del btn-info" onclick="deleteByPid(#{pid})"><span class="fa fa-trash-o"></span> 删除</a></td>'
-									+ '</tr>';
+<script type="text/html" id="incrementId">
+	{{d.LAY_TABLE_INDEX+1}}
+</script>
+<script>
+	layui.use('table', function () {
+		var table = layui.table //表格
+		//执行一个 table 实例
+		table.render({
+			elem: '#shopTable',
+			limit: 10, //要传向后台的每页显示条数
+			page: 1, //当前页数
+			url: 'http://localhost:8080/selectAllShopByPage', //数据接口
+			//page: true, //开启分页
+			page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+				layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip' ]//自定义分页布局
+				,limits:[10,20,30,40,50,60,70,80,90]
+				,first: false //不显示首页
+				,last: false //不显示尾页
+				,prev: '上一页'
+				,next: '下一页'
+			},
+			//toolbar: 'default', //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+			//totalRow: true, //开启合计行
+			method: 'post',
+			cols: [[
+				//{type: 'checkbox', fixed: 'left'},
+				{type: 'numbers',title: '序号',templet: '#incrementId',fixed: 'left',width: 50},
+				{field: 'id', title: '订单ID', width: 70, totalRowText: '合计：', align: 'center'},
+				{field: 'publishId', width: 80, title: '发布人ID', align: 'center'},
+				{field: 'serviceArea', width: 150, title: '服务区域', align: 'center'},
+				{field: 'travelTime', width: 150, title: '约会时间', align: 'center'},
+				{field: 'charge', width: 125, title: '每小时收费', align: 'center'},
+				{field: 'outTime', width: 155, title: '到期时间', align: 'center'},
+				{field: 'state', width: 60, title: '状态', align: 'center'},
+				{field: 'createTime', width: 155, title: '订单发布时间', align: 'center'},
+			]],
+			id: 'shopTable'
+		});
 
-							html = html.replace(/#{id}/g, list[i].id);
-							html = html.replace(/#{publishId}/g, list[i].publishId);
-							html = html.replace(/#{serviceArea}/g, list[i].serviceArea);
-							html = html.replace(/#{travelTime}/g, list[i].travelTime);
-							html = html.replace(/#{charge}/g, list[i].charge);
-							html = html.replace(/#{outTime}/g, list[i].outTime);
-							html = html.replace(/#{state}/g, list[i].state);
-							html = html.replace(/#{createTime}/g, list[i].createTime);
-
-							$("#shop-list").append(html);
-						}
-						$(".add-def:eq(0)").hide();
-					} else {
-						alert(Msg.msg);
-					}
+		// 执行搜索，表格重载
+		$('#select_btn').on('click', function () {
+			// 搜索条件
+			var userId = $("input[name='publisherId']").val();
+			table.reload('shopTable', {
+				where: {
+					publisherId: userId
 				}
 			});
-		}
+		});
 
-		function selectBySid() {
-			var sid = $("#gUCount").val();
-			$.ajax({
-				"url": "/admin/findBySid",
-				"type": "GET",
-				"data": "sid=" + sid,
-				"dataType": "json",
-				success: function (Msg) {
-					if (Msg.code == 100) {
-						var list = Msg.extend["shop"];
-						$("#shop-list").empty();
-						var html = '<tr>'
-								+ '<td><div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div></td>'
-								+ '<td>1</td>'
-								+ '<td>#{id}</td>'
-								+ '<td>#{publishId}</td>'
-								+ '<td>#{serviceArea}</td>'
-								+ '<td>#{travelTime}</td>'
-								+ '<td>#{charge}</td>'
-								+ '<td>#{outTime}</td>'
-								+ '<td>#{state}</td>'
-								+ '<td>#{createTime}</td>'
-								+ '<td><a class="btn btn-xs add-del btn-info" onclick="deleteByPid(#{pid})"><span class="fa fa-trash-o"></span> 删除</a></td>'
-								+ '</tr>';
-
-						html = html.replace(/#{id}/g, list.id);
-						html = html.replace(/#{publishId}/g, list.publishId);
-						html = html.replace(/#{serviceArea}/g, list.serviceArea);
-						html = html.replace(/#{travelTime}/g, list.travelTime);
-						html = html.replace(/#{charge}/g, list.charge);
-						html = html.replace(/#{outTime}/g, list.outTime);
-						html = html.replace(/#{state}/g, list.state);
-						html = html.replace(/#{createTime}/g, list.createTime);
-
-						$("#shop-list").append(html);
-						$(".add-def:eq(0)").hide();
-					} else {
-						alert(Msg.msg);
-					}
+		//已发布
+		$('#not_audit').on('click', function () {
+			var table = layui.table; //表格
+			table.reload('shopTable', {
+				where: {
+					state: 0
 				}
 			});
-		}
-	</script>
+		});
 
-<!--	<script>-->
-<!--		//查询所有用户 -->
-<!--		function get_all_user_info(pn, textName, textValue) {-->
-<!--			var adminUser = localStorage.getItem("adminUser");-->
-<!--			adminUser = JSON.parse(adminUser);-->
-<!--			if (adminUser == null) {-->
-<!--				parent.location.href = 'login.html';-->
-<!--				return false;-->
-<!--			}-->
-<!--			$.ajax({-->
-<!--				url : "/meiyou/showGuide",-->
-<!--				type : 'POST',-->
-<!--				data : 'pn=' + pn + "&" + textName + "=" + textValue,-->
-<!--				success : function(data) {-->
-<!--					console.log(data);-->
-<!--					if (data.code == 100) {-->
-<!--						//展示数据 -->
-<!--						show_info(data, textName, textValue);-->
-<!--					} else if (data.code == 200) {-->
-<!--						//账号被挤出 -->
-<!--					} else if (data.code == 300) {-->
-<!--						//登录信息过去请重新登录 -->
-<!--						layer.msg('登录信息过期，请重新登录', {-->
-<!--							icon : 1,-->
-<!--							time : 1000-->
-<!--						//2秒关闭（如果不配置，默认是3秒）-->
-<!--						}, function() {-->
-<!--							parent.location.href = "login.html";-->
-<!--						});-->
-<!--					}-->
-<!--				}-->
-<!--			});-->
-<!--		}-->
+		//赴约成功
+		$('#success_audit').on('click', function () {
+			var table = layui.table; //表格
+			table.reload('shopTable', {
+				where: {
+					state: 1
+				}
+			});
+		});
 
-<!--		/*用户-删除*/-->
-<!--		function member_del(cid, obj) {-->
-<!--			layer.confirm('确认要删除吗？', function(index) {-->
-<!--				//发异步删除数据-->
-<!--				var id = $('#delete').attr("deleteId");-->
-<!--				$(obj).parents("tr").remove();-->
-<!--				layer.msg('已删除!', {-->
-<!--					icon : 1,-->
-<!--					time : 1000-->
-<!--				});-->
-<!--				location.reload();-->
-<!--				//发送ajax请求删除数据 -->
-<!--				var adminUser = localStorage.getItem("adminUser");-->
-<!--				adminUser = JSON.parse(adminUser);-->
-<!--				if (adminUser == null) {-->
-<!--					parent.location.href = 'login.html';-->
-<!--					return false;-->
-<!--				}-->
-<!--				$.ajax({-->
-<!--					url : "/meiyou/delGuide",-->
-<!--					type : "POST",-->
-<!--					data : "gId=" + cid,-->
-<!--					headers : {-->
-<!--						Accept : "application/json; charset=utf-8",-->
-<!--						headerId : adminUser.aId,-->
-<!--						headerToken : adminUser.token-->
-<!--					},-->
-<!--					success : function(data) {-->
-<!--						if (data.code == 100) {-->
-<!--							location.reload();-->
-<!--						} else if (data.code == 200) {-->
+	});
+</script>
 
-<!--						} else if (data.code == 300) {-->
-<!--							//登录信息过去请重新登录 -->
-<!--							layer.msg('登录信息过期，请重新登录', {-->
-<!--								icon : 1,-->
-<!--								time : 1000-->
-<!--							//2秒关闭（如果不配置，默认是3秒）-->
-<!--							}, function() {-->
-<!--								parent.location.href = "login.html";-->
-<!--							});-->
-<!--						}-->
-<!--					}-->
-<!--				});-->
-<!--			});-->
-<!--		}-->
-
-<!--		get_all_user_info(1);-->
-<!--		//用户信息展示-->
-<!--		function show_info(data, textName, textValue) {-->
-<!--			//清空之前的数据-->
-<!--			$('#td').empty();-->
-<!--			//数据信息展示 -->
-<!--			var list = data.extend.pageInfo.list;-->
-<!--			$.each(list,function(i, item) {-->
-<!--								var tr = $('<tr></tr>');-->
-<!--								var td = $('<td></td>');-->
-<!--								var tdgId = $('<td></td>').append(item.gId);-->
-<!--								var tdgUCount = $('<td></td>').append(item.gUCount);-->
-<!--								var tdgTime = $('<td></td>').append(item.gTime);-->
-<!--								var tdgState = $('<td></td>').append(item.gState);-->
-<!--								var tdgZdtime = $('<td></td>').append(item.gZdtime);-->
-<!--								var endtd = $('<td class="td-manage"></td>');-->
-<!--								var a2 = $('<a title="删除" id="delete" href="javascript:;" deleteId="'+item.gId+'"></a>');-->
-<!--								a2.click(function() {-->
-<!--									member_del(item.gId);-->
-<!--								});-->
-<!--								var li2 = $('<i class="layui-icon">&#xe640;</i>');-->
-<!--								a2.append(li2);-->
-<!--								endtd.append(a2);-->
-<!--								tr.append(tdgId).append(tdgUCount).append(tdgTime).append(tdgState).append(tdgZdtime).append(endtd);-->
-<!--								$('#td').append(tr);-->
-<!--							});-->
-<!--			  $('#totil').empty();-->
-<!--	    	  $('#totil').append('共有数据：'+data.extend.pageInfo.total+"条");-->
-<!--			//分页操作-->
-<!--			$('.page').empty();-->
-<!--			var div = $('<div></div>');-->
-<!--			//判断是否是首页 -->
-<!--			var shouyea;-->
-<!--			var shangyiye;-->
-<!--			if (data.extend.pageInfo.pageNum == 1) {-->
-<!--				shouyea = $('<a class="num">首页</a>');-->
-<!--				shangyiye = $('<a class="prev">&lt;&lt;</a>');-->
-<!--			} else {-->
-<!--				shouyea = $('<a class="num" href="">首页</a>');-->
-<!--				shangyiye = $('<a class="prev" href="">&lt;&lt;</a>');-->
-<!--				shouyea.click(function() {-->
-<!--					get_all_user_info(1, textName, textValue);-->
-<!--					return false;-->
-<!--				});-->
-<!--				shangyiye.click(function() {-->
-<!--					get_all_user_info(data.extend.pageInfo.pageNum - 1,-->
-<!--							textName.textValue);-->
-<!--					return false;-->
-<!--				});-->
-<!--			}-->
-<!--			div.append(shouyea).append(shangyiye);-->
-<!--			$.each(data.extend.pageInfo.navigatepageNums, function(i, item) {-->
-<!--				var a;-->
-<!--				if (item == data.extend.pageInfo.pageNum) {-->
-<!--					a = $('<span class="current"></span>').append(item);-->
-<!--				} else {-->
-<!--					a = $(' <a class="num" href=""></a>').append(item);-->
-<!--					a.click(function() {-->
-<!--						get_all_user_info(item, textName, textValue);-->
-<!--						return false;-->
-<!--					});-->
-<!--				}-->
-<!--				div.append(a);-->
-<!--			});-->
-
-<!--			//判断是否还有 下一页 -->
-<!--			var xiayiye;-->
-<!--			var moye;-->
-<!--			if (data.extend.pageInfo.hasNextPage) {-->
-<!--				xiayiye = $(' <a class="next" href="">&gt;&gt;</a>');-->
-<!--				moye = $('<a class="num" href="">末页</a>');-->
-<!--				xiayiye.click(function() {-->
-<!--					get_all_user_info(data.extend.pageInfo.pageNum + 1,-->
-<!--							textName.textValue);-->
-<!--					return false;-->
-<!--				});-->
-<!--				moye.click(function() {-->
-<!--					get_all_user_info(data.extend.pageInfo.pages, textName,-->
-<!--							textValue);-->
-<!--					return false;-->
-<!--				});-->
-<!--			} else {-->
-<!--				xiayiye = $(' <a class="next">&gt;&gt;</a>');-->
-<!--				moye = $('<a class="num">末页</a>');-->
-<!--			}-->
-<!--			div.append(xiayiye).append(moye);-->
-<!--			$('.page').append(div);-->
-<!--		}-->
-
-<!--		//查询按钮事件-->
-<!--		$('#select_btn').click(function() {-->
-<!--			var gUCount = $('#gUCount').val();-->
-<!--			if (gUCount == null || gUCount == '') {-->
-<!--				layer.msg('查询失败,请检查查询条件', {-->
-<!--					icon : 2,-->
-<!--					time : 1000-->
-<!--				//2秒关闭（如果不配置，默认是3秒）-->
-<!--				});-->
-<!--				return false;-->
-<!--			}-->
-<!--			if (gUCount != null && gUCount != '') {-->
-<!--				var textName = "gUCount";-->
-<!--				var textValue = gUCount;-->
-<!--				get_all_user_info(1, textName, textValue);-->
-<!--				return false;-->
-<!--			}-->
-<!--		});-->
-<!--		$('#not_audit').click(function(){-->
-<!--	    	var str = $('#not_audit').html();-->
-<!--	    	var textName = "gState";-->
-<!--			var textValue = str;-->
-<!--			get_all_user_info(1, textName, textValue);-->
-<!--			return false;-->
-<!--	    });-->
-<!--	    $('#audit').click(function(){-->
-<!--	    	var str = $('#audit').html();-->
-<!--	    	var textName = "gState";-->
-<!--			var textValue = str;-->
-<!--			get_all_user_info(1, textName, textValue);-->
-<!--			return false;-->
-<!--	    });-->
-<!--	    $('#success_audit').click(function(){-->
-<!--	    	var str = $('#success_audit').html();-->
-<!--	    	var textName = "gState";-->
-<!--			var textValue = str;-->
-<!--			get_all_user_info(1, textName, textValue);-->
-<!--			return false;-->
-<!--	    });-->
-<!--		/***-->
-<!--		获取url地址上参数-->
-<!--		 */-->
-<!--		function getUrlParam(url, name) {-->
-<!--			var pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");-->
-<!--			var matcher = pattern.exec(url);-->
-<!--			var items = null;-->
-<!--			if (matcher != null) {-->
-<!--				try {-->
-<!--					items = decodeURIComponent(decodeURIComponent(matcher[1]));-->
-<!--				} catch (e) {-->
-<!--					try {-->
-<!--						items = decodeURIComponent(matcher[1]);-->
-<!--					} catch (e) {-->
-<!--						items = matcher[1];-->
-<!--					}-->
-<!--				}-->
-<!--			}-->
-<!--			return items;-->
-<!--		}-->
-<!--	</script>-->
-
-<!--	<script>-->
-<!--		var _hmt = _hmt || [];-->
-<!--		(function() {-->
-<!--			var hm = document.createElement("script");-->
-<!--			hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";-->
-<!--			var s = document.getElementsByTagName("script")[0];-->
-<!--			s.parentNode.insertBefore(hm, s);-->
-<!--		})();-->
-<!--	</script>-->
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+		var hm = document.createElement("script");
+		hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hm, s);
+	})();
+</script>
 </body>
 </html>

@@ -11,6 +11,7 @@ public class AdminExample {
      *
      * @mbggenerated Wed Aug 21 16:35:07 CST 2019
      */
+
     protected String orderByClause;
 
     /**

@@ -52,25 +52,15 @@
  						});
         		  return false;
         	  }
-        	  var adminUser = localStorage.getItem("adminUser");
-     	      adminUser = JSON.parse(adminUser);
-     	      if(adminUser ==null){
-	       		  parent.location.href='login.html';
-	       		  return false;
-     	      }
         	  $.ajax({
-        		  url:'/meiyou/shuju/updateTHgetMeijin',
-        		  type:'post',
-        		  data:"quantity="+quantity,
-        		  headers: {
-       		        Accept: "application/json; charset=utf-8",
-       		        headerId:adminUser.aId,
-       		        headerToken:adminUser.token
-       		      },
+        		  url:'updVideo_money',
+        		  type:'get',
+        		  data:"money="+quantity,
         		  success:function(data){
         			  parent.location.href="essential_data.html";
         		  }
         	  });
           });
-    </script> 
+    </script>
+  </body>
 </html>

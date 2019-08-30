@@ -1,5 +1,7 @@
 package com.meiyou.service;
 
+import java.util.List;
+
 /**
  * @description:  悬赏金业务层接口
  * @author: Mr.Z
@@ -7,11 +9,13 @@ package com.meiyou.service;
  **/
 public interface CountRewardService {
 
+    List<Integer> countRewardNums();
+
     Integer nowRewardNums();
 
     Integer yesterdayRewardNums();
 
-    Integer nowWeekRewardhNums();
+    Integer nowWeekRewardNums();
 
     Integer nowMonthRewardNums();
 

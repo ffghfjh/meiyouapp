@@ -1,6 +1,5 @@
 package com.meiyou.controller;
 
-import com.meiyou.pojo.Club;
 import com.meiyou.pojo.Shop;
 import com.meiyou.service.AdminShopManagementService;
 import com.meiyou.utils.Msg;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description:
@@ -18,7 +18,6 @@ import java.util.List;
  **/
 @RestController
 @Api(value = "管理员同城导游控制器",tags = "用来查看整个同城导游情况")
-@RequestMapping("/admin")
 public class AdminShopManagementController {
 
     @Autowired
@@ -52,5 +51,16 @@ public class AdminShopManagementController {
         msg.setMsg("成功");
         msg.add("shop",shop);
         return msg;
+    }
+
+    /**
+    * @Description: 分页查询所有的导游
+    * @Author: JK
+    * @Date: 2019/8/29
+    */
+    @ApiOperation(value = "分页查询所有的导游", notes = "分页查询所有的导游", httpMethod = "POST")
+    @RequestMapping(value = "selectAllShopByPage")
+    public Map<String,Object> selectAllShopByPage(Integer page, Integer limit, Integer publisherId, Integer state){
+        return service.selectAllShopByPage(page,limit,publisherId,state);
     }
 }

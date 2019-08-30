@@ -128,8 +128,11 @@ public class BaseServiceImpl {
         List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 
+        Integer nums = 0;
         //通过查询出来的Club,报名人头像,Club星级赋值给ClubVO
-        Integer nums = clubBuys.size();
+        if(!clubBuys.isEmpty()){
+            nums = clubBuys.size();
+        }
 
         //查询每一个发布的Club中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
         for(ClubBuy c : clubBuys){
@@ -174,12 +177,19 @@ public class BaseServiceImpl {
         List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 
+        Integer nums = 0;
         //通过查询出来的Shop,报名人头像,Shop星级赋值给ShopVO
-        Integer nums = shopBuys.size();
+        if(!shopBuys.isEmpty()){
+            nums = shopBuys.size();
+        }
 
         //查询每一个发布的Shop中购买了的每一个用户的每一个头像，遍历出来并添加到头像集合List<String>中
         for(ShopBuy s : shopBuys){
-            list.add(getUserByUid(s.getBuyerId()).getHeader());
+            User userByUid = getUserByUid(s.getBuyerId());
+            if(userByUid == null){
+                continue;
+            }
+            list.add(userByUid.getHeader());
         }
 
         ShopVO shopVO = new ShopVO();
@@ -288,13 +298,4 @@ public class BaseServiceImpl {
         return sum;
     }
 
-
-    public Integer listsSum(List<List<Integer>> list){
-        Integer sum = 0;
-        if(list.isEmpty()){
-            return sum;
-        }
-
-        return sum;
-    }
 }

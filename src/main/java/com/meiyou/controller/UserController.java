@@ -52,7 +52,11 @@ public class UserController {
             return msg;
         }
     }
-
+    @RequestMapping(value = "getUserInfo",method = RequestMethod.POST)
+    @ApiOperation(value = "获取用户资料")
+    public Msg getUserInfo(int uId,String token){
+        return userService.getUserInfo(uId,token);
+    }
     /**
      * 手机注册
      * @param code
@@ -176,6 +180,14 @@ public class UserController {
             return Msg.noLogin();
         }
     }
+
+    @RequestMapping(value = "getOtherInfo",method = RequestMethod.POST)
+    @ApiOperation("拉取别人资料通过账号")
+    public Msg getOtherInfo(String account){
+        return userService.getOtherMsg(account);
+    }
+
+
 
     /**
     * @Description: 查询用户余额

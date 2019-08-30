@@ -3,6 +3,7 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.AskerVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
 import com.meiyou.myEnum.StateEnum;
@@ -267,33 +268,40 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             return msg;
         }
 
-        //查找聘请了此导游的记录
+        //查找购买经典商家的记录
         ShopBuyExample shopBuyExample = new ShopBuyExample();
-        //聘请id为sid的所有聘请记录
+        //聘请了id为sid的所有购买记录
         shopBuyExample.createCriteria().andGuideIdEqualTo(sid);
 
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 
-        if(result == null && result.size() ==0){
+        if(result.isEmpty()){
             msg.setCode(404);
-            msg.setMsg("找不到指定的导游聘请记录");
+            msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
 
         //对查找出来的ShopBuy进行封装
-        List<ShopVO> shopVOS = new ArrayList<>();
-        for(ShopBuy s : result){
-            Shop shop = shopMapper.selectByPrimaryKey(s.getGuideId());
+        List<AskerVO> askerVOS = new ArrayList<>();
+        for(ShopBuy shopBuy : result){
+            User buyer = getUserByUid(shopBuy.getBuyerId());
 
-            ShopVO shopVO = setShopToShopVO(shop);
-            //设置聘用者状态
-            shopVO.setAskState(s.getState());
+            AskerVO askerVO = new AskerVO();
 
-            shopVOS.add(shopVO);
+            askerVO.setId(buyer.getId());
+            askerVO.setNickname(buyer.getNickname());
+            askerVO.setHeader(buyer.getHeader());
+            askerVO.setBirthday(buyer.getBirthday());
+            askerVO.setSex(buyer.getSex());
+            askerVO.setSignature(buyer.getSignature());
+
+            askerVO.setAskState(shopBuy.getState());
+
+            askerVOS.add(askerVO);
         }
 
-        //返回一个封装好的ShopVO类
-        msg.add("shopVOS",shopVOS);
+        //返回一个封装好的askerVO类
+        msg.add("askerVOS",askerVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;

@@ -8,13 +8,11 @@ import com.meiyou.pojo.Club;
 import com.meiyou.pojo.ClubBuy;
 import com.meiyou.pojo.ClubBuyExample;
 import com.meiyou.pojo.Shop;
-import com.meiyou.service.CountPublishService;
-import com.meiyou.service.CountShareService;
+import com.meiyou.service.*;
 //import com.meiyou.service.MyAskService;
-import com.meiyou.service.MyAskService;
-import com.meiyou.service.ShopService;
 import com.meiyou.service.impl.BaseServiceImpl;
 import com.meiyou.utils.Msg;
+import org.apache.commons.collections.bag.SynchronizedSortedBag;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,6 +149,78 @@ public class ClubTests extends BaseServiceImpl {
     @Autowired
     CountPublishService publishService;
 
+    @Autowired
+    CountPublishMoneyService publishMoneyService;
+
+    @Autowired
+    CountVideoService videoService;
+
+    @Autowired
+    CountRechargeService rechargeService ;
+
+    @Autowired
+    CountCashService cashService;
+
+    @Test
+    public void cash(){
+        System.out.println(
+                cashService.nowCashNums()
+                        +","+
+                        cashService.yesterdayCashNums()
+                        +","+
+                        cashService.nowWeekCashNums()
+                        +","+
+                        cashService.nowMonthCashNums()
+                        +","+
+                        cashService.lastMonthCashNums()
+                        +","+
+                        cashService.nowYearCashNums()
+                        +","+
+                        cashService.allCashNums()
+        );
+        System.out.println(cashService.countCashNums());
+    }
+
+    @Test
+    public void rewar(){
+        System.out.println(
+                rechargeService.nowRechargeNums()
+                        +","+
+                        rechargeService.yesterdayRechargeNums()
+                        +","+
+                        rechargeService.nowWeekRechargeNums()
+                        +","+
+                        rechargeService.nowMonthRechargeNums()
+                        +","+
+                        rechargeService.lastMonthRechargeNums()
+                        +","+
+                        rechargeService.nowYearRechargeNums()
+                        +","+
+                        rechargeService.allRechargeNums()
+        );
+
+        System.out.println(rechargeService.countRechargeNums());
+    }
+
+    @Test
+    public void ve(){
+//        System.out.println(
+//                videoService.nowVideoNums()
+//                        +","+
+//                        videoService.yesterdayVideoNums()
+//                        +","+
+//                        videoService.nowWeekVideoNums()
+//                        +","+
+//                        videoService.nowMonthVideoNums()
+//                        +","+
+//                        videoService.lastMonthVideoNums()
+//                        +","+
+//                        videoService.nowYearVideoNums()
+//                        +","+
+//                        videoService.allVideoNums()
+//        );
+    }
+
     @Test
     public void pu(){
         System.out.println(
@@ -168,13 +238,54 @@ public class ClubTests extends BaseServiceImpl {
                 +","+
                 publishService.allPublishNums()
         );
+        System.out.println(publishService.countPublishNums());
+
+        System.out.println(
+                publishMoneyService.nowPublishNums()
+                        +","+
+                        publishMoneyService.yesterdayPublishNums()
+                        +","+
+                        publishMoneyService.nowWeekPublishNums()
+                        +","+
+                        publishMoneyService.nowMonthPublishNums()
+                        +","+
+                        publishMoneyService.lastMonthPublishNums()
+                        +","+
+                        publishMoneyService.nowYearPublishNums()
+                        +","+
+                        publishMoneyService.allPublishNums()
+        );
+        System.out.println(publishMoneyService.countPublishNums());
     }
 
     @Test
     public void shareSum(){
         Integer integer = service.nowShareMoney();
-        Integer integer1 = service.nowWeekShareMoney();
+        Integer integer1 = service.yesterdayShareMoney();
+        Integer integer2 = service.nowWeekShareMoney();
+        Integer integer3 = service.nowMonthShareMoney();
+        Integer integer4 = service.lastMonthShareMoney();
+        Integer integer5 = service.nowYearShareMoney();
+        Integer integer6 = service.allShareMoney();
+        System.out.println(integer+","+integer);
         System.out.println(integer+","+integer1);
+        System.out.println(integer+","+integer2);
+        System.out.println(integer+","+integer3);
+        System.out.println(integer+","+integer4);
+        System.out.println(integer+","+integer5);
+        System.out.println(integer+","+integer6);
+
+        List<Integer> list = service.countShareMoney();
+        System.out.println(list);
+    }
+
+    @Autowired
+    CountRewardService rewardService;
+
+    @Test
+    public void rewardSum(){
+        Integer integer = rewardService.nowRewardNums();
+        System.out.println(integer);
     }
 
     @Test
@@ -204,14 +315,51 @@ public class ClubTests extends BaseServiceImpl {
     @Autowired
     CountRewardMapper rewardMapper;
 
+    @Autowired
+    CountAskService askService;
+
+    @Test
+    public void asks(){
+        Integer integer = askService.nowAskNums();
+        Integer integer1 = askService.yesterdayAskNums();
+        Integer integer2 = askService.nowWeekAskNums();
+        Integer integer3 = askService.nowMonthAskNums();
+        Integer integer4 = askService.lastMonthAskNums();
+        Integer integer5 = askService.nowYearAskNums();
+        Integer integer6 = askService.allAskNums();
+        System.out.println(integer);
+        System.out.println(integer1);
+        System.out.println(integer2);
+        System.out.println(integer3);
+        System.out.println(integer4);
+        System.out.println(integer5);
+        System.out.println(integer6);
+
+        List<Integer> list = askService.countAskNums();
+        System.out.println(list);
+    }
+
     @Test
     public void re(){
-        List<List<Integer>> lists2 = rewardMapper.lastMonthRewardNums();
-        List<List<Integer>> lists3 = rewardMapper.nowYearRewardNums();
-        List<List<Integer>> lists4 = rewardMapper.allRewardNums();
-        System.out.println(lists2.get(0));
-        System.out.println(lists3.get(0)+","+lists3.size());
-        System.out.println(lists4+","+lists4.size());
+//
+
+        Integer integer = rewardService.nowRewardNums();
+        Integer integer1 = rewardService.yesterdayRewardNums();
+        Integer integer2 = rewardService.nowWeekRewardNums();
+        Integer integer3 = rewardService.nowMonthRewardNums();
+        Integer integer4 = rewardService.lastMonthRewardNums();
+        Integer integer5 = rewardService.nowYearRewardNums();
+        Integer integer6 = rewardService.allRewardNums();
+        System.out.println(integer);
+        System.out.println(integer1);
+        System.out.println(integer2);
+        System.out.println(integer3);
+        System.out.println(integer4);
+        System.out.println(integer5);
+        System.out.println(integer6);
+
+        List<Integer> list = rewardService.countRewardNums();
+        System.out.println(list);
     }
 
     @Test
@@ -224,5 +372,31 @@ public class ClubTests extends BaseServiceImpl {
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(7).andBuyerIdEqualTo(9);
         clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
+    }
+
+    @Autowired
+    CountUserService userService;
+
+    @Test
+    public void user(){
+        List<Integer> list = videoService.CountVideoNums();
+        System.out.println(list);
+    }
+
+    @Autowired
+    CountSincerityService sincerityService;
+
+    @Test
+    public void sin(){
+        System.out.println(sincerityService.nowSincerityNums());
+        System.out.println(sincerityService.yesterdaySincerityNums());
+        System.out.println(sincerityService.nowWeekSincerityNums());
+        System.out.println(sincerityService.nowMonthSincerityNums());
+        System.out.println(sincerityService.lastMonthSincerityNums());
+        System.out.println(sincerityService.nowYearSincerityNums());
+        System.out.println(sincerityService.allSincerityNums());
+
+        List<Integer> list = sincerityService.countSincerityNums();
+        System.out.println(list);
     }
 }

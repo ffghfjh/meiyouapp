@@ -3,14 +3,15 @@ package com.meiyou.service.impl;
 import com.meiyou.mapper.AppointAskMapper;
 import com.meiyou.mapper.AppointmentMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.model.AskerVO;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AppointmentService;
 import com.meiyou.service.RootMessageService;
-import com.meiyou.utils.RootMessageUtil;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
+import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import java.util.List;
  * @create: 2019-08-21 14:12
  **/
 @Service
-public class AppointmentServiceImpl implements AppointmentService {
+public class AppointmentServiceImpl extends BaseServiceImpl implements AppointmentService {
     @Autowired
     private AppointmentMapper appointmentMapper;
     @Autowired
@@ -201,6 +202,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         user.setMoney(balance);
 
+        //查询该报名者是否已经报名
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
+                .andAskStateEqualTo(1).andAppointIdEqualTo(id);
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+        if (appointAsks.size() > 0){
+            msg.setCode(250);
+            msg.setMsg("请勿重复报名");
+            return msg;
+        }
+
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(Integer.parseInt(uid));
         //更新报名者账户余额
@@ -212,18 +224,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointAsk.setAskState(1);
         appointAsk.setCreateTime(new Date());
         appointAsk.setUpdateTime(new Date());
-
-        //查询该报名者是否已经报名
-        AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
-                .andAskStateEqualTo(1).andAppointIdEqualTo(id);
-        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() >= 0){
-            msg.setCode(200);
-            msg.setMsg("请勿重复报名");
-            return msg;
-        }
-
         //约会记录表中增加一条记录
         appointAskMapper.insertSelective(appointAsk);
         //根据约会订单表id查出该订单所有信息
@@ -478,7 +478,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-        if (state == 2) {
+       /* if (state == 2) {
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1)
                     .andAppointIdEqualTo(id);
@@ -528,7 +528,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             if (i == 3) {
                 return Msg.success();
             }
-        }
+        }*/
 
         if (state == 3) {
             Integer confirmId = appointment.getConfirmId();
@@ -555,14 +555,14 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointAskExample.createCriteria().andAskStateEqualTo(2)
                     .andAppointIdEqualTo(id);
             AppointAsk appointAsk = new AppointAsk();
-            //退还报名金后，报名者状态从2变成0
-            appointAsk.setAskState(0);
+            //退还报名金后，报名者状态从2变成1
+            appointAsk.setAskState(1);
             appointAsk.setUpdateTime(new Date());
             i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            appointment.setState(1);
+            appointment.setState(2);
             appointment.setUpdateTime(new Date());
             int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 
@@ -690,6 +690,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             Integer state = appointment.getState();
             //获取用户id
             Integer publisherId = appointment.getPublisherId();
+
+            //如果发布者等于报名者，则跳出本次循环
+            if (publisherId == Integer.parseInt(uid)){
+                continue;
+            }
             User user = userMapper.selectByPrimaryKey(publisherId);
             HashMap<String, Object> map = new HashMap<>();
             if (state == 1 || state == 2){
@@ -737,4 +742,60 @@ public class AppointmentServiceImpl implements AppointmentService {
         return msg.add("list",list);
     }
 
+    /**
+    * @Description: 查询报名约会的全部人员
+    * @Author: JK
+    * @Date: 2019/8/29
+    */
+    @Override
+    public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
+
+        Msg msg = new Msg();
+        //判断访问者是否为发布者
+        Integer publishId = appointmentMapper.selectByPrimaryKey(id).getPublisherId();
+        if (publishId != uid) {
+            msg.setCode(506);
+            msg.setMsg("没有访问权限");
+            return msg;
+        }
+
+        //查找购买按摩会所的记录
+        AppointAskExample appointAskExample = new AppointAskExample();
+        //购买者了id为cid的所有购买记录
+        appointAskExample.createCriteria().andAppointIdEqualTo(id);
+
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+
+        if (appointAsks == null && appointAsks.size() == 0) {
+            msg.setCode(404);
+            msg.setMsg("找不到指定的约会记录");
+            return msg;
+        }
+
+        //对查找出来的ClubBuy进行封装
+        List<AskerVO> askerVOS = new ArrayList<>();
+        for (AppointAsk c : appointAsks) {
+            User buyer = getUserByUid(c.getAskerId());
+
+            AskerVO askerVO = new AskerVO();
+            askerVO.setId(buyer.getId());
+            askerVO.setNickname(buyer.getNickname());
+            askerVO.setHeader(buyer.getHeader());
+            askerVO.setBirthday(buyer.getBirthday());
+            askerVO.setSex(buyer.getSex());
+            askerVO.setSignature(buyer.getSignature());
+            askerVO.setAskState(c.getAskState());
+
+            askerVOS.add(askerVO);
+        }
+
+        //返回一个封装好的askerVO类
+        msg.add("askerVOS", askerVOS);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
+    }
 }

@@ -10,17 +10,17 @@ import java.util.Map;
  **/
 public interface CountRewardMapper {
 
-    List<List<Integer>> nowRewardNums();
+    List<Integer> nowRewardNums();
 
-    List<List<Integer>> yesterdayRewardNums();
+    List<Integer> yesterdayRewardNums();
 
-    List<List<Integer>> nowWeekRewardNums();
+    List<Integer> nowWeekRewardNums();
 
-    List<List<Integer>> nowMonthRewardNums();
+    List<Integer> nowMonthRewardNums();
 
-    List<List<Integer>> lastMonthRewardNums();
+    List<Integer> lastMonthRewardNums();
 
-    List<List<Integer>> nowYearRewardNums();
+    List<Integer> nowYearRewardNums();
 
-    List<List<Integer>> allRewardNums();
+    List<Integer> allRewardNums();
 }

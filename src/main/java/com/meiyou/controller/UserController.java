@@ -5,7 +5,6 @@ import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +22,18 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
     @Autowired
     SendCodeApiService sendCodeApiService;
+
     @Autowired
     RedisTemplate<String,String> redis;
+
+    @RequestMapping(value = "userReport",method = RequestMethod.POST)
+    @ApiOperation(value = "用户举报",notes = "uid为用户id, type为举报类型， content为举报备注")
+    public Msg userReport(Integer reporter_id, Integer reported_id,  String type, String content) {
+        return userService.userReport(reporter_id, reported_id, type, content);
+    }
 
     /**
      * 用户手机号登录

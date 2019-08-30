@@ -22,6 +22,7 @@ public class TourVO implements Serializable {
     private String endAddress;
     private String goTime;
     private Integer state;
+    private Integer askState;
     private List<String> askerHeader;
 
     @Override
@@ -38,6 +39,7 @@ public class TourVO implements Serializable {
                 ", endAddress='" + endAddress + '\'' +
                 ", goTime='" + goTime + '\'' +
                 ", state=" + state +
+                ", askState=" + askState +
                 ", askerHeader=" + askerHeader +
                 '}';
     }
@@ -128,6 +130,14 @@ public class TourVO implements Serializable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Integer getAskState() {
+        return askState;
+    }
+
+    public void setAskState(Integer askState) {
+        this.askState = askState;
     }
 
     public List<String> getAskerHeader() {

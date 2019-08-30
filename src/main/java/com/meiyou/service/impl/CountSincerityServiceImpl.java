@@ -7,6 +7,7 @@ import com.meiyou.service.CountSincerityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,28 @@ public class CountSincerityServiceImpl extends BaseServiceImpl implements CountS
 
     @Autowired
     CountSincerityMapper mapper;
+
+    @Override
+    public List<Integer> countSincerityNums() {
+        Integer nowNums = nowSincerityNums();
+        Integer yesterdayNums = yesterdaySincerityNums();
+        Integer nowWeekNums = nowWeekSincerityNums();
+        Integer nowMonthNums = nowMonthSincerityNums();
+        Integer lastMonthNums = lastMonthSincerityNums();
+        Integer nowYearNums = nowYearSincerityNums();
+        Integer allNums = allSincerityNums();
+
+        List<Integer> sincerityList = new ArrayList<>();
+        sincerityList.add(nowNums);
+        sincerityList.add(yesterdayNums);
+        sincerityList.add(nowWeekNums);
+        sincerityList.add(nowMonthNums);
+        sincerityList.add(lastMonthNums);
+        sincerityList.add(nowYearNums);
+        sincerityList.add(allNums);
+
+        return sincerityList;
+    }
 
     //本日
     @Override

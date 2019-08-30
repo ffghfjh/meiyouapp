@@ -5,6 +5,7 @@ import com.meiyou.service.CountPublishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +18,28 @@ public class CountPublishServiceImpl extends BaseServiceImpl implements CountPub
 
     @Autowired
     CountPublishMapper publishMapper;
+
+    @Override
+    public List<Integer> countPublishNums() {
+        Integer nowNums = nowPublishNums();
+        Integer yesterdayNums = yesterdayPublishNums();
+        Integer nowWeekNums = nowWeekPublishNums();
+        Integer nowMonthNums = nowMonthPublishNums();
+        Integer lastMonthNums = lastMonthPublishNums();
+        Integer nowYearNums = nowYearPublishNums();
+        Integer allNums = allPublishNums();
+
+        List<Integer> publishList = new ArrayList<>();
+        publishList.add(nowNums);
+        publishList.add(yesterdayNums);
+        publishList.add(nowWeekNums);
+        publishList.add(nowMonthNums);
+        publishList.add(lastMonthNums);
+        publishList.add(nowYearNums);
+        publishList.add(allNums);
+
+        return publishList;
+    }
 
     @Override
     public Integer nowPublishNums() {

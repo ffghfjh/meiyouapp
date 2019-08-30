@@ -1,7 +1,9 @@
 package com.meiyou.controller;
 
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 import com.meiyou.service.MyPublishService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
@@ -30,14 +32,23 @@ public class MyPublishController {
     @ApiOperation(value = "通过用户id查找指定用户id发布的全部景点商家",notes = "返回为ShopVO类,nums为报名人数")
     public Msg selectMyPublishList(@RequestParam("uid") String uid,
                             @RequestParam("token") String token){
-        if(!RedisUtil.authToken(uid,token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid,token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
-        List<Object> appointmentList = myPublishService.selectAppointmentList(uid, token);
-        List<Object> tourList = myPublishService.selectTourList(uid, token);
-        msg.add("appointmentList",appointmentList);
-        msg.add("tourList",tourList);
+        List<AppointmentVO> appointmentList = myPublishService.selectAppointmentList(uid, token);
+        if(appointmentList.isEmpty()){
+            msg.add("appointmentList",null);
+        }else {
+            msg.add("appointmentList",appointmentList);
+        }
+
+        List<TourVO> tourList = myPublishService.selectTourList(uid, token);
+        if(tourList.isEmpty()){
+            msg.add("tourList",null);
+        }else {
+            msg.add("tourList",tourList);
+        }
 
         List<ClubVO> clubList = myPublishService.selectClubByUid(Integer.valueOf(uid), token);
         if(clubList.isEmpty()){

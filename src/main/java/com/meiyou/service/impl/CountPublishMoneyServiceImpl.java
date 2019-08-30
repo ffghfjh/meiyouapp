@@ -5,6 +5,9 @@ import com.meiyou.service.CountPublishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @description: 我的发布金
  * @author: Mr.Z
@@ -15,6 +18,28 @@ public class CountPublishMoneyServiceImpl extends BaseServiceImpl implements Cou
 
     @Autowired
     CountPublishService service;
+
+    @Override
+    public List<Integer> countPublishNums() {
+        Integer nowNums = nowPublishNums();
+        Integer yesterdayNums = yesterdayPublishNums();
+        Integer nowWeekNums = nowWeekPublishNums();
+        Integer nowMonthNums = nowMonthPublishNums();
+        Integer lastMonthNums = lastMonthPublishNums();
+        Integer nowYearNums = nowYearPublishNums();
+        Integer allNums = allPublishNums();
+
+        List<Integer> publishMoneyList = new ArrayList<>();
+        publishMoneyList.add(nowNums);
+        publishMoneyList.add(yesterdayNums);
+        publishMoneyList.add(nowWeekNums);
+        publishMoneyList.add(nowMonthNums);
+        publishMoneyList.add(lastMonthNums);
+        publishMoneyList.add(nowYearNums);
+        publishMoneyList.add(allNums);
+
+        return publishMoneyList;
+    }
 
     @Override
     public Integer nowPublishNums() {

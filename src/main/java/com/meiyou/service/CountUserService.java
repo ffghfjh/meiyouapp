@@ -1,5 +1,7 @@
 package com.meiyou.service;
 
+import java.util.List;
+
 /**
  * @description:  注册人数业务层接口
  * @author: Mr.Z
@@ -7,18 +9,6 @@ package com.meiyou.service;
  **/
 public interface CountUserService {
 
-    Integer nowNums();
-
-    Integer yesterdayNums();
-
-    Integer nowWeekNums();
-
-    Integer nowMonthNums();
-
-    Integer lastMonthNums();
-
-    Integer nowYearNums();
-
-    Integer allNums();
+    List<Integer> CountUserNums();
 
 }

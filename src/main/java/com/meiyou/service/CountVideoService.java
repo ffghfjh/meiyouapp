@@ -1,5 +1,7 @@
 package com.meiyou.service;
 
+import java.util.List;
+
 /**
  * @description:  视频聊天收益业务层接口
  * @author: Mr.Z
@@ -7,18 +9,6 @@ package com.meiyou.service;
  **/
 public interface CountVideoService {
 
-    Integer nowVideoNums();
-
-    Integer yesterdayVideoNums();
-
-    Integer nowWeekVideoNums();
-
-    Integer nowMonthVideoNums();
-
-    Integer lastMonthVideoNums();
-
-    Integer nowYearVideoNums();
-
-    Integer allVideoNums();
+    List<Integer> CountVideoNums();
 
 }

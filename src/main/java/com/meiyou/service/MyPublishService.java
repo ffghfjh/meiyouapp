@@ -1,7 +1,9 @@
 package com.meiyou.service;
 
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 import com.meiyou.utils.Msg;
 
 import java.util.List;
@@ -17,12 +19,12 @@ public interface MyPublishService {
     /**
      * 查询我的约会发布
      */
-    List<Object> selectAppointmentList(String uid, String token);
+    List<AppointmentVO> selectAppointmentList(String uid, String token);
 
     /**
      * 查询我的旅游发布
      */
-    List<Object> selectTourList(String uid, String token);
+    List<TourVO> selectTourList(String uid, String token);
 
 
     /**

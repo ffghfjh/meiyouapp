@@ -13,7 +13,6 @@ import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -370,7 +369,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //旅游报名表中2是被选中状态
         tourAsk.setAskState0(2);
         tourAsk.setUpdateTime(new Date());
-        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
+        int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
         TourAskExample tourAskExample1 = new TourAskExample();
         tourAskExample1.createCriteria().andAskState0EqualTo(1)

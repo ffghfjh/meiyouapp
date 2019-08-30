@@ -364,7 +364,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
 
         TourAsk tourAsk = new TourAsk();
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAskerIdEqualTo(askerId)
+        tourAskExample.createCriteria().andAskerIdNotEqualTo(askerId)
                 .andAskState0EqualTo(1);
 
         //旅游报名表中2是被选中状态

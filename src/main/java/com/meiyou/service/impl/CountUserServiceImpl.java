@@ -5,6 +5,9 @@ import com.meiyou.service.CountUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @description: 注册人数业务层接口实现类
  * @author: Mr.Z
@@ -17,37 +20,24 @@ public class CountUserServiceImpl implements CountUserService {
     CountUserMapper mapper;
 
     @Override
-    public Integer nowNums() {
-        return mapper.nowNums();
+    public List<Integer> CountUserNums() {
+        Integer nowNums = mapper.nowNums();
+        Integer yesterdayNums = mapper.yesterdayNums();
+        Integer nowWeekNums = mapper.nowWeekNums();
+        Integer nowMonthNums = mapper.nowMonthNums();
+        Integer lastMonthNums = mapper.lastMonthNums();
+        Integer nowYearNums = mapper.nowYearNums();
+        Integer allNums = mapper.allNums();
+
+        List<Integer> userList = new ArrayList<>();
+        userList.add(nowNums);
+        userList.add(yesterdayNums);
+        userList.add(nowWeekNums);
+        userList.add(nowMonthNums);
+        userList.add(lastMonthNums);
+        userList.add(nowYearNums);
+        userList.add(allNums);
+        return userList;
     }
 
-    @Override
-    public Integer yesterdayNums() {
-        return mapper.yesterdayNums();
-    }
-
-    @Override
-    public Integer nowWeekNums() {
-        return mapper.nowWeekNums();
-    }
-
-    @Override
-    public Integer nowMonthNums() {
-        return mapper.nowMonthNums();
-    }
-
-    @Override
-    public Integer lastMonthNums() {
-        return mapper.lastMonthNums();
-    }
-
-    @Override
-    public Integer nowYearNums() {
-        return mapper.nowYearNums();
-    }
-
-    @Override
-    public Integer allNums() {
-        return mapper.allNums();
-    }
 }

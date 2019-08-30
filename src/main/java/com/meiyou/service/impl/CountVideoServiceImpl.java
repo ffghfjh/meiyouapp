@@ -7,6 +7,7 @@ import com.meiyou.service.CountVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,42 +22,62 @@ public class CountVideoServiceImpl extends BaseServiceImpl implements CountVideo
     CountVideoMapper mapper;
 
     @Override
+    public List<Integer> CountVideoNums() {
+        Integer nowNums = nowVideoNums();
+        Integer yesterdayNums = yesterdayVideoNums();
+        Integer nowWeekNums = nowWeekVideoNums();
+        Integer nowMonthNums = nowMonthVideoNums();
+        Integer lastMonthNums = lastMonthVideoNums();
+        Integer nowYearNums = nowYearVideoNums();
+        Integer allNums = allVideoNums();
+
+        List<Integer> videoList = new ArrayList<>();
+        videoList.add(nowNums);
+        videoList.add(yesterdayNums);
+        videoList.add(nowWeekNums);
+        videoList.add(nowMonthNums);
+        videoList.add(lastMonthNums);
+        videoList.add(nowYearNums);
+        videoList.add(allNums);
+
+        return videoList;
+}
+
     public Integer nowVideoNums() {
         List<Integer> list = mapper.nowVideoNums();
         return listSum(list);
     }
 
-    @Override
     public Integer yesterdayVideoNums() {
         List<Integer> list = mapper.yesterdayVideoNums();
         return listSum(list);
     }
 
-    @Override
+
     public Integer nowWeekVideoNums() {
         List<Integer> list = mapper.nowWeekVideoNums();
         return listSum(list);
     }
 
-    @Override
+
     public Integer nowMonthVideoNums() {
         List<Integer> list = mapper.nowMonthVideoNums();
         return listSum(list);
     }
 
-    @Override
+
     public Integer lastMonthVideoNums() {
         List<Integer> list = mapper.lastMonthVideoNums();
         return listSum(list);
     }
 
-    @Override
+
     public Integer nowYearVideoNums() {
         List<Integer> list = mapper.nowYearVideoNums();
         return listSum(list);
     }
 
-    @Override
+
     public Integer allVideoNums() {
         List<Integer> list = mapper.allVideoNums();
         return listSum(list);

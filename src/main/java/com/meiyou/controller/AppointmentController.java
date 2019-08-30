@@ -95,7 +95,7 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "GET")
+    @ApiOperation(value = "查询所有报名某个约会的人员信息", notes = "查询所有报名某个约会的人员信息", httpMethod = "POST")
     @PostMapping(value = "/selectAppointAskList")
     public Msg selectAppointAskList(String uid,Integer appointId,String token) {
         Msg msg = appointmentService.selectAppointAskList(uid,appointId,token);
@@ -189,7 +189,7 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/24
      */
-    @ApiOperation(value = "查看热门约会", notes = "查看热门约会", httpMethod = "GET")
+    @ApiOperation(value = "查看热门约会", notes = "查看热门约会", httpMethod = "POST")
     @PostMapping(value = "/selectHotAppointment")
     public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
         Msg msg = appointmentService.selectHotAppointment(uid, token, latitude, longitude);
@@ -202,7 +202,7 @@ public class AppointmentController {
      * @Author: JK
      * @Date: 2019/8/29
      */
-    @ApiOperation(value = "查询报名约会的全部人员", notes = "查询报名约会的全部人员", httpMethod = "GET")
+    @ApiOperation(value = "查询报名约会的全部人员", notes = "查询报名约会的全部人员", httpMethod = "POST")
     @PostMapping(value = "/selectAllAppointmentById")
     public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
         return appointmentService.selectAllAppointmentById(uid, token, id);

@@ -13,6 +13,7 @@ import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -467,6 +468,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     */
     @Transactional
     @Override
+    @CachePut
     public Msg againReleaseTour(String uid, Integer id, String token) {
         Tour tour = tourMapper.selectByPrimaryKey(id);
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -479,7 +481,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-        if (state == 2) {
+       /* if (state == 2) {
             TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1)
                     .andAppointIdEqualTo(id);
@@ -513,7 +515,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                         .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
                 TourAsk tourAsk1 = new TourAsk();
                 //退还报名金后，报名者状态从1变成0
-                tourAsk1.setAskState0(0);
+                tourAsk1.setAskState0(1);
                 tourAsk1.setUpdateTime(new Date());
                 i2 = tourAskMapper.updateByExampleSelective(tourAsk1, tourAskExample1);
                 if (i2 != 1){
@@ -530,7 +532,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 return Msg.success();
             }
         }
-
+*/
         if (state == 3) {
             Integer confirmId = tour.getConfirmId();
             //根据报名者id查询出他所有信息
@@ -555,14 +557,14 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             tourAskExample.createCriteria().andAskState0EqualTo(2)
                     .andAppointIdEqualTo(id);
             TourAsk tourAsk = new TourAsk();
-            //退还报名金后，报名者状态从2变成0
-            tourAsk.setAskState0(0);
+            //取消选中，报名者状态从2变成1
+            tourAsk.setAskState0(1);
             tourAsk.setUpdateTime(new Date());
             i2 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            tour.setState(1);
+            tour.setState(2);
             tour.setUpdateTime(new Date());
             int i3 = tourMapper.updateByExampleSelective(tour, tourExample);
 

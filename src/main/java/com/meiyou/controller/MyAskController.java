@@ -38,9 +38,18 @@ public class MyAskController {
 //        }
         Msg msg = new Msg();
         List<Object> appointmentList = myAskService.selectMyAppointmentAsk(uid, token);
+        if(appointmentList.isEmpty()){
+            msg.add("appointmentList",null);
+        }else {
+            msg.add("appointmentList",appointmentList);
+        }
+
         List<Object> tourList = myAskService.selectMyTourAsk(uid, token);
-        msg.add("appointmentList",appointmentList);
-        msg.add("tourList",tourList);
+        if(tourList.isEmpty()){
+            msg.add("tourList",null);
+        }else {
+            msg.add("tourList",tourList);
+        }
 
 
         List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));

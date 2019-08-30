@@ -31,7 +31,7 @@
 
     <!--    模板引擎：配置动态屏蔽状态转化-->
     <script type="text/html" id="aTpl">
-        {{#  if(d.activityBoolHide == 0){ }}
+        {{#  if(d.reportedBoolClose == 0){ }}
         不屏蔽
         {{#  } else { }}
         屏蔽
@@ -109,7 +109,7 @@
                         sort: true
                     }, {
                         fixed: 'right',
-                        title: '操作动态',
+                        title: '操作被举报人',
                         toolbar: '#barDemoActivity',
                         width: 150
                     }]
@@ -145,20 +145,20 @@
             table.on('tool(test)', function(obj) {
                 var data = obj.data;
                 if(obj.event === 'aHide') {
-                    layer.confirm('确定屏蔽这条动态吗?', function(index) {
+                    layer.confirm('确定对被举报人封号吗?', function(index) {
                         obj.del();
                         table.reload('test', {
-                            url:"/AdminActivity/hideActivityById",//如果这个是变量的话无法重载表格
-                            where: {aid:data.activityId} //设定异步数据接口的额外参数,这里的参数可以是data变量
+                            url:"/AdminUserReport/hideReportedPersonById",//如果这个是变量的话无法重载表格
+                            where: {uid:data.pid, type:1} //设定异步数据接口的额外参数,这里的参数可以是data变量
                         });
                         layer.close(index);
                     });
                 } else if(obj.event === 'aCancle') {
-                    layer.confirm('取消屏蔽此条动态吗?', function(index) {
+                    layer.confirm('确定取消屏蔽举报人吗?', function(index) {
                         obj.del();
                         table.reload('test', {
-                            url:"/AdminActivity/noHideActvityById",//如果这个是变量的话无法重载表格
-                            where: {aid:data.activityId} //设定异步数据接口的额外参数,这里的参数可以是data变量
+                            url:"/AdminUserReport/hideReportedPersonById",//如果这个是变量的话无法重载表格
+                            where: {uid:data.pid, type:0} //设定异步数据接口的额外参数,这里的参数可以是data变量
                         });
                         layer.close(index);
                     });

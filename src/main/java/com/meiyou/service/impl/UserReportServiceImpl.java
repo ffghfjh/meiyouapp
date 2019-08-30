@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,6 +31,36 @@ public class UserReportServiceImpl implements UserReportService {
 
     @Autowired
     UserReportMapper userReportMapper;
+
+
+    /**
+     * 屏蔽被举报人
+     *
+     * @param uid
+     * @param type
+     * @return
+     */
+    @Override
+    public LayuiTableJson hideReportedPersonById(int page, int limit, int uid, int type) {
+        //查找被屏蔽的用户是否存在
+        User user = userMapper.selectByPrimaryKey(uid);
+        if (user == null) {
+            return listUserReport(page, limit);
+        }
+        User user1 = new User();
+        user1.setId(uid);
+        user1.setUpdateTime(new Date());
+        //屏蔽
+        if (type == 1) {
+            user1.setBoolClose(true);
+        }
+        //不屏蔽
+        if (type == 0) {
+            user1.setBoolClose(false);
+        }
+        userMapper.updateByPrimaryKeySelective(user1);
+        return listUserReport(page, limit);
+    }
 
     /**
      * 获得所有用户举报信息
@@ -65,10 +96,12 @@ public class UserReportServiceImpl implements UserReportService {
             hashMap.put("report_id", report.getId());
             hashMap.put("reporter", "[" + reporter.getId() + "]" + reporter.getNickname());
             hashMap.put("reported", "[" + reportedPerson.getId() + "]" + reportedPerson.getNickname());
-            hashMap.put("reportedBoolClose", reporter.getBoolClose());
+            //在前端不展示的被举报人id
+            hashMap.put("pid", reportedPerson.getId());
+            hashMap.put("reportedBoolClose", reportedPerson.getBoolClose());
             hashMap.put("type", report.getType());
             hashMap.put("content", report.getContent());
-            hashMap.put("time", report.getCreateTime());
+            hashMap.put("time", DateUtil.formatDateTime(report.getCreateTime()));
             list.add(hashMap);
         }
         if (list.isEmpty()) {

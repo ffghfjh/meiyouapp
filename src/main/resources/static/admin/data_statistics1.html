@@ -18,7 +18,7 @@
     <![endif]-->
   </head>
   
-  <body>
+  <body onload="show_all_info()">
     <div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="">首页</a>
@@ -38,40 +38,45 @@
       <table class="layui-table x-admin">
         <thead>
           <tr>
-            <th>时间</th>
-            <th>注册用户</th>
-            <th>分享金币</th>
-            <th>总发需求</th>
-            <th>悬赏金币</th>
-            <th>诚意金收益</th>
-            <th>平台费收益</th>
-            <th>充值金币总数</th>
-            <th>提现金额</th>
-            <th>视频聊天收益</th>
-            <th>报名人数</th></tr>
+            <th>分类</th>
+            <th>今天</th>
+            <th>昨天</th>
+            <th>本周</th>
+            <th>本月</th>
+            <th>上月</th>
+            <th>本年</th>
+            <th>全部</th>
         </thead>
         <tbody id="td">
-             <tr id="today">
-                <td>今天</td>
-                
+             <tr id="user">
+                <td>注册用户</td>
              </tr>
-             <tr id="yesterday">
-                <td>昨天</td>
+             <tr id="share">
+                <td>分享金币</td>
              </tr>
-             <tr id="thisWeek">
-                <td>本周</td>
+             <tr id="publish">
+                <td>总发需求</td>
              </tr>
-             <tr id="thisMonth">
-                <td>本月</td>
+             <tr id="reward">
+                <td>悬赏金币</td>
              </tr>
-             <tr id="lastMonth">
-                <td>上月</td>
+             <tr id="sincerity">
+                <td>诚意金收益</td>
              </tr>
-             <tr id="thisYear">
-                <td>本年</td>
+             <tr id="publishMoney">
+                <td>平台费收益</td>
              </tr>
-             <tr id="all">
-                <td>全部</td>
+             <tr id="recharge">
+                <td>充值金币总数</td>
+             </tr>
+             <tr id="cash">
+                <td>提现金额</td>
+             </tr>
+             <tr id="video">
+                <td>视频聊天收益</td>
+             </tr>
+             <tr id="ask">
+                <td>报名人数</td>
              </tr>
         </tbody>
       </table>
@@ -95,68 +100,66 @@
         });
       });
 
-     $(function(){
-    	 get_all_info("今天",'#today'); 
-    	 get_all_info("昨天",'#yesterday'); 
-    	 get_all_info("本周",'#thisWeek');
-    	 get_all_info("本月",'#thisMonth');
-    	 get_all_info("上月",'#lastMonth');
-    	 get_all_info("本年",'#thisYear');
-    	 get_all_info("全部",'#all'); 
-     });
+     // $(function(){
+    	//  get_all_info("今天",'#user');
+    	//  get_all_info("昨天",'#yesterday');
+    	//  get_all_info("本周",'#thisWeek');
+    	//  get_all_info("本月",'#thisMonth');
+    	//  get_all_info("上月",'#lastMonth');
+    	//  get_all_info("本年",'#thisYear');
+    	//  get_all_info("全部",'#all');
+     // });
      
      //获取后台数据 
-     function get_all_info(date,id){
-    	 var adminUser = localStorage.getItem("adminUser");
-   	     adminUser = JSON.parse(adminUser);
-   	     if(adminUser ==null){
-	   		  parent.location.href='login.html';
-	   		  return false;
-   	     }
+     function show_all_info(){
     	 $.ajax({
-    		 url:"/meiyou/shuju/getAllShujuByDate",
+    		 url:"/countNums/get",
     		 type:"post",
-    		 data:"condition="+date,
-    		 headers: {
-   		        Accept: "application/json; charset=utf-8",
-   		        headerId:adminUser.aId,
-   		        headerToken:adminUser.token
-   		     },
-    		 success:function(result){
-    			 if(result.code==100){
-    				 show_info(result,id);
-       		     }else if(result.code==200){
-       			  
-       		     }else if(result.code==300){
-       			    //登录时间过期
-       			     layer.msg('登录信息过期，请重新登录',{
-  						icon: 1,
-  						time: 1000 //2秒关闭（如果不配置，默认是3秒）
-  						}, function(){
-  							parent.location.href = "login.html";
-  						});
-       		    }
-    			 
+    		 dateType: "json",
+    		 success:function(Msg){
+    			 if(Msg.code==100){
+    			     var userNums = Msg.extend["userNums"]
+    				 show_info(userNums);
+                     var shareMoney = Msg.extend["shareMoney"]
+                         show_info(shareMoney);
+                     var publishNums = Msg.extend["publishNums"]
+                         show_info(publishNums);
+                     var rewardMoney = Msg.extend["rewardMoney"]
+                         show_info(rewardMoney);
+                     var sincerityMoney = Msg.extend["sincerityMoney"]
+                         show_info(sincerityMoney);
+                     var publishMoney = Msg.extend["publishMoney"]
+                         show_info(publishMoney);
+                     var rechargeMoney = Msg.extend["rechargeMoney"]
+                         show_info(rechargeMoney);
+                     var cashMoney = Msg.extend["cashMoney"]
+                         show_info(cashMoney);
+                     var videoMoney = Msg.extend["videoMoney"]
+                         show_info(videoMoney);
+                     var askNums = Msg.extend["askNums"]
+                         show_info(askNums);
+       		     }
     		}
     	 }); 
      }
      
-     function show_info(result,id){
-    	 console.log(result);
-		 var shuju = result.extend.shuju;
-		 var td1 = $('<td></td>').html(shuju.volumeNumber);
-		 var td2 = $('<td></td>').html(shuju.fenxiangJin);
-		 var td3 = $('<td></td>').html(shuju.needData);
-		 var td4 = $('<td></td>').html(shuju.postReward);
-		 var td5 = $('<td></td>').html(shuju.chenyijin);
-		 var td6 = $('<td></td>').html(shuju.pingtaifei);
-		 var td7 = $('<td></td>').html(shuju.chongzhi);
-		 var td8 = $('<td></td>').html(shuju.tixian);
-		 var td9 = $('<td></td>').html(shuju.shipingfei);
-		 var td10 = $('<td></td>').html(shuju.baominshu);
-		 $(id).append(td1).append(td2).append(td3)
-		 .append(td4).append(td5).append(td6).append(td7)
-		 .append(td8).append(td9).append(td10);
+     function show_info(data){
+    	 console.log(data);
+         var list=["user","share","publish","reward","sincerity","publishMoney","recharge","cash","video","ask"];
+    	 for(var i=0;i<list.length;i++){
+             var td1 = $('<td></td>').html(data[0]);
+             var td2 = $('<td></td>').html(data[1]);
+             var td3 = $('<td></td>').html(data[2]);
+             var td4 = $('<td></td>').html(data[3]);
+             var td5 = $('<td></td>').html(data[4]);
+             var td6 = $('<td></td>').html(data[5]);
+             var td7 = $('<td></td>').html(data[6]);
+
+             $(list[i]).append(td1).append(td2).append(td3)
+                 .append(td4).append(td5).append(td6).append(td7);
+         }
+
+
      }
     </script>
     <script>var _hmt = _hmt || []; (function() {

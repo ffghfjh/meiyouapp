@@ -26,9 +26,15 @@ public class AdminUserReportController {
     UserReportService userReportService;
 
     @ApiOperation(value = "获得所有用户举报", notes = "page为页码，limit为条数", httpMethod = "POST")
-    @PostMapping(value = "/listUserReport")
+    @RequestMapping(value = "/listUserReport") //必须以Get方式获取，如果用Post方式就获取不到
     public LayuiTableJson listUserReport(int page, int limit) {
         return userReportService.listUserReport(page, limit);
+    }
+
+    @ApiOperation(value = "获得所有用户举报", notes = "page为页码，limit为条数, uid为被举报的人, type=0不屏蔽，type=1屏蔽", httpMethod = "POST")
+    @RequestMapping(value = "/hideReportedPersonById") //必须以Get方式获取，如果用Post方式就获取不到
+    public LayuiTableJson hideReportedPersonById(int page, int limit, int uid, int type) {
+        return userReportService.hideReportedPersonById(page, limit, uid, type);
     }
 
 }

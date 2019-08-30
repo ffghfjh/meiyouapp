@@ -1,7 +1,9 @@
 package com.meiyou.controller;
 
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
@@ -37,18 +39,18 @@ public class MyAskController {
 //            return Msg.noLogin();
 //        }
         Msg msg = new Msg();
-        List<Object> appointmentList = myAskService.selectMyAppointmentAsk(uid, token);
-        if(appointmentList.isEmpty()){
-            msg.add("appointmentList",null);
+        List<AppointmentVO> appointmentVOS = myAskService.selectMyAppointmentAsk(uid, token);
+        if(appointmentVOS.isEmpty()){
+            msg.add("appointmentVOS",null);
         }else {
-            msg.add("appointmentList",appointmentList);
+            msg.add("appointmentVOS",appointmentVOS);
         }
 
-        List<Object> tourList = myAskService.selectMyTourAsk(uid, token);
-        if(tourList.isEmpty()){
-            msg.add("tourList",null);
+        List<TourVO> tourVOS = myAskService.selectMyTourAsk(uid, token);
+        if(tourVOS.isEmpty()){
+            msg.add("tourVOS",null);
         }else {
-            msg.add("tourList",tourList);
+            msg.add("tourVOS",tourVOS);
         }
 
 

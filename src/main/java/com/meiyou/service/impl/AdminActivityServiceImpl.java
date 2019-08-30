@@ -153,6 +153,9 @@ public class AdminActivityServiceImpl implements AdminActivityService {
             hashMap.put("activityStatus", activity1.getBoolClose());
             list.add(hashMap);
         }
+        if (list.isEmpty()) {
+            return LayuiTableJson.fail();
+        }
         PageInfo pageInfo = new PageInfo(list);
         return LayuiTableJson.success().addCount(getActivityReportTotalCount()).addData(pageInfo);
     }

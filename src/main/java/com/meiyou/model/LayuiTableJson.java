@@ -1,5 +1,6 @@
 package com.meiyou.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
 /*
  * 必须注意：调用时，务必先调用addCount()再调用addData()，否则调用失败
  */
-public class LayuiTableJson {
+public class LayuiTableJson implements Serializable {
 	
 	//状态码
 	private int code;

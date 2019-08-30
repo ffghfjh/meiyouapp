@@ -1,0 +1,26 @@
+package com.meiyou.service;
+
+import com.meiyou.model.LayuiTableJson;
+
+/**
+ * @author ：huangzhaoyang
+ * @date ：Created in 2019/8/30 14:24
+ * @description：用户举报接口层
+ * @modified By：huangzhaoyang
+ * @version: 1.0.0
+ */
+public interface UserReportService {
+
+    /**
+     * 获得所有用户举报信息
+     * @return
+     */
+    LayuiTableJson listUserReport(int page, int limit);
+
+    /**
+     * 获得用户举报总条数
+     * @return
+     */
+    int getUserReportTotolCount();
+
+}

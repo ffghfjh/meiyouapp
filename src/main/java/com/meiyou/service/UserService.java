@@ -118,4 +118,14 @@ public interface UserService {
      */
     Msg qqLogin(String qqOpenId,String qqToken);
 
+    /**
+     * 用户举报
+     * @param reporter_id [举报人]
+     * @param reported_id [被举报人]
+     * @param type [举报类型]
+     * @param content [举报备注]
+     * @return
+     */
+    Msg userReport(Integer reporter_id, Integer reported_id,  String type, String content);
+
 }

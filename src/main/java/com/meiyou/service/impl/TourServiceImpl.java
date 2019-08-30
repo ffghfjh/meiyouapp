@@ -364,7 +364,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
 
         TourAsk tourAsk = new TourAsk();
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAskerIdNotEqualTo(askerId)
+        tourAskExample.createCriteria().andAskerIdEqualTo(askerId).andAppointIdEqualTo(appointId)
                 .andAskState0EqualTo(1);
 
         //旅游报名表中2是被选中状态
@@ -376,7 +376,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         tourAskExample1.createCriteria().andAskState0EqualTo(1)
                 .andAskerIdNotEqualTo(askerId);
 
-        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample1);
         int i2 = 0;
         int i3 = 0;
         if (tourAsks != null && tourAsks.size() != 0) {

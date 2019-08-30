@@ -362,7 +362,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
 
         AppointAsk appointAsk = new AppointAsk();
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskerIdEqualTo(askerId)
+        appointAskExample.createCriteria().andAskerIdEqualTo(askerId).andAppointIdEqualTo(appointId)
                 .andAskStateEqualTo(1);
 
         //约会报名表中2是被选中状态

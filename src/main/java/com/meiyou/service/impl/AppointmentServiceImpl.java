@@ -510,8 +510,8 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 AppointAskExample appointAskExample1 = new AppointAskExample();
                 appointAskExample1.createCriteria().andAskStateEqualTo(1)
                         .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
-                //退还报名金后，报名者状态从1变成0
-                appointAsk1.setAskState(0);
+                //退还报名金后，报名者状态从1变成3
+                appointAsk1.setAskState(3);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
 

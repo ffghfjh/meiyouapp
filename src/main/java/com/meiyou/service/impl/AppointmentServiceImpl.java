@@ -765,13 +765,13 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         //查找购买按摩会所的记录
         AppointAskExample appointAskExample = new AppointAskExample();
         //购买者了id为cid的所有购买记录
-        appointAskExample.createCriteria().andIdEqualTo(id);
+        appointAskExample.createCriteria().andAppointIdEqualTo(id);
 
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
 
         if (appointAsks == null && appointAsks.size() == 0) {
             msg.setCode(404);
-            msg.setMsg("找不到指定的导游聘请记录");
+            msg.setMsg("找不到指定的约会记录");
             return msg;
         }
 

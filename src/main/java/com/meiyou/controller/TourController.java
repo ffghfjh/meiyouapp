@@ -75,7 +75,7 @@ public class TourController {
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @ApiOperation(value = "查询所有报名某个旅游的人员信息", notes = "查询所有报名某个旅游的人员信息", httpMethod = "GET")
+    @ApiOperation(value = "查询所有报名某个旅游的人员信息", notes = "查询所有报名某个旅游的人员信息", httpMethod = "POST")
     @PostMapping(value = "/selectTourAskList")
     public Msg selectTourAskList(String uid,Integer appointId,String token) {
         Msg msg = tourService.selectTourAskList(uid,appointId,token);
@@ -169,7 +169,7 @@ public class TourController {
      * @Author: JK
      * @Date: 2019/8/24
      */
-    @ApiOperation(value = "查看热门旅游", notes = "查看热门旅游", httpMethod = "GET")
+    @ApiOperation(value = "查看热门旅游", notes = "查看热门旅游", httpMethod = "POST")
     @PostMapping(value = "/selectHotTour")
     public Msg selectHotTour(String uid, String token,double latitude, double longitude) {
         Msg msg = tourService.selectHotTour(uid, token, latitude, longitude);
@@ -181,7 +181,7 @@ public class TourController {
     * @Author: JK
     * @Date: 2019/8/29
     */
-    @ApiOperation(value = "查询报名旅游的全部人员", notes = "查询报名旅游的全部人员", httpMethod = "GET")
+    @ApiOperation(value = "查询报名旅游的全部人员", notes = "查询报名旅游的全部人员", httpMethod = "POST")
     @PostMapping(value = "/selectAllTourById")
     public Msg selectAllTourById(Integer uid, String token, Integer id) {
         return tourService.selectAllTourById(uid, token,id);

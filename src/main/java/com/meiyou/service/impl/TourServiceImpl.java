@@ -765,13 +765,13 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             //查找购买按摩会所的记录
         TourAskExample tourAskExample = new TourAskExample();
         //购买者了id为cid的所有购买记录
-        tourAskExample.createCriteria().andIdEqualTo(id);
+        tourAskExample.createCriteria().andAppointIdEqualTo(id);
 
         List<TourAsk> tours = tourAskMapper.selectByExample(tourAskExample);
 
         if (tours == null && tours.size() == 0) {
                 msg.setCode(404);
-                msg.setMsg("找不到指定的导游聘请记录");
+                msg.setMsg("找不到指定的旅游记录");
                 return msg;
             }
 

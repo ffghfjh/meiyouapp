@@ -1065,8 +1065,7 @@ public class UserServiceImpl implements UserService {
         float lateMoney = minute*videoMoney*(1-videoRate);//接收方得到费用
         videoChat.setMoney((double)totalMoney*videoRate);
         videoChat.setState(1);
-
-        if(addMoney(receiverU.getId(),lateMoney)&& delMoney(senderU.getId(),totalMoney)&&videoChatMapper.updateByPrimaryKey(videoChat)==1){
+        if(addMoney(receiverU.getId(),(int)lateMoney)&& delMoney(senderU.getId(),(int)totalMoney)&&videoChatMapper.updateByPrimaryKey(videoChat)==1){
             return Msg.success();
         }else {
             return Msg.fail();

@@ -371,7 +371,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         tourAsk.setAskState0(2);
         tourAsk.setUpdateTime(new Date());
         int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
-
+        System.out.println(i1);
         TourAskExample tourAskExample1 = new TourAskExample();
         tourAskExample1.createCriteria().andAskState0EqualTo(1)
                 .andAskerIdNotEqualTo(askerId);

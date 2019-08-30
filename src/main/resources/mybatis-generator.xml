@@ -57,6 +57,6 @@
 <!--        <table tableName="club_star" domainObjectName="ClubStar"></table>-->
 <!--        <table tableName="shop_star" domainObjectName="ShopStar"></table>-->
 <!--        <table tableName="comment" domainObjectName="Comment"></table>-->
-        <table tableName="user_report" domainObjectName="UserReport"></table>
+        <table tableName="recharge" domainObjectName="Recharge"></table>
     </context>
 </generatorConfiguration>

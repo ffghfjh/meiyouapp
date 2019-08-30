@@ -4,6 +4,7 @@ import com.meiyou.model.MqttComsumer;
 import com.meiyou.model.MqttPruducter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @program: meiyou
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Bean;
  * @author: dengshilin
  * @create: 2019-08-24 08:54
  **/
-//@Configuration
+@Configuration
 public class AliMQConfig {
 
     @Value("${producerId}")

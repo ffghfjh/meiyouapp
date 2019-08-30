@@ -9,6 +9,7 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.config.QueueConfig;
+import com.meiyou.mapper.*;
 import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
@@ -72,6 +73,8 @@ public class UserServiceImpl implements UserService {
     RedPacketMapper redPacketMapper;
     @Autowired
     AmqpTemplate rabbitTemplate;
+    @Autowired
+    VideoChatMapper videoChatMapper;
 
 
 
@@ -443,6 +446,8 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+
 
 
     /**
@@ -1044,6 +1049,40 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Msg videoEnd(String channelId) {
+
+        VideoChatExample example = new VideoChatExample();
+        VideoChatExample.Criteria criteria = example.createCriteria();
+        criteria.andChannelIdEqualTo(channelId);
+        VideoChat videoChat = videoChatMapper.selectByExample(example).get(0);
+        String sender  = videoChat.getSenderAccount();
+        String receiver  = videoChat.getReceiverAccount();
+        UserExample example1 = new UserExample();
+        UserExample.Criteria criteria1 = example1.createCriteria();
+        criteria1.andAccountEqualTo(sender);
+        User senderU = userMapper.selectByExample(example1).get(0); //呼叫放方
+        UserExample example2 = new UserExample();
+        UserExample.Criteria criteria2 = example2.createCriteria();
+        criteria2.andAccountEqualTo(receiver);
+        User receiverU = userMapper.selectByExample(example2).get(0);//接收方
+        Date date = new Date();
+        Date videoDate = videoChat.getGreateTime();
+        int minute = getDatePoor(date,videoDate);//通话时长
+        float videoRate = Float.parseFloat(rootMessageService.getMessageByName("video_rate"));
+        float videoMoney = Float.parseFloat(rootMessageService.getMessageByName("video_money"));
+        float totalMoney = minute*videoMoney;//总费用
+        float lateMoney = minute*videoMoney*(1-videoRate);//接收方得到费用
+        videoChat.setMoney((double)totalMoney*videoRate);
+        videoChat.setState(1);
+        if(addMoney(receiverU.getId(),(int)lateMoney)&& delMoney(senderU.getId(),(int)totalMoney)&&videoChatMapper.updateByPrimaryKey(videoChat)==1){
+            return Msg.success();
+        }else {
+            return Msg.fail();
+        }
+
+    }
+
     /**
      * 用户举报
      * @param reporter_id [举报人]
@@ -1138,5 +1177,21 @@ public class UserServiceImpl implements UserService {
             }
         }
         return age;
+    }
+
+    public int getDatePoor(Date endDate, Date nowDate) {
+        long nd = 1000 * 24 * 60 * 60;
+
+        long nh = 1000 * 60 * 60;
+
+        long nm = 1000 * 60;
+
+        // 获得两个时间的毫秒时间差异
+
+        long diff = endDate.getTime() - nowDate.getTime();
+
+        long min = diff % nd % nh / nm;
+
+        return (int)min;
     }
 }

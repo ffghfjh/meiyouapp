@@ -468,7 +468,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     */
     @Transactional
     @Override
-    @CachePut
     public Msg againReleaseTour(String uid, Integer id, String token) {
         Tour tour = tourMapper.selectByPrimaryKey(id);
         boolean authToken = RedisUtil.authToken(uid, token);

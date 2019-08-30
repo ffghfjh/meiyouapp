@@ -250,21 +250,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = activityMapper.selectByPrimaryKey(nbhAid);
             //如果activity不存在
             if (activity == null) {
-                HashMap<String, Object> hashMap = new HashMap<String, Object>();
-                hashMap.put("header", "no picture");
-                hashMap.put("nickname", "无昵称");
-                hashMap.put("sex", 0);
-                hashMap.put("birthday", "0");
-                hashMap.put("content", "无附近动态内容");
-                hashMap.put("imgsUrl", "no picture");
-                hashMap.put("distance", "0.00");
-                hashMap.put("time", "时间不存在");
-                hashMap.put("readNum", 0);
-                hashMap.put("likeNum", 0);
-                hashMap.put("commontNum", 0);
-                hashMap.put("uid", 0);
-                hashMap.put("aid", nbhAid);
-                list.add(hashMap);
+                continue;
             }
             User user1 = userMapper.selectByPrimaryKey(activity.getPublishId());
             boolean boolUser = (user1 == null || user1.getId()==0 || user1.getNickname().equals("找不到任何用户"));

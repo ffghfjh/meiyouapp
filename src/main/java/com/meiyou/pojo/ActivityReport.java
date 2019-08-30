@@ -1,5 +1,7 @@
 package com.meiyou.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class ActivityReport {
@@ -41,6 +43,7 @@ public class ActivityReport {
      *
      * @mbggenerated Thu Aug 29 09:29:43 CST 2019
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**

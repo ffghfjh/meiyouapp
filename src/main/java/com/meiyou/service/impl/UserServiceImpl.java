@@ -13,6 +13,7 @@ import com.meiyou.mapper.AuthorizationMapper;
 import com.meiyou.mapper.RedPacketMapper;
 import com.meiyou.mapper.ShareMapper;
 import com.meiyou.mapper.UserMapper;
+import com.meiyou.mapper.*;
 import com.meiyou.model.AliPayInfo;
 import com.meiyou.model.ExpirationMessagePostProcessor;
 import com.meiyou.model.WXUserInfo;
@@ -51,6 +52,9 @@ import java.util.logging.Logger;
 @Service
 @CacheConfig(cacheNames = "MeiyouCache") //hzy, 配置Redis缓存
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    UserReportMapper userReportMapper;
 
     @Autowired
     UserMapper userMapper;
@@ -1038,6 +1042,45 @@ public class UserServiceImpl implements UserService {
         }
         return null;
 
+    }
+
+    /**
+     * 用户举报
+     * @param reporter_id [举报人]
+     * @param reported_id [被举报人]
+     * @param type [举报类型]
+     * @param content [举报备注]
+     * @return
+     */
+    @Override
+    public Msg userReport(Integer reporter_id, Integer reported_id,  String type, String content) {
+        Msg msg = new Msg();
+        //先查询举报人是否存在
+        User user = userMapper.selectByPrimaryKey(reporter_id);
+        //查询被举报人是否存在
+        User user1 = userMapper.selectByPrimaryKey(reported_id);
+        if (user == null || user1 == null) {
+            msg.setCode(200);
+            msg.setMsg("举报人或被举报人不存在");
+            msg.add("黄朝阳", "666");
+            return msg;
+        }
+        UserReport userReport = new UserReport();
+        userReport.setReporterId(reporter_id);
+        userReport.setReportedPersonId(reported_id);
+        userReport.setCreateTime(new Date());
+        userReport.setUpdateTime(new Date());
+        userReport.setType(type);
+        userReport.setContent(content);
+        int i = userReportMapper.insertSelective(userReport);
+        if (i == 0) {
+            msg.setCode(200);
+            msg.setMsg("插入数据到数据库失败");
+            return msg;
+        }
+        msg.setCode(100);
+        msg.setMsg("举报成功！");
+        return msg;
     }
 
 

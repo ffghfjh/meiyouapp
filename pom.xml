@@ -20,6 +20,14 @@
 
     <dependencies>
 
+        <!--        hzy：开启分页-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+
+
         <!-- 国产java工具Hutool
                 https://hutool.cn/docs/#/
          -->
@@ -64,11 +72,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.security</groupId>-->
-<!--            <artifactId>spring-security-test</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.security</groupId>-->
+        <!--            <artifactId>spring-security-test</artifactId>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
         <!-- 引入druid数据源 -->
         <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
@@ -82,7 +90,6 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
-
 
 
         <!--springfox的核心jar包 -->
@@ -121,7 +128,6 @@
             <artifactId>jedis</artifactId>
             <version>3.0.1</version>
         </dependency>
-
 
 
         <!--mqtt-->
@@ -179,7 +185,6 @@
             <artifactId>aliyun-java-sdk-rtc</artifactId>
             <version>1.0.3</version>
         </dependency>
-
 
 
     </dependencies>

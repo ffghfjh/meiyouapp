@@ -141,6 +141,7 @@ public class BaseServiceImpl {
 
         ClubVO clubVO = new ClubVO();
         clubVO.setNums(nums);
+        clubVO.setId(club.getId());
         clubVO.setPublishId(club.getPublishId());
         clubVO.setImgsUrl(club.getImgsUrl());
         clubVO.setProjectName(club.getProjectName());
@@ -193,6 +194,7 @@ public class BaseServiceImpl {
 
         ShopVO shopVO = new ShopVO();
         shopVO.setNums(nums);
+        shopVO.setId(shop.getId());
         shopVO.setPublishId(shop.getPublishId());
         shopVO.setImgsUrl(shop.getImgsUrl());
         shopVO.setServiceArea(shop.getServiceArea());

@@ -78,7 +78,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             appointmentVO.setPublishBirthday(publish.getBirthday());
 
             //添加约会信息
-            appointmentVO.setId(appointment.getId());
+            appointmentVO.setId(ask.getId());
             appointmentVO.setAppointContext(appointment.getAppointContext());
             appointmentVO.setAppointAddress(appointment.getAppointAddress());
             appointmentVO.setAppointTime(appointment.getAppointTime());
@@ -121,7 +121,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             tourVO.setPublishBirthday(publish.getBirthday());
 
             //添加旅游信息
-            tourVO.setId(tour.getId());
+            tourVO.setId(ask.getId());
             tourVO.setStartAddress(tour.getStartAddress());
             tourVO.setEndAddress(tour.getEndAddress());
             tourVO.setGoMessage(tour.getGoMessage());

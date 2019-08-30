@@ -440,6 +440,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    
+
     /**
      * 获取微信用户信息
      *

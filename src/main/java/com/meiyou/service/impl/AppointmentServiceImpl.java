@@ -478,7 +478,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-        if (state == 2) {
+       /* if (state == 2) {
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1)
                     .andAppointIdEqualTo(id);
@@ -528,7 +528,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             if (i == 3) {
                 return Msg.success();
             }
-        }
+        }*/
 
         if (state == 3) {
             Integer confirmId = appointment.getConfirmId();
@@ -555,14 +555,14 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             appointAskExample.createCriteria().andAskStateEqualTo(2)
                     .andAppointIdEqualTo(id);
             AppointAsk appointAsk = new AppointAsk();
-            //退还报名金后，报名者状态从2变成0
-            appointAsk.setAskState(0);
+            //退还报名金后，报名者状态从2变成1
+            appointAsk.setAskState(1);
             appointAsk.setUpdateTime(new Date());
             i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            appointment.setState(1);
+            appointment.setState(2);
             appointment.setUpdateTime(new Date());
             int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 

@@ -369,7 +369,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //旅游报名表中2是被选中状态
         tourAsk.setAskState0(2);
         tourAsk.setUpdateTime(new Date());
-        int i1 = tourMapper.updateByExampleSelective(tour, tourExample);
+        int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
         TourAskExample tourAskExample1 = new TourAskExample();
         tourAskExample1.createCriteria().andAskState0EqualTo(1)
@@ -479,7 +479,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-        if (state == 2) {
+       /* if (state == 2) {
             TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1)
                     .andAppointIdEqualTo(id);
@@ -513,7 +513,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                         .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
                 TourAsk tourAsk1 = new TourAsk();
                 //退还报名金后，报名者状态从1变成0
-                tourAsk1.setAskState0(0);
+                tourAsk1.setAskState0(1);
                 tourAsk1.setUpdateTime(new Date());
                 i2 = tourAskMapper.updateByExampleSelective(tourAsk1, tourAskExample1);
                 if (i2 != 1){
@@ -530,7 +530,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 return Msg.success();
             }
         }
-
+*/
         if (state == 3) {
             Integer confirmId = tour.getConfirmId();
             //根据报名者id查询出他所有信息
@@ -555,14 +555,14 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             tourAskExample.createCriteria().andAskState0EqualTo(2)
                     .andAppointIdEqualTo(id);
             TourAsk tourAsk = new TourAsk();
-            //退还报名金后，报名者状态从2变成0
-            tourAsk.setAskState0(0);
+            //取消选中，报名者状态从2变成1
+            tourAsk.setAskState0(1);
             tourAsk.setUpdateTime(new Date());
             i2 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            tour.setState(1);
+            tour.setState(2);
             tour.setUpdateTime(new Date());
             int i3 = tourMapper.updateByExampleSelective(tour, tourExample);
 
@@ -696,8 +696,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 continue;
             }
             User user = userMapper.selectByPrimaryKey(publisherId);
-            System.out.println("hzy---yonghu id" + user.getId());
-
             HashMap<String, Object> map = new HashMap<>();
 
             if (state == 1 || state == 2){
@@ -767,13 +765,13 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             //查找购买按摩会所的记录
         TourAskExample tourAskExample = new TourAskExample();
         //购买者了id为cid的所有购买记录
-        tourAskExample.createCriteria().andIdEqualTo(id);
+        tourAskExample.createCriteria().andAppointIdEqualTo(id);
 
         List<TourAsk> tours = tourAskMapper.selectByExample(tourAskExample);
 
         if (tours == null && tours.size() == 0) {
                 msg.setCode(404);
-                msg.setMsg("找不到指定的导游聘请记录");
+                msg.setMsg("找不到指定的旅游记录");
                 return msg;
             }
 

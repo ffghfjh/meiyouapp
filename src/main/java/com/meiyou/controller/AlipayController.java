@@ -52,4 +52,14 @@ public class AlipayController {
             return Msg.noLogin();
         }
     }
+
+    @RequestMapping(value = "aliCash",method = RequestMethod.POST)
+    public Msg aliCash(int uId,String token,float money,String password){
+        if(RedisUtil.authToken(String.valueOf(uId),token)){
+            return alipayService.aliCash(password,uId,money);
+        }else {
+            return Msg.noLogin();
+        }
+
+    }
 }

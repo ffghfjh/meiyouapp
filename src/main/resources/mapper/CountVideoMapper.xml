@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountVideoMapper">
+  <select id="nowVideoNums" resultType="java.lang.Integer">
+    select money from `video_chat` where to_days(greate_time) = to_days(now()) AND state = 1
+  </select>
+
+  <select id="yesterdayVideoNums" resultType="java.lang.Integer">
+    select money from `video_chat` where to_days(NOW()) - to_days(greate_time) = 1 AND state = 1
+  </select>
+
+  <select id="nowWeekVideoNums" resultType="java.lang.Integer">
+    SELECT money FROM `video_chat` WHERE YEARWEEK(date_format(greate_time,'%Y-%m-%d')) = YEARWEEK(now()) AND state = 1
+  </select>
+
+  <select id="nowMonthVideoNums" resultType="java.lang.Integer">
+    select money from `video_chat` where Month(greate_time)=Month(NOW()) AND state = 1
+  </select>
+
+  <select id="lastMonthVideoNums" resultType="java.lang.Integer">
+    SELECT money FROM `video_chat` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( greate_time, '%Y%m' ) ) =1 AND state = 1
+  </select>
+
+  <select id="nowYearVideoNums" resultType="java.lang.Integer">
+    select money from `video_chat` where YEAR(greate_time)=YEAR(NOW()) AND state = 1
+  </select>
+
+  <select id="allVideoNums" resultType="java.lang.Integer">
+    select money from `video_chat` where state = 1
+  </select>
+
+</mapper>

@@ -240,13 +240,14 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         for(GeoRadiusResponse result : geoRadiusResponses){
             //获取id
             String member = result.getMemberByString();
+            Integer id = Integer.valueOf(member);
 
             //距离我多远
             Double dis = result.getDistance();
             if (dis != null) {
                 dis = 0.00;
             }
-            Integer id = Integer.valueOf(member);
+
 
             //通过id查找club
             ClubExample example = new ClubExample();
@@ -257,6 +258,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 msg.setMsg("附近没有找到按摩会所");
                 return msg;
             }
+
+            if(uid == clubs.get(0).getPublishId()){
+                continue;
+            }
+
 
             //把club的值转换到ClubVO中
             ClubVO clubVO = setClubToClubVO(clubs.get(0));

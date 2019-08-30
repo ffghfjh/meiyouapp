@@ -479,7 +479,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-       /* if (state == 2) {
+        if (state == 2) {
             TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1)
                     .andAppointIdEqualTo(id);
@@ -530,7 +530,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 return Msg.success();
             }
         }
-*/
         if (state == 3) {
             Integer confirmId = tour.getConfirmId();
             //根据报名者id查询出他所有信息

@@ -201,7 +201,7 @@ public class MqttComsumer implements Serializable {
                                  info1.setToken(token1);
                                  info1.setNonce(auth.getNonce());
                                  info1.setTimestamp(auth.getTimestamp());
-                                 info1.setUserId(mqttMessage.getSender());
+                                 info1.setUserId(mqttMessage.getReceiver());
                                  info1.setmGslb(Constants.GSLB);
 
                                  //通知加入会话
@@ -210,6 +210,10 @@ public class MqttComsumer implements Serializable {
 
                              }
                         }
+                    }
+                    //挂断
+                    if(mqttMessage.getMsgType()==MqttConstants.HANGUP){
+
                     }
                 }
                 @Override
@@ -257,6 +261,8 @@ public class MqttComsumer implements Serializable {
         }else{
             return true;
         }
+
+
     }
 
 

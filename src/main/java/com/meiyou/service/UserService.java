@@ -174,4 +174,11 @@ public interface UserService {
      * @return
      */
     public User selUserInfoByAdmin(String account);
+
+    /**
+     * 通话结束
+     * @param channelId
+     * @return
+     */
+    public Msg videoEnd(String channelId);
 }

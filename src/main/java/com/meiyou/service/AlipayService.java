@@ -11,6 +11,6 @@ import javax.servlet.http.HttpServletRequest;
  * @create: 2019-08-30 19:42
  **/
 public interface AlipayService {
-    public AlipayTradeAppPayResponse getOrderInfo(String total_amount, String subject, String out_trade_no, HttpServletRequest req);//获取支付订单信息
+    public AlipayTradeAppPayResponse getOrderInfo(String total_amount, String subject, String out_trade_no, int uId);//获取支付订单信息
 
 }

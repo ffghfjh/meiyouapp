@@ -13,7 +13,7 @@ public class Constants {
     public static String AGE = "22";//默认用户年龄
 
 
-
+    public static String ADDRESS = "http://www.meiyou8.cn/";
 
     /**
      * 音视频通讯

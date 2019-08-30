@@ -477,6 +477,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         //获取当前订单状态
         Integer state = tour.getState();
+        System.out.println(state);
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;

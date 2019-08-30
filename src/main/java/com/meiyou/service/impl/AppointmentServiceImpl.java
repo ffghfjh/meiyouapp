@@ -497,7 +497,12 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
                 //金额退还后账户余额
                 float balance = money + askMoneyValue;
-
+                User user1 = new User();
+                UserExample userExample = new UserExample();
+                userExample.createCriteria().andIdEqualTo(askerId);
+                user1.setMoney(balance);
+                user1.setUpdateTime(new Date());
+                i1 = userMapper.updateByExampleSelective(user1, userExample);
                 if (i1 != 1){
                     return Msg.fail();
                 }
@@ -509,13 +514,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 appointAsk1.setAskState(0);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
-
-                User user1 = new User();
-                UserExample userExample = new UserExample();
-                userExample.createCriteria().andIdEqualTo(askerId);
-                user1.setMoney(balance);
-                user1.setUpdateTime(new Date());
-                i1 = userMapper.updateByExampleSelective(user1, userExample);
 
                 if (i2 != 1){
                     return Msg.fail();
@@ -809,10 +807,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             return msg;
         }
 
-        //查找购买按摩会所的记录
+        //查找报名约会的记录
         AppointAskExample appointAskExample = new AppointAskExample();
-        //购买者了id为cid的所有购买记录
-        appointAskExample.createCriteria().andAppointIdEqualTo(id);
+        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(1);
 
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
 

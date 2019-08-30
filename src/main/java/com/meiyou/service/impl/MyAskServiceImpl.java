@@ -55,14 +55,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     public List<Object> selectMyAppointmentAsk(String uid, String token) {
         Msg msg = new Msg();
         HashMap<String, Object> map = new HashMap<>();
-        boolean authToken = RedisUtil.authToken(uid, token);
-        //判断是否登录
-        if (!authToken) {
-            ArrayList<Object> list = new ArrayList<>();
-            map.put("code",300);
-            map.put("msg","未登陆");
-            return list;
-        }
+
         AppointAskExample appointAskExample = new AppointAskExample();
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
@@ -192,14 +185,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     public List<Object> selectMyTourAsk(String uid, String token) {
         Msg msg = new Msg();
         HashMap<String, Object> map = new HashMap<>();
-        boolean authToken = RedisUtil.authToken(uid, token);
-        //判断是否登录
-        if (!authToken) {
-            ArrayList<Object> list = new ArrayList<>();
-            map.put("code",300);
-            map.put("msg","未登陆");
-            return list;
-        }
+
         TourAskExample tourAskExample = new TourAskExample();
         tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);

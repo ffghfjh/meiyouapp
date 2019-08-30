@@ -207,7 +207,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1).andAppointIdEqualTo(id);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() >= 0){
+        if (appointAsks.size() > 0){
             msg.setCode(250);
             msg.setMsg("请勿重复报名");
             return msg;
@@ -690,6 +690,11 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             Integer state = appointment.getState();
             //获取用户id
             Integer publisherId = appointment.getPublisherId();
+
+            //如果发布者等于报名者，则跳出本次循环
+            if (publisherId == Integer.parseInt(uid)){
+                continue;
+            }
             User user = userMapper.selectByPrimaryKey(publisherId);
             HashMap<String, Object> map = new HashMap<>();
             if (state == 1 || state == 2){

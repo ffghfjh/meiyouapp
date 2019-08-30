@@ -19,7 +19,7 @@ public class Constants {
     public static String VIDEOAPPID = "txz2zhcn";
     public static String VIDEOACCESSKEYID = "LTAIvKcmvWQ80zRM";
     public static String VIDEOACCESSKEYSECRET = "09bBSKCP1j6Aer2fjRo3w5uDBMEmO0";
-    public static String[] GSLB = new String[]{"https://rgslb.rtc.aliyuncs.com"};
+    public static String GSLB = "https://rgslb.rtc.aliyuncs.com";
 
     /**
      * 腾讯云

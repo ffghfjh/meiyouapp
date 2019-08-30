@@ -14,7 +14,7 @@ public class AliRtcAuthInfo {
         public String mNonce;
         public long mTimestamp;
         public String mToken;
-        public String[] mGslb;
+        public String mGslb;
 
         public AliRtcAuthInfo() {
         }
@@ -67,12 +67,11 @@ public class AliRtcAuthInfo {
             this.mToken = token;
         }
 
-        public String[] getGslb() {
-            return this.mGslb;
-        }
+      public String getmGslb() {
+        return mGslb;
+      }
 
-        public void setGslb(String[] gslb) {
-            this.mGslb = gslb;
-        }
-
+      public void setmGslb(String mGslb) {
+        this.mGslb = mGslb;
+      }
 }

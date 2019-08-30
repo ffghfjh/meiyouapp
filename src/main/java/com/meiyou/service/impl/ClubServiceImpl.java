@@ -74,18 +74,23 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             case DAY:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case WEEK:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case MONTH:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case QUARTER:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case YEAR:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
         }
 
         //添加过期时间
@@ -101,7 +106,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         String publish_money = getRootMessage("publish_money");
 
         //计算支付金额
-        Float pay_money = Float.valueOf(top_money) * days + Float.valueOf(publish_money);
+        Float pay_money = Float.valueOf(top_money) + Float.valueOf(publish_money);
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");

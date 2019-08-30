@@ -45,20 +45,55 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
     @Override
     public Msg changePassword(Integer uid, String newPassword) {
         Msg msg = new Msg();
-        AuthorizationExample authorizationExample = new AuthorizationExample();
-        authorizationExample.createCriteria().andUserIdEqualTo(uid).andIdentityTypeEqualTo(1);
-        List<Authorization> authorizations = authorizationMapper.selectByExample(authorizationExample);
-        if(authorizations.isEmpty() && authorizations == null){
-            msg.setMsg("不存在此用户");
+        User user = getUserByUid(uid);
+        if(user == null){
             msg.setCode(300);
+            msg.setMsg("此用户不存在");
             return msg;
         }
         Authorization authorization = new Authorization();
         authorization.setCredential(newPassword);
 
         AuthorizationExample example = new AuthorizationExample();
-        example.createCriteria().andUserIdEqualTo(uid);
-        authorizationMapper.updateByExampleSelective(authorization,example);
-        return null;
+        example.createCriteria().andUserIdEqualTo(uid).andIdentityTypeEqualTo(1);
+        Integer rows = authorizationMapper.updateByExampleSelective(authorization, example);
+        if(rows != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
+    }
+
+    @Override
+    public Msg changePayPassword(Integer uid, String newPassword) {
+        Msg msg = new Msg();
+        User user = getUserByUid(uid);
+        if(user == null){
+            msg.setCode(300);
+            msg.setMsg("此用户不存在");
+            return msg;
+        }
+        User u = new User();
+        u.setId(uid);
+        u.setPayWord(newPassword);
+        Integer rows = userMapper.updateByPrimaryKeySelective(u);
+        if(rows != 1){
+            return Msg.fail();
+        }
+        return Msg.success();
+    }
+
+    @Override
+    public Msg selectByUid(Integer uid) {
+        Msg msg = new Msg();
+        User user = getUserByUid(uid);
+        if(user == null){
+            msg.setCode(300);
+            msg.setMsg("此用户不存在");
+            return msg;
+        }
+        msg.add("user",user);
+        msg.setMsg("成功");
+        msg.setCode(100);
+        return msg;
     }
 }

@@ -74,18 +74,23 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             case DAY:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case WEEK:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case MONTH:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case QUARTER:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
             case YEAR:
                 days = type.getValue();
                 top_money = getRootMessage(timeType);
+                break;
         }
 
         //添加过期时间
@@ -101,7 +106,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         String publish_money = getRootMessage("publish_money");
 
         //计算支付金额
-        Float pay_money = Float.valueOf(top_money) * days + Float.valueOf(publish_money);
+        Float pay_money = Float.valueOf(top_money) + Float.valueOf(publish_money);
 
         if(payWord.equals("")){
             msg.setMsg("请设置支付密码!");
@@ -240,13 +245,14 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         for(GeoRadiusResponse result : geoRadiusResponses){
             //获取id
             String member = result.getMemberByString();
+            Integer id = Integer.valueOf(member);
 
             //距离我多远
             Double dis = result.getDistance();
             if (dis != null) {
                 dis = 0.00;
             }
-            Integer id = Integer.valueOf(member);
+
 
             //通过id查找club
             ClubExample example = new ClubExample();
@@ -257,6 +263,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 msg.setMsg("附近没有找到按摩会所");
                 return msg;
             }
+
+            if(uid == clubs.get(0).getPublishId()){
+                continue;
+            }
+
 
             //把club的值转换到ClubVO中
             ClubVO clubVO = setClubToClubVO(clubs.get(0));

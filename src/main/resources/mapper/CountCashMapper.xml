@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountCashMapper">
+  <select id="nowCashNums" resultType="java.lang.Integer">
+    select cash_money from `cash` where to_days(create_time) = to_days(now()) AND state = 1
+  </select>
+
+  <select id="yesterdayCashNums" resultType="java.lang.Integer">
+    select cash_money from `cash` where to_days(NOW()) - to_days(create_time) = 1 AND state = 1
+  </select>
+
+  <select id="nowWeekCashNums" resultType="java.lang.Integer">
+    SELECT cash_money FROM `cash` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now()) AND state = 1
+  </select>
+
+  <select id="nowMonthCashNums" resultType="java.lang.Integer">
+    select cash_money from `cash` where Month(create_time)=Month(NOW()) AND state = 1
+  </select>
+
+  <select id="lastMonthCashNums" resultType="java.lang.Integer">
+    SELECT cash_money FROM `cash` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1 AND state = 1
+  </select>
+
+  <select id="nowYearCashNums" resultType="java.lang.Integer">
+    select cash_money from `cash` where YEAR(create_time)=YEAR(NOW()) AND state = 1
+  </select>
+
+  <select id="allCashNums" resultType="java.lang.Integer">
+    select cash_money from `cash` where state = 1
+  </select>
+
+</mapper>

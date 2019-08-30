@@ -149,6 +149,53 @@ public class ClubTests extends BaseServiceImpl {
     @Autowired
     CountPublishService publishService;
 
+    @Autowired
+    CountPublishMoneyService publishMoneyService;
+
+    @Autowired
+    CountVideoService videoService;
+
+    @Autowired
+    CountRechargeService rechargeService ;
+
+    @Test
+    public void rewar(){
+        System.out.println(
+                rechargeService.nowRechargeNums()
+                        +","+
+                        rechargeService.yesterdayRechargeNums()
+                        +","+
+                        rechargeService.nowWeekRechargeNums()
+                        +","+
+                        rechargeService.nowMonthRechargeNums()
+                        +","+
+                        rechargeService.lastMonthRechargeNums()
+                        +","+
+                        rechargeService.nowYearRechargeNums()
+                        +","+
+                        rechargeService.allRechargeNums()
+        );
+    }
+
+    @Test
+    public void ve(){
+        System.out.println(
+                videoService.nowVideoNums()
+                        +","+
+                        videoService.yesterdayVideoNums()
+                        +","+
+                        videoService.nowWeekVideoNums()
+                        +","+
+                        videoService.nowMonthVideoNums()
+                        +","+
+                        videoService.lastMonthVideoNums()
+                        +","+
+                        videoService.nowYearVideoNums()
+                        +","+
+                        videoService.allVideoNums()
+        );
+    }
+
     @Test
     public void pu(){
         System.out.println(
@@ -165,6 +212,22 @@ public class ClubTests extends BaseServiceImpl {
                 publishService.nowYearPublishNums()
                 +","+
                 publishService.allPublishNums()
+        );
+
+        System.out.println(
+                publishMoneyService.nowPublishNums()
+                        +","+
+                        publishMoneyService.yesterdayPublishNums()
+                        +","+
+                        publishMoneyService.nowWeekPublishNums()
+                        +","+
+                        publishMoneyService.nowMonthPublishNums()
+                        +","+
+                        publishMoneyService.lastMonthPublishNums()
+                        +","+
+                        publishMoneyService.nowYearPublishNums()
+                        +","+
+                        publishMoneyService.allPublishNums()
         );
     }
 

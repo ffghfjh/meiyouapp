@@ -27,7 +27,6 @@ public class CountPublishServiceImpl extends BaseServiceImpl implements CountPub
     @Override
     public Integer yesterdayPublishNums() {
         List<Integer> list = publishMapper.yesterdayPublishNums();
-        System.out.println(list);
         return listSum(list);
     }
 

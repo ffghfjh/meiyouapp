@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meiyou.mapper.CountRechargeMapper">
+  <select id="nowRechargeNums" resultType="java.lang.Integer">
+    select money from `recharge` where to_days(create_time) = to_days(now()) AND state = 1
+  </select>
+
+  <select id="yesterdayRechargeNums" resultType="java.lang.Integer">
+    select money from `recharge` where to_days(NOW()) - to_days(create_time) = 1 AND state = 1
+  </select>
+
+  <select id="nowWeekRechargeNums" resultType="java.lang.Integer">
+    SELECT money FROM `recharge` WHERE YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now()) AND state = 1
+  </select>
+
+  <select id="nowMonthRechargeNums" resultType="java.lang.Integer">
+    select money from `recharge` where Month(create_time)=Month(NOW()) AND state = 1
+  </select>
+
+  <select id="lastMonthRechargeNums" resultType="java.lang.Integer">
+    SELECT money FROM `recharge` WHERE PERIOD_DIFF( date_format( now( ) , '%Y%m' ) , date_format( create_time, '%Y%m' ) ) =1 AND state = 1
+  </select>
+
+  <select id="nowYearRechargeNums" resultType="java.lang.Integer">
+    select money from `recharge` where YEAR(create_time)=YEAR(NOW()) AND state = 1
+  </select>
+
+  <select id="allRechargeNums" resultType="java.lang.Integer">
+    select money from `recharge` where state = 1
+  </select>
+
+</mapper>

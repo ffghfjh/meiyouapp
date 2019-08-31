@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -108,12 +109,12 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         //计算支付金额
         Float pay_money = Float.valueOf(top_money) + Float.valueOf(publish_money);
 
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password)){
+        if(!password.equals(payWord)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
@@ -227,7 +228,15 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    @Cacheable(value = "nearClub")
+    @Caching(
+            cacheable = {
+                    @Cacheable(value = "nearClub")
+            },
+            put = {
+                    //先执行方法
+                    @CachePut(value = "nearClub"),
+            }
+    )
     public Msg selectClubByPosition(Integer uid, String token, Double longitude, Double latitude) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();

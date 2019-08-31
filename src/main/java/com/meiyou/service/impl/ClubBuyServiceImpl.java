@@ -66,12 +66,12 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice()
                 +Integer.valueOf(ask_money);
 
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password.toString())){
+        if(!password.toString().equals(payWord)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;

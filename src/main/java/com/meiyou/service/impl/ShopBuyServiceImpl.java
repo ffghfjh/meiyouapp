@@ -52,7 +52,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
-        //String ask_money = getRootMessage("ask_money");
+        String ask_money = getRootMessage("ask_money");
 
         //获取购买者的支付密码和余额
         User result = getUserByUid(shopBuy.getBuyerId());
@@ -84,7 +84,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
             //计算剩余金额
             User user = new User();
-            money = money - Float.valueOf(charges);
+            money = money - Float.valueOf(charges) - Float.valueOf(ask_money);
             user.setMoney(money);
             user.setUpdateTime(new Date());
 

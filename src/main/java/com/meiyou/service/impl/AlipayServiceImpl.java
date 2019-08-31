@@ -120,7 +120,12 @@ public class AlipayServiceImpl implements AlipayService {
                         Cash cash = new Cash();
                         cash.setCashMoney((int)moneyEnd);
                         cash.setCashType(1);
-                        cash.setState(1);
+                        if(money<10000){
+                            cash.setState(1);
+                        }else {
+                            cash.setState(0);
+
+                        }
                         Date date = new Date();
                         cash.setCreateTime(date);
                         cash.setUpdateTime(date);
@@ -128,25 +133,27 @@ public class AlipayServiceImpl implements AlipayService {
                         cash.setCashNumber(cashNumber);
 
                         if(cashMapper.insertSelective(cash)==1){
-                            AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
-                            request.setBizContent("{" + "\"out_biz_no\":\"" + cashNumber + "\","
-                                    + "\"payee_type\":\"ALIPAY_LOGONID\"," + "\"payee_account\":\"" + user.getAlipayAccount() + "\","
-                                    + "\"amount\":\"" + moneyEnd + "\"," + "\"payer_show_name\":\"美游提现\","
-                                    + "\"payee_real_name\":\"" + user.getAlipayName() + "\"," + "\"remark\":\"提现\"" + "  }");
+                            if(money<10000){
+                                AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
+                                request.setBizContent("{" + "\"out_biz_no\":\"" + cashNumber + "\","
+                                        + "\"payee_type\":\"ALIPAY_LOGONID\"," + "\"payee_account\":\"" + user.getAlipayAccount() + "\","
+                                        + "\"amount\":\"" + moneyEnd + "\"," + "\"payer_show_name\":\"美游提现\","
+                                        + "\"payee_real_name\":\"" + user.getAlipayName() + "\"," + "\"remark\":\"提现\"" + "  }");
 
-                            AlipayFundTransToaccountTransferResponse response = null;
-                            try {
-                                response = alipayClient.execute(request);
-                                if (response.isSuccess()) {
-                                    msg = Msg.success();
-                                    return msg;
-                                } else {
-                                    System.out.println("调用失败");
-                                    msg = Msg.fail();
-                                    return msg;
+                                AlipayFundTransToaccountTransferResponse response = null;
+                                try {
+                                    response = alipayClient.execute(request);
+                                    if (response.isSuccess()) {
+                                        msg = Msg.success();
+                                        return msg;
+                                    } else {
+                                        System.out.println("调用失败");
+                                        msg = Msg.fail();
+                                        return msg;
+                                    }
+                                } catch (AlipayApiException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (AlipayApiException e) {
-                                e.printStackTrace();
                             }
                         }
                     }

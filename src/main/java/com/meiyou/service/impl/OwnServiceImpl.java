@@ -7,10 +7,13 @@ import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
 import com.meiyou.service.OwnService;
+import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -39,6 +42,30 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
         }
         msg.setCode(100);
         msg.setMsg("成功");
+        return msg;
+    }
+
+    @Override
+    public Msg changeHeader(Integer uid, MultipartFile img, HttpServletRequest req) {
+        Msg fileMsg = FileUploadUtil.uploadUtil(img, "", req);
+        Msg msg = new Msg();
+        if(fileMsg.getCode() != 100){
+            msg.setCode(500);
+            msg.setMsg("头像上传失败");
+            return msg;
+        }
+        User user = new User();
+        user.setHeader(fileMsg.getExtend().get("path").toString());
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(uid);
+        Integer rows = userMapper.updateByExampleSelective(user, userExample);
+        if(rows != 1){
+            msg.setMsg("更新用户头像失败");
+            msg.setCode(501);
+            return msg;
+        }
+        msg.setCode(100);
+        msg.setMsg("更新头像成功");
         return msg;
     }
 

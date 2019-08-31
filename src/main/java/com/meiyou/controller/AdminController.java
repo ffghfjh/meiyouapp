@@ -253,8 +253,4 @@ public class AdminController {
         return userService.hideUserById(uid, type);
     }
 
-
-
-
-
 }

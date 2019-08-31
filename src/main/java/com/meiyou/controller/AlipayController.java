@@ -73,11 +73,12 @@ public class AlipayController {
 
     @PostMapping("addBingAlipay")
     @ApiOperation("绑定支付宝")
-    public Msg addBingAlipay(Integer uid,String token,String alipay_account,String alipay_name,String phone,String code){
+    public Msg addBingAlipay(Integer uid,String token,String alipay_account,String alipay_name
+            /*,String phone,String code*/){
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }
-        return alipayService.addBindAlipay(uid,alipay_account,alipay_name,phone,code);
+        return alipayService.addBindAlipay(uid,alipay_account,alipay_name/*,phone,code*/);
     }
 
     /**

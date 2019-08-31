@@ -274,32 +274,31 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      * 评星
      * @param uid
      * @param token
-     * @param cid
+     * @param clubBuyId 购买会所的记录Id
      * @param star
      * @return
      */
     @Override
-    public Msg addClubStar(Integer uid, String token, Integer cid,Integer star) {
+    public Msg addClubStar(Integer uid, String token, Integer clubBuyId,Integer star) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
 
-        ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
-        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        ClubBuy result = clubBuyMapper.selectByPrimaryKey(clubBuyId);
 
         Msg msg = new Msg();
-        if(result == null && result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
+
         //判断订单状态是否完成(完成了才可以评星)
-        if(result.get(0).getState() != StateEnum.COMPLETE.getValue()){
+        if(result.getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
         ClubStar clubStar = new ClubStar();
-        clubStar.setClubId(cid);
+        clubStar.setClubId(result.getClubId());
         clubStar.setEvaluationId(uid);
         clubStar.setStar(star);
         clubStar.setCreateTime(new Date());

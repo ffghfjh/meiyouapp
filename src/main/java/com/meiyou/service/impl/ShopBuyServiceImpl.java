@@ -101,27 +101,26 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      * 给完成了的景点商家评星
      * @param uid
      * @param token
-     * @param sid
+     * @param shopBuyId shopBuy的Id
      * @param star
      * @return
      */
     @Override
-    public Msg addShopStar(Integer uid, String token, Integer sid, Integer star) {
+    public Msg addShopStar(Integer uid, String token, Integer shopBuyId, Integer star) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
-        ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
-        List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
+
+        ShopBuy result = shopBuyMapper.selectByPrimaryKey(shopBuyId);
 
         Msg msg = new Msg();
-        if(shopBuys == null && shopBuys.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
         //判断订单状态是否完成(完成了才可以评星)
-        if(shopBuys.get(0).getState() != StateEnum.COMPLETE.getValue()){
+        if(result.getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
 
@@ -130,7 +129,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopStar.setCreateTime(new Date());
         shopStar.setUpdateTime(new Date());
         shopStar.setEvaluationId(uid);
-        shopStar.setGuideId(sid);
+        shopStar.setGuideId(result.getGuideId());
 
         int i = shopStarMapper.insertSelective(shopStar);
         if(i != 1){

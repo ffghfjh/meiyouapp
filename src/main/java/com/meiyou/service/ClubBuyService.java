@@ -53,9 +53,9 @@ public interface ClubBuyService {
      * 给购买过的club进行评星
      * @param uid
      * @param token
-     * @param cid
+     * @param clubBuyId clubBuy的Id
      * @return
      */
-    Msg addClubStar(Integer uid,String token,Integer cid,Integer star);
+    Msg addClubStar(Integer uid,String token,Integer clubBuyId,Integer star);
 
 }

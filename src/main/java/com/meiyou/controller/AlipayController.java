@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,6 +69,15 @@ public class AlipayController {
     @ApiOperation("查询是否绑定支付宝")
     public Msg isBindAlipay(int uId){
         return alipayService.isBindAlipay(uId);
+    }
+
+    @PostMapping("addBingAlipay")
+    @ApiOperation("绑定支付宝")
+    public Msg addBingAlipay(Integer uid,String token,String alipay_account,String alipay_name,String phone,String code){
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        return alipayService.addBindAlipay(uid,alipay_account,alipay_name,phone,code);
     }
 
     /**

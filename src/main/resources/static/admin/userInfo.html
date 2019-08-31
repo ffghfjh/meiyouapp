@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="./css/font.css">
     <link rel="stylesheet" href="./css/xadmin.css">
     <link rel="stylesheet" href="./lib/layui/css/layui.css">
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
 
     <script type="text/javascript" src="./js/xadmin.js"></script>
@@ -14,41 +14,178 @@
 
 </head>
 <body>
-
-<div class="layui-container">
-    <div class="layui-row">
-        <div class="layui-col-xs3">
-            <div class="grid-demo grid-demo-bg1">ID</div>
+<div style="margin: 25px">
+    <form class="layui-form layui-form-pane"> <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户id</label>
+            <div class="layui-input-inline">
+                <input type="text" name="uid" id="uid" autocomplete="off" class="layui-input" >
+            </div>
         </div>
-        <div class="layui-col-xs6">
-            <div class="grid-demo">1233455</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">昵称</label>
+            <div class="layui-input-block">
+                <input type="text" name="nickName" id="nickName" autocomplete="off" class="layui-input">
+            </div>
         </div>
-    </div>
-    <div class="layui-row">
-        <div class="layui-col-xs3">
-            <div class="grid-demo grid-demo-bg1">头像</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">账号</label>
+            <div class="layui-input-block">
+                <input type="text" name="account" id="account" autocomplete="off" class="layui-input">
+            </div>
         </div>
-        <div class="layui-col-xs9">
-            <div class="grid-demo"><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1567080204239&di=96acda95ffb34ec0ff6af6627b217001&imgtype=0&src=http%3A%2F%2Fimg2.ph.126.net%2F2zB3_wWPXlEW0RdwQa8d6A%3D%3D%2F2268688312388037455.jpg"> </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">头像</label>
+            <div class="layui-input-block">
+                <input type="text" name="header" id="header" autocomplete="off" class="layui-input">
+            </div>
         </div>
-    </div>
-    <div class="layui-row">
-        <div class="layui-col-xs6">
-            <div class="grid-demo grid-demo-bg1">6/12</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-inline">
+                <input type="text" name="sex" id="sex" autocomplete="off" class="layui-input">
+            </div>
         </div>
-        <div class="layui-col-xs6">
-            <div class="grid-demo">6/12</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">年龄</label>
+            <div class="layui-input-inline">
+                <input type="text" name="age" id="age" autocomplete="off" class="layui-input">
+            </div>
         </div>
-    </div>
-    <div class="layui-row">
-        <div class="layui-col-xs6">
-            <div class="grid-demo grid-demo-bg1">6/12</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">签名</label>
+            <div class="layui-input-block">
+                <input type="text" name="signature" id="signature" autocomplete="off" class="layui-input">
+            </div>
         </div>
-        <div class="layui-col-xs6">
-            <div class="grid-demo">6/12</div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">背景图片</label>
+            <div class="layui-input-block">
+                <input type="text" name="bgPicture" id="bgPicture" autocomplete="off" class="layui-input">
+            </div>
         </div>
-    </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">支付密码</label>
+            <div class="layui-input-inline">
+                <input type="text" name="payWord" id="payWord" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">美金</label>
+            <div class="layui-input-inline">
+                <input type="text" name="money" id="money" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">邀请码</label>
+            <div class="layui-input-inline">
+                <input type="text" name="shareCode" id="shareCode" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">注册时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="createTime" id="createTime" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-btn-container">
+            <button type="button" name="killBtn" id="killBtn" class="layui-btn layui-btn-danger">封号</button>
+            <button type="button" name="noKillBtn" id="noKillBtn" class="layui-btn">取消封号</button>
+            <button type="button" name="closeBtn" id="closeBtn" class="layui-btn layui-btn-warm">关闭</button>
+        </div>
+    </form>
 </div>
-   </div>
+<script>
+    layui.use(['form', 'layer'], function() {
+        var form = layui.form;
+        var layer = layui.layer;
+
+    });
+</script>
+
+<script>
+    $(function() {
+        $(document).on('click', '#killBtn',
+            function() {
+                //uid的获取要放在此处
+                var uid = $("#uid").val();
+                //点击封号按钮后发出异步请求
+                $.ajax({
+                    url:"hideUserById",
+                    data:{uid:uid, type:1},
+                    success: function(result){
+                        switch (result.code) {
+                            case 1001:
+                                layer.msg('用户不存在', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            case 1002:
+                                layer.msg('封号失败', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            case 1003:
+                                layer.msg('封号成功', {
+                                    icon: 1,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            default:
+                                layer.msg('不要到处溜达', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                        }
+                    }
+                });
+            });
+        $(document).on('click', '#noKillBtn',
+            function() {
+                //uid的获取要放在此处
+                var uid = $("#uid").val();
+                //点击封号按钮后发出异步请求
+                $.ajax({
+                    url:"hideUserById",
+                    data:{uid:uid, type:0},
+                    success: function(result){
+                        switch (result.code) {
+                            case 1001:
+                                layer.msg('用户不存在', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            case 1004:
+                                layer.msg('取消封号失败', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            case 1005:
+                                layer.msg('取消封号成功', {
+                                    icon: 1,
+                                    anim: 6 //动画类型
+                                });
+                                break;
+                            default:
+                                layer.msg('不要到处溜达', {
+                                    icon: 5,
+                                    anim: 6 //动画类型
+                                });
+                        }
+                    }
+                });
+            });
+        //关闭弹窗
+        $(document).on('click', '#closeBtn',
+            function() {
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭
+            });
+    });
+</script>
 </body>
 </html>

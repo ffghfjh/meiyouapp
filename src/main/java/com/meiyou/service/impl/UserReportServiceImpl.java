@@ -34,6 +34,17 @@ public class UserReportServiceImpl implements UserReportService {
 
 
     /**
+     * 通过账号屏蔽用户
+     *
+     * @param account
+     * @return
+     */
+    @Override
+    public LayuiTableJson hidePersonByAccount(String account) {
+        return null;
+    }
+
+    /**
      * 屏蔽被举报人
      *
      * @param uid

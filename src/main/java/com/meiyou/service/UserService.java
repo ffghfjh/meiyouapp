@@ -25,6 +25,14 @@ public interface UserService {
     public Msg weChatLogin(String auth_code);
 
     /**
+     * 通过用户id对用户进行封号
+     * @param uid
+     * @param type
+     * @return
+     */
+    Msg hideUserById(String uid, String type);
+
+    /**
      * hzy
      * 根据id获取用户信息
      *

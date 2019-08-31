@@ -46,7 +46,7 @@ public class ShopBuyController {
     }
 
     @PostMapping("/update")
-    @ApiOperation(value = "取消聘请的同城导游",notes = "取消即更发布状态，实际数据不删除")
+    @ApiOperation(value = "取消聘请的同城导游",notes = "sid 为聘请经典商家的这条记录的Id,取消即更发布状态，实际数据不删除")
     public Msg updateShop(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
                           @RequestParam("sid") Integer sid){
@@ -54,7 +54,7 @@ public class ShopBuyController {
     }
 
     @PostMapping("/updateComplete")
-    @ApiOperation(value = "更改购买景点商家的状态为已到店(已完成)",notes = "修改状态为已赴约(已完成)--->>1")
+    @ApiOperation(value = "更改购买景点商家的状态为已到店(已完成)",notes = "sid 为聘请经典商家的这条记录的Id,修改状态为已赴约(已完成)--->>1")
     public Msg updateShopBuyComplete(@RequestParam("uid") Integer uid,
                                      @RequestParam("token") String token,
                                      @RequestParam("sid") Integer sid){

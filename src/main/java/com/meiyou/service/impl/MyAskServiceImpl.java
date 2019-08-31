@@ -162,8 +162,11 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ClubVO clubVO = setClubToClubVO(club);
             //设置购买者状态
-            //clubVO.setId(c.getId());
+            clubVO.setId(c.getId());
             clubVO.setAskState(c.getState());
+
+            //设置按摩会所id
+            clubVO.setPublishId(c.getClubId());
 
             clubVOS.add(clubVO);
         }
@@ -197,6 +200,9 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             //设置购买者状态
             shopVO.setId(shopBuy.getId());
             shopVO.setAskState(shopBuy.getState());
+
+            //设置经典商家id
+            shopVO.setPublishId(shopBuy.getGuideId());
 
             shopVOS.add(shopVO);
         }

@@ -246,6 +246,15 @@ public class AdminController {
         }
     }
 
+    @RequestMapping(value="cashAudit",method = RequestMethod.POST)
+    @ApiOperation(value = "提现审核",tags = "0 不通过 1 通过")
+    public Msg cashAudit(HttpServletRequest req,int cashId,int result){
+        if(authAdmin(req)){
+            return userService.cashAudit(cashId,result);
+        }else{
+            return Msg.noLogin();
+        }
+    }
     @RequestMapping(value = "hideUserById",method = RequestMethod.GET)
     @ApiOperation(value = "通过id对用户进行封号",notes = "uid为用户id, type为1时封号，为0时取消封号")
     public Msg hideUserById(String uid, String type, HttpServletRequest request) {

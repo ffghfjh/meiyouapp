@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.meiyou.service.AlipayService;
 import com.meiyou.utils.*;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -72,11 +73,12 @@ public class AlipayController {
 
     @PostMapping("addBingAlipay")
     @ApiOperation("绑定支付宝")
-    public Msg addBingAlipay(Integer uid,String token,String alipay_account,String alipay_name,String phone,String code){
+    public Msg addBingAlipay(Integer uid,String token,String alipay_account,String alipay_name
+            /*,String phone,String code*/){
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }
-        return alipayService.addBindAlipay(uid,alipay_account,alipay_name,phone,code);
+        return alipayService.addBindAlipay(uid,alipay_account,alipay_name/*,phone,code*/);
     }
 
     /**
@@ -98,6 +100,8 @@ public class AlipayController {
     public Msg getChargeRadio(){
         return alipayService.getChargeRadio();
     }
+
+
 
 
 }

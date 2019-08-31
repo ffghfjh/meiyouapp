@@ -5,8 +5,10 @@ import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayFundTransToaccountTransferRequest;
 import com.alipay.api.request.AlipaySystemOauthTokenRequest;
 import com.alipay.api.request.AlipayUserInfoShareRequest;
+import com.alipay.api.response.AlipayFundTransToaccountTransferResponse;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.meiyou.config.QueueConfig;
@@ -78,6 +80,8 @@ public class UserServiceImpl implements UserService {
     VideoChatMapper videoChatMapper;
     @Autowired
     TencentImService tencentImService;
+    @Autowired
+    CashMapper cashMapper;
 
 
 
@@ -150,7 +154,7 @@ public class UserServiceImpl implements UserService {
 
 
                         User user = new User();
-                        String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                        String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                         user.setAccount(userAccount);
                         user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                         user.setBindAlipay(false);//未绑定支付宝
@@ -274,7 +278,7 @@ public class UserServiceImpl implements UserService {
             }else{
 
                 User user = new User();
-                String account = RandomUtil.randomNumbers(10);//用户账号
+                String account = RandomUtil.randomNumbers(8);//用户账号
                 String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
                 user.setShareCode(shareCode);//邀请码
                 user.setAccount(account);
@@ -404,7 +408,7 @@ public class UserServiceImpl implements UserService {
 
                 WXUserInfo info = getWxUserInfo(access_token,openid);
                 User user = new User();
-                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -894,7 +898,6 @@ public class UserServiceImpl implements UserService {
                 Authorization authorization = authorizations.get(0);
                 User user = userMapper.selectByPrimaryKey(authorization.getUserId());
                 if(authorization.getBoolVerified()) { //已激活
-
                     msg = Msg.success();
                     msg.add("uid", user.getId());
                     msg.add("account", user.getAccount());
@@ -931,7 +934,7 @@ public class UserServiceImpl implements UserService {
 
 
                 User user = new User();
-                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -1141,6 +1144,51 @@ public class UserServiceImpl implements UserService {
             return Msg.fail();
         }
 
+    }
+
+    @Override
+    public Msg cashAudit(int cashId, int result) {
+        Msg msg;
+        Cash cash = cashMapper.selectByPrimaryKey(cashId);
+        //通过
+        if(result==1){
+            if(cash.getState()==0){
+                cash.setState(1);
+                if(cashMapper.updateByPrimaryKey(cash)==1){
+                    User user = userMapper.selectByPrimaryKey(cash.getCashId());
+                    AlipayFundTransToaccountTransferRequest request = new AlipayFundTransToaccountTransferRequest();
+                    request.setBizContent("{" + "\"out_biz_no\":\"" + cash.getCashNumber() + "\","
+                            + "\"payee_type\":\"ALIPAY_LOGONID\"," + "\"payee_account\":\"" + user.getAlipayAccount() + "\","
+                            + "\"amount\":\"" + cash.getCashMoney() + "\"," + "\"payer_show_name\":\"美游提现\","
+                            + "\"payee_real_name\":\"" + user.getAlipayName() + "\"," + "\"remark\":\"提现\"" + "  }");
+                    AlipayFundTransToaccountTransferResponse response = null;
+                    try {
+                        response = alipayClient.execute(request);
+                        if (response.isSuccess()) {
+                            msg = Msg.success();
+                            return msg;
+                        } else {
+                            System.out.println("调用失败");
+                            msg = Msg.fail();
+                            return msg;
+                        }
+                    } catch (AlipayApiException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            //不通过
+            if(result==0){
+                if(cash.getState()==0){
+                    cash.setState(2);
+                    if(cashMapper.updateByPrimaryKey(cash)==1){
+                        return Msg.success();
+                    }
+                }
+            }
+        }
+
+        return Msg.fail();
     }
 
     /**

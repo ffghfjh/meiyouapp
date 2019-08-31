@@ -155,36 +155,36 @@
         	 var list = data.extend.msgList;
         	 $.each(list,function(i,val){
         		 if(val.name==="sincerity_money"){
-        			 $('#chenyijin').find("cite").append(val.value);
+        			 $('#chenyijin').find("cite").append(val.value+"元");
         		 }
         		 if(val.name==="publish_money"){
-        			 $('#fabujin').find("cite").append(val.value);
+        			 $('#fabujin').find("cite").append(val.value+"元");
         		 }
         		 if(val.name==="cash"){
-        			 $('#tixianlv').find("cite").append(val.value);
+        			 $('#tixianlv').find("cite").append(val.value*100+"%");
         		 }
         		 if(val.name==="share_money"){
-        			 $('#fenxiangjin').find("cite").append(val.value);
+        			 $('#fenxiangjin').find("cite").append(val.value+"元");
         		 }
         		 if(val.name==="video_money"){
-        			 $('#tonghuafei').find("cite").append(val.value);
+        			 $('#tonghuafei').find("cite").append(val.value+"元/分钟");
         		 }
         		 if(val.name == "range"){
-                     $('#range').find("cite").append(val.value);
+                     $('#range').find("cite").append(val.value+"公里");
                  }
                  if(val.name == "一年"){
-                     $('#onyer').find("cite").append(val.value);
+                     $('#onyer').find("cite").append(val.value+"元");
                  }
                  if(val.name == "一季"){
-                     $('#ohji').find("cite").append(val.value);
+                     $('#ohji').find("cite").append(val.value+"元");
                  }
                  if(val.name == "一月"){
-                     $('#onmonth').find("cite").append(val.value);
+                     $('#onmonth').find("cite").append(val.value+"元");
                  }
                  if(val.name == "一周"){
-                     $('#onzhou').find("cite").append(val.value);
+                     $('#onzhou').find("cite").append(val.value+"元");
                  }if(val.name == "一天"){
-                     $('#onday').find("cite").append(val.value);
+                     $('#onday').find("cite").append(val.value+"元");
                  }
         	 });
          }

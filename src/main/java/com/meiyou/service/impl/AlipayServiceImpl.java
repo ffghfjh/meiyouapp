@@ -195,14 +195,14 @@ public class AlipayServiceImpl implements AlipayService {
     }
 
     @Override
-    public Msg addBindAlipay(Integer uid, String alipayAccount, String alipayName,String phone, String code) {
+    public Msg addBindAlipay(Integer uid, String alipayAccount, String alipayName/*,String phone, String code*/) {
         Msg msg = new Msg();
 
-        if(!RedisUtil.authCode(phone, code)){
-            msg.setCode(500);
-            msg.setMsg("验证码错误");
-            return msg;
-        }
+//        if(!RedisUtil.authCode(phone, code)){
+//            msg.setCode(500);
+//            msg.setMsg("验证码错误");
+//            return msg;
+//        }
 
         User user = new User();
         user.setId(uid);

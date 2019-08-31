@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.meiyou.service.AlipayService;
 import com.meiyou.utils.*;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -88,6 +89,8 @@ public class AlipayController {
     public Msg getChargeRadio(){
         return alipayService.getChargeRadio();
     }
+
+
 
 
 }

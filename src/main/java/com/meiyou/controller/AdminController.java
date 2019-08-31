@@ -238,6 +238,17 @@ public class AdminController {
         }
     }
 
+    @RequestMapping(value="cashAudit",method = RequestMethod.POST)
+    @ApiOperation(value = "提现审核",tags = "0 不通过 1 通过")
+    public Msg cashAudit(HttpServletRequest req,int cashId,int result){
+        if(authAdmin(req)){
+            return userService.cashAudit(cashId,result);
+        }else{
+            return Msg.noLogin();
+        }
+    }
+
+
 
 
 

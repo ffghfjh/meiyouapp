@@ -191,4 +191,12 @@ public interface UserService {
      * @return
      */
     public Msg videoEnd(String channelId);
+
+    /**
+     * 提交审核
+     * @param cashId
+     * @param result
+     * @return
+     */
+    public Msg cashAudit(int cashId,int result);
 }

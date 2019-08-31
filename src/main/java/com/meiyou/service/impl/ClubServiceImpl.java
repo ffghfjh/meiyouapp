@@ -246,7 +246,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         //查找附近的key
         List<GeoRadiusResponse> geoRadiusResponses = getClubGeoRadiusResponse(uid,longitude,latitude);
 
-        if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
+        if(geoRadiusResponses == null){
             return Msg.fail();
         }
 

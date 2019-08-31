@@ -18,18 +18,18 @@ public interface ClubBuyService {
 
     /**
      * 取消购买
-     * @param cid
+     * @param clubBuyId
      */
-    Msg updateBuyClub(Integer uid,Integer cid,String token);
+    Msg updateBuyClub(Integer uid,Integer clubBuyId,String token);
 
     /**
      * 修改为已完成状态
      * @param uid
-     * @param cid
+     * @param clubBuyId 购买按摩会所这条记录的ID
      * @param token
      * @return
      */
-    Msg updateClubBuyComplete(Integer uid,Integer cid,String token);
+    Msg updateClubBuyComplete(Integer uid,Integer clubBuyId,String token);
 
     /**
      * 查找指定的会所购买记录

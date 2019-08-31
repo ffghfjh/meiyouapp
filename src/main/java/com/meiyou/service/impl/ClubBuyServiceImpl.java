@@ -102,22 +102,30 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     /**
      * 取消购买(退款全部)
      * @param uid
-     * @param cid
+     * @param clubBuyId
      * @param token
      * @return
      */
     @Transactional
     @Override
-    public Msg updateBuyClub(Integer uid,Integer cid,String token) {
+    public Msg updateBuyClub(Integer uid,Integer clubBuyId,String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
 
+        Msg msg = new Msg();
         //从系统数据表获取置顶费用
         String ask_money = getRootMessage("ask_money");
 
+        ClubBuy buy = clubBuyMapper.selectByPrimaryKey(clubBuyId);
+        if(buy == null){
+            msg.setMsg("没找到这条记录");
+            msg.setCode(404);
+            return msg;
+        }
+
         //获取项目金额
-        Integer projectPrice = clubMapper.selectByPrimaryKey(cid).getProjectPrice();
+        Integer projectPrice = clubMapper.selectByPrimaryKey(buy.getClubId()).getProjectPrice();
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
@@ -125,7 +133,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        clubBuyExample.createCriteria().andIdEqualTo(clubBuyId);
         clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
 
         //退钱操作
@@ -144,12 +152,12 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     /**
      * 修改状态为已到店(已完成)--->>1
      * @param uid
-     * @param cid
+     * @param clubBuyId 购买按摩会所这条记录的ID
      * @param token
      * @return
      */
     @Override
-    public Msg updateClubBuyComplete(Integer uid, Integer cid, String token) {
+    public Msg updateClubBuyComplete(Integer uid, Integer clubBuyId, String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -160,7 +168,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        clubBuyExample.createCriteria().andIdEqualTo(clubBuyId);
         int rows = clubBuyMapper.updateByExampleSelective(clubBuy, clubBuyExample);
         if(rows < 1){
             return Msg.fail();

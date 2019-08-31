@@ -22,6 +22,7 @@ import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Constants;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -191,6 +192,30 @@ public class AlipayServiceImpl implements AlipayService {
             msg.add("bind",false);
             return msg;
         }
+    }
+
+    @Override
+    public Msg addBindAlipay(Integer uid, String alipayAccount, String alipayName,String phone, String code) {
+        Msg msg = new Msg();
+
+        if(!RedisUtil.authCode(phone, code)){
+            msg.setCode(500);
+            msg.setMsg("验证码错误");
+            return msg;
+        }
+
+        User user = new User();
+        user.setId(uid);
+        user.setAlipayAccount(alipayAccount);
+        user.setAlipayName(alipayName);
+
+        Integer rows = userMapper.insertSelective(user);
+        if(rows != 1){
+            return Msg.fail();
+        }
+        msg.setMsg("绑定成功");
+        msg.setCode(100);
+        return msg;
     }
 
     @Override

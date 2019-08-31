@@ -39,6 +39,8 @@ public interface AlipayService {
      */
     public Msg isBindAlipay(int uId);
 
+    public Msg addBindAlipay(Integer uid,String alipayAccount,String alipayName,String phone,String code);
+
     /**
      * 支付结果回调
      */

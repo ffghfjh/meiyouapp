@@ -79,7 +79,7 @@ public class UserController {
         System.out.println("用户注册");
         if(phone==null||password==null||phone.equals("")||password.equals("")){
             return Msg.nullParam();
-        }else{
+        } else {
             Msg msg = userService.userRegist(code,shareCode,phone,password,nickname,birthday,sex,signature,img,req);
             return msg;
         }

@@ -1,8 +1,10 @@
 package com.meiyou.service.impl;
 
 import com.meiyou.mapper.*;
+import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
+import com.meiyou.model.TourVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import com.meiyou.utils.Msg;
@@ -23,8 +25,6 @@ import java.util.List;
  **/
 @Service
 public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
-    @Autowired
-    private UserMapper userMapper;
     @Autowired
     private AppointAskMapper appointAskMapper;
     @Autowired
@@ -52,128 +52,42 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
      * @Date: 2019/8/26
      */
     @Override
-    public List<Object> selectMyAppointmentAsk(String uid, String token) {
-        Msg msg = new Msg();
-        HashMap<String, Object> map = new HashMap<>();
-
+    public List<AppointmentVO> selectMyAppointmentAsk(String uid, String token) {
         AppointAskExample appointAskExample = new AppointAskExample();
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks != null && appointAsks.size() != 0) {
-            ArrayList<Object> list = new ArrayList<>();
-            for (AppointAsk ask : appointAsks) {
-                Integer appointId = ask.getAppointId();
-                Integer askState = ask.getAskState();
-                Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
-                String header = null;
-                String appointContext = null;
-                String appointTime = null;
-                String appointAddress = null;
 
-                switch (askState) {
-                    case 1:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
+        List<AppointmentVO> appointmentVOS = new ArrayList<>();
 
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 2:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 3:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 4:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 5:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 6:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 7:
-                        header = user.getHeader();
-                        appointContext = appointment.getAppointContext();
-                        appointTime = appointment.getAppointTime();
-                        appointAddress = appointment.getAppointAddress();
-
-                        map.put("header", header);
-                        map.put("appointContext", appointContext);
-                        map.put("appointTime", appointTime);
-                        map.put("appointAddress", appointAddress);
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                }
-            }
-            map.put("msg","查询我的约会报名返回成功");
-            map.put("code",100);
-            list.add(map);
-            return list;
+        if (appointAsks == null && appointAsks.size() == 0) {
+            return appointmentVOS;
         }
-        ArrayList<Object> list = new ArrayList<>();
-        map.put("msg","没有查询到数据");
-        map.put("code",200);
-        return list;
+        for (AppointAsk ask : appointAsks) {
+            AppointmentVO appointmentVO = new AppointmentVO();
+            Appointment appointment = appointmentMapper.selectByPrimaryKey(ask.getAppointId());
+            if(appointment == null){
+                continue;
+            }
+
+            User publish = getUserByUid(appointment.getPublisherId());
+
+            //添加发布者信息
+            appointmentVO.setPublishNickName(publish.getNickname());
+            appointmentVO.setPublishHeader(publish.getHeader());
+            appointmentVO.setPublishSignature(publish.getSignature());
+            appointmentVO.setPublishBirthday(publish.getBirthday());
+
+            //添加约会信息
+            appointmentVO.setId(ask.getId());
+            appointmentVO.setAppointContext(appointment.getAppointContext());
+            appointmentVO.setAppointAddress(appointment.getAppointAddress());
+            appointmentVO.setAppointTime(appointment.getAppointTime());
+            //添加报名者状态
+            appointmentVO.setAskState(ask.getAskState());
+
+            appointmentVOS.add(appointmentVO);
+        }
+        return appointmentVOS;
     }
 
     /**
@@ -182,150 +96,42 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     * @Date: 2019/8/26
     */
     @Override
-    public List<Object> selectMyTourAsk(String uid, String token) {
-        Msg msg = new Msg();
-        HashMap<String, Object> map = new HashMap<>();
-
+    public List<TourVO> selectMyTourAsk(String uid, String token) {
         TourAskExample tourAskExample = new TourAskExample();
         tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
-        if (tourAsks != null && tourAsks.size() != 0) {
-            ArrayList<Object> list = new ArrayList<>();
-            for (TourAsk ask : tourAsks) {
-                Integer appointId = ask.getAppointId();
-                Integer askState = ask.getAskState0();
-                Tour tour = tourMapper.selectByPrimaryKey(appointId);
-                User user = userMapper.selectByPrimaryKey(ask.getAskerId());
-                String header = null;
-                String goMessage = null;
-                String startAddress = null;
-                String endAddress = null;
-                String goTime = null;
 
-                switch (askState) {
-                    case 1:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 2:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 3:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 4:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 5:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 6:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                    case 7:
-                        header = user.getHeader();
-                        goMessage = tour.getGoMessage();
-                        startAddress = tour.getStartAddress();
-                        endAddress = tour.getEndAddress();
-                        goTime = tour.getGoTime();
-
-
-                        map.put("header", header);
-                        map.put("goMessage ", goMessage );
-                        map.put("startAddress ", startAddress );
-                        map.put("endAddress ", endAddress );
-                        map.put("goTime ", goTime );
-                        map.put("askState", askState);
-                        list.add(map);
-                        break;
-                }
-            }
-            map.put("msg","查询我的旅游报名返回成功");
-            map.put("code",100);
-            list.add(map);
-            return list;
+        ArrayList<TourVO> tourVOS = new ArrayList<>();
+        if (tourAsks == null && tourAsks.size() == 0) {
+            return tourVOS;
         }
-        ArrayList<Object> list = new ArrayList<>();
-        map.put("msg","没有查询到数据");
-        map.put("code",200);
-        return list;
+        for (TourAsk ask : tourAsks) {
+            TourVO tourVO= new TourVO();
+            Tour tour = tourMapper.selectByPrimaryKey(ask.getAppointId());
+            if(tour == null){
+                continue;
+            }
+
+            User publish = getUserByUid(tour.getPublishId());
+
+            //添加发布者信息
+            tourVO.setPublishNickName(publish.getNickname());
+            tourVO.setPublishHeader(publish.getHeader());
+            tourVO.setPublishSignature(publish.getSignature());
+            tourVO.setPublishBirthday(publish.getBirthday());
+
+            //添加旅游信息
+            tourVO.setId(ask.getId());
+            tourVO.setStartAddress(tour.getStartAddress());
+            tourVO.setEndAddress(tour.getEndAddress());
+            tourVO.setGoMessage(tour.getGoMessage());
+            tourVO.setGoTime(tour.getGoTime());
+            //添加报名者状态
+            tourVO.setAskState(ask.getAskState0());
+
+            tourVOS.add(tourVO);
+        }
+        return tourVOS;
     }
 
     /**
@@ -334,16 +140,16 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
      * @return
      */
     @Override
-    @Cacheable(cacheNames = "buy")
+    //@Cacheable(cacheNames = "buy")
     public List<ClubVO> selectMyClubAsk(Integer uid) {
 
-        Msg msg = new Msg();
         //查找购买按摩会所的记录
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         //购买者id为uid的购买记录
         clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        System.out.println(result);
 
         //对查找出来的ClubBuy进行封装
         List<ClubVO> clubVOS = new ArrayList<>();
@@ -356,6 +162,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ClubVO clubVO = setClubToClubVO(club);
             //设置购买者状态
+            //clubVO.setId(c.getId());
             clubVO.setAskState(c.getState());
 
             clubVOS.add(clubVO);
@@ -388,7 +195,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             ShopVO shopVO = setShopToShopVO(shop);
             //设置购买者状态
-            shopVO.setState(shopBuy.getState());
+            shopVO.setId(shopBuy.getId());
+            shopVO.setAskState(shopBuy.getState());
 
             shopVOS.add(shopVO);
         }

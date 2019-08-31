@@ -188,6 +188,12 @@ public class UserController {
         return userService.getOtherMsg(account);
     }
 
+    @RequestMapping(value = "video_end",method = RequestMethod.POST)
+    @ApiOperation("通话结束")
+    public Msg video_end(String channelId){
+        return userService.videoEnd(channelId);
+    }
+
 
 
     /**

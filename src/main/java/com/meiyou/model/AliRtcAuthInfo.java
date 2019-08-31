@@ -17,6 +17,7 @@ public class AliRtcAuthInfo {
         public String mGslb;
 
         public AliRtcAuthInfo() {
+
         }
 
         public String getConferenceId() {

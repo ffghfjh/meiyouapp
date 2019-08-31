@@ -57,7 +57,7 @@ public class AliyunVideoServiceImpl implements AliyunVideoService{
 			auth.channelKey = response.getChannelKey();
 			auth.nonce = response.getNonce();
 			auth.recovered = false;
-			auth.timestamp = response.getTimestamp();
+			auth.timestamp = (long)response.getTimestamp();
 			auth.requestID = response.getRequestId();
 	        msg = Msg.success();
 	        msg.add("auth",auth);

@@ -4,7 +4,7 @@ public class ChannelAuth {
     public String appID;
     public String channelID;
     public String nonce;
-    public Integer timestamp;
+    public long timestamp;
     public String channelKey;
     public Boolean recovered;
     public String requestID;
@@ -34,11 +34,12 @@ public class ChannelAuth {
         this.nonce = nonce;
     }
 
-    public Integer getTimestamp() {
+
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Integer timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

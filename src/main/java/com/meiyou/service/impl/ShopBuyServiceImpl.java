@@ -144,12 +144,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      * 取消聘请导游
      * @param uid
      * @param token
-     * @param sid shop_id
+     * @param shopBuyId 聘请导游这条记录的Id
      * @return
      */
     @Override
     @Transactional
-    public Msg updateShopBuy(Integer uid, String token, Integer sid) {
+    public Msg updateShopBuy(Integer uid, String token, Integer shopBuyId) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -157,12 +157,14 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 //        从系统数据表获取置顶费用
 //        String ask_money = getRootMessage("ask_money");
 
+        Msg msg = new Msg();
+        ShopBuy buy = shopBuyMapper.selectByPrimaryKey(shopBuyId);
         //获取每小时收费和聘请时间
-        Integer charge = shopMapper.selectByPrimaryKey(sid).getCharge();
+        Integer charge = shopMapper.selectByPrimaryKey(buy.getGuideId()).getCharge();
 
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
-        Integer time = shopBuyMapper.selectByExample(example).get(0).getTime();
+        example.createCriteria().andIdEqualTo(shopBuyId);
+        Integer time = shopBuyMapper.selectByPrimaryKey(shopBuyId).getTime();
         Integer money = time * charge;
 
         //修改聘用表状态-->取消状态-2
@@ -171,7 +173,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuy.setUpdateTime(new Date());
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
-        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid).andIdEqualTo(sid);
+        shopBuyExample.createCriteria().andIdEqualTo(shopBuyId);
         shopBuyMapper.updateByExampleSelective(shopBuy,shopBuyExample);
 
         //执行退款
@@ -189,12 +191,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     /**
      * 修改状态为已赴约(已完成)--->>1
      * @param uid
-     * @param sid 景点商家(导游Id)
+     * @param shopBuyId 购买景点商家这条记录的ID
      * @param token
      * @return
      */
     @Override
-    public Msg updateShopBuyComplete(Integer uid, Integer sid, String token) {
+    public Msg updateShopBuyComplete(Integer uid, Integer shopBuyId, String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -204,7 +206,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //修改购买表状态
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andBuyerIdEqualTo(uid).andGuideIdEqualTo(sid);
+        example.createCriteria().andIdEqualTo(shopBuyId);
         int rows = shopBuyMapper.updateByExampleSelective(shopBuy, example);
         if(rows != 1){
             return Msg.fail();

@@ -13,10 +13,7 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.meiyou.mapper.CashMapper;
 import com.meiyou.mapper.RechargeMapper;
 import com.meiyou.mapper.UserMapper;
-import com.meiyou.pojo.Cash;
-import com.meiyou.pojo.Recharge;
-import com.meiyou.pojo.RechargeExample;
-import com.meiyou.pojo.User;
+import com.meiyou.pojo.*;
 import com.meiyou.service.AlipayService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
@@ -205,14 +202,16 @@ public class AlipayServiceImpl implements AlipayService {
 //        }
 
         User user = new User();
-        user.setId(uid);
         user.setAlipayAccount(alipayAccount);
         user.setAlipayName(alipayName);
-
-        Integer rows = userMapper.insertSelective(user);
-        if(rows != 1){
+        user.setId(uid);
+        user.setBindAlipay(true);
+        user.setUpdateTime(new Date());
+        int rows = userMapper.updateByPrimaryKeySelective(user);
+        if(rows == 0){
             return Msg.fail();
         }
+
         msg.setMsg("绑定成功");
         msg.setCode(100);
         return msg;

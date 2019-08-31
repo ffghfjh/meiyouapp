@@ -226,6 +226,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             if (dis != null) {
                 dis = 0.00;
             }
+
             Integer id = Integer.valueOf(member);
 
             //通过id查找shop

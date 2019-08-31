@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -193,7 +194,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
-    @Cacheable(value = "nearShop")
+    @Caching(
+            cacheable = {
+                    @Cacheable(value = "nearShop")
+            },
+            put = {
+                    //先执行方法
+                    @CachePut(value = "nearShop"),
+            }
+    )
     public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();

@@ -1,5 +1,6 @@
 package com.meiyou.controller;
 
+import com.meiyou.service.RootMessageService;
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
@@ -25,7 +26,8 @@ public class UserController {
 
     @Autowired
     SendCodeApiService sendCodeApiService;
-
+    @Autowired
+    RootMessageService rootMessageService;
     @Autowired
     RedisTemplate<String,String> redis;
 
@@ -194,6 +196,12 @@ public class UserController {
     }
 
 
+    @RequestMapping(value="getShareMoney",method = RequestMethod.GET)
+    @ApiOperation("获取分享金")
+    public Msg getShareMoney(){
+       String shareMoney = rootMessageService.getMessageByName("share_money");
+       return Msg.success().add("shareMoney",shareMoney);
+    }
 
     /**
     * @Description: 查询用户余额
@@ -226,5 +234,4 @@ public class UserController {
         System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
         return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
     }
-
 }

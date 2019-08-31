@@ -32,13 +32,13 @@ public class AlipayController {
      */
     @RequestMapping(value = "alipayOrder", method = RequestMethod.GET)
     @ApiOperation(value = "支付宝获取支付订单信息接口")
-    public Msg alipay(String total_amount, String subject,int uId,String token) {
+    public Msg alipay(String total_amount,int uId,String token) {
+        System.out.println("获取支付订单");
         Msg msg;
         if(RedisUtil.authToken(String.valueOf(uId),token)){
-            System.out.println("支付参数" + total_amount + "," + subject);
             String out_trade_no = RandomUtil.randomString(11);
             System.out.println("订单号" + out_trade_no);
-            AlipayTradeAppPayResponse response = alipayService.getOrderInfo(total_amount, subject, out_trade_no, uId);
+            AlipayTradeAppPayResponse response = alipayService.getOrderInfo(total_amount, out_trade_no, uId);
             if (response != null) {
                 if (response.isSuccess()) {
                     msg = Msg.success();
@@ -54,12 +54,40 @@ public class AlipayController {
     }
 
     @RequestMapping(value = "aliCash",method = RequestMethod.POST)
+    @ApiOperation("支付宝提现")
     public Msg aliCash(int uId,String token,float money,String password){
         if(RedisUtil.authToken(String.valueOf(uId),token)){
             return alipayService.aliCash(password,uId,money);
         }else {
             return Msg.noLogin();
         }
-
     }
+
+    @RequestMapping(value="isBindAlipay",method = RequestMethod.GET)
+    @ApiOperation("查询是否绑定支付宝")
+    public Msg isBindAlipay(int uId){
+        return alipayService.isBindAlipay(uId);
+    }
+
+    /**
+     * 支付结果回调
+     * @param request
+     */
+    @RequestMapping(value="payCallback",method = RequestMethod.POST)
+    public void payCallback(HttpServletRequest request){
+        Map requestParams = request.getParameterMap();
+        alipayService.payCallback(requestParams);
+    }
+
+    /**
+     * 获取充值比例
+     * @return
+     */
+    @RequestMapping(value = "getChargeRadio",method = RequestMethod.GET)
+    @ApiOperation("获取充值比例")
+    public Msg getChargeRadio(){
+        return alipayService.getChargeRadio();
+    }
+
+
 }

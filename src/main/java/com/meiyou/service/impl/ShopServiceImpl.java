@@ -203,7 +203,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         //查找附近的key
         List<GeoRadiusResponse> geoRadiusResponses = getShopGeoRadiusResponse(uid,longitude,latitude);
 
-        if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
+        if(geoRadiusResponses == null){
             return Msg.fail();
         }
 
@@ -217,6 +217,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             if (dis != null) {
                 dis = 0.00;
             }
+
             Integer id = Integer.valueOf(member);
 
             //通过id查找shop

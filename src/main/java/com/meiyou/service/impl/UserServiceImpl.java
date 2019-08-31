@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
 
                 WXUserInfo info = getWxUserInfo(access_token,openid);
                 User user = new User();
-                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(6);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝

@@ -76,6 +76,8 @@ public class UserServiceImpl implements UserService {
     AmqpTemplate rabbitTemplate;
     @Autowired
     VideoChatMapper videoChatMapper;
+    @Autowired
+    TencentImService tencentImService;
 
 
 
@@ -87,7 +89,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Msg alipayLogin(String auth_code) {
-
         Msg msg;
         // 支付宝请求
         AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();// 初始化请求
@@ -114,6 +115,7 @@ public class UserServiceImpl implements UserService {
                         msg.add("account",user.getAccount());
                         msg.add("nickName",user.getNickname());
                         msg.add("header",user.getHeader());
+                        msg.add("shareCode",user.getShareCode());
                         String token = UUID.randomUUID().toString();
                         //保存token
                         RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);
@@ -233,6 +235,7 @@ public class UserServiceImpl implements UserService {
             msg.add("account",user.getAccount());
             msg.add("nickName",user.getNickname());
             msg.add("header",user.getHeader());
+            msg.add("shareCode",user.getShareCode());
             String token = UUID.randomUUID().toString();//UUID生成token
             if(!RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND)){
                 System.out.println("写入token失败");
@@ -248,6 +251,7 @@ public class UserServiceImpl implements UserService {
             return Msg.fail();
         }
     }
+
 
 
     @Override
@@ -381,6 +385,7 @@ public class UserServiceImpl implements UserService {
                       msg.add("account",user.getAccount());
                       msg.add("nickName",user.getNickname());
                       msg.add("header",user.getHeader());
+                      msg.add("shareCode",user.getShareCode());
                       String token = UUID.randomUUID().toString();
                       //保存token
                       RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);
@@ -721,6 +726,7 @@ public class UserServiceImpl implements UserService {
                         msg.add("account",user.getAccount());
                         msg.add("nickName",user.getNickname());
                         msg.add("header",user.getHeader());
+                        msg.add("shareCode",user.getShareCode());
                         String token = UUID.randomUUID().toString();
                         RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
                         msg.add("token",token);
@@ -790,6 +796,7 @@ public class UserServiceImpl implements UserService {
                     String token = UUID.randomUUID().toString();
                     RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
                     msg.add("token",token);
+                    msg.add("shareCode",user.getShareCode());
                     return msg;
                 }else {
                     System.out.println("更新用户数据失败");
@@ -854,6 +861,7 @@ public class UserServiceImpl implements UserService {
                     String token = UUID.randomUUID().toString();
                     RedisUtil.setToken(String.valueOf(user.getId()),token,Constants.TOKEN_EXPIRES_SECOND);//写入token
                     msg.add("token",token);
+                    msg.add("shareCode",user.getShareCode());
                     return msg;
                 }else {
                     System.out.println("更新用户数据失败");
@@ -892,6 +900,7 @@ public class UserServiceImpl implements UserService {
                     msg.add("account", user.getAccount());
                     msg.add("nickName", user.getNickname());
                     msg.add("header", user.getHeader());
+                    msg.add("shareCode",user.getShareCode());
                     String token = UUID.randomUUID().toString();
                     //保存token
                     RedisUtil.setToken(String.valueOf(user.getId()), token, Constants.TOKEN_EXPIRES_SECOND);
@@ -987,6 +996,12 @@ public class UserServiceImpl implements UserService {
             msg.add("signature",user.getSignature());
             msg.add("sex",user.getSex());
             msg.add("age",user.getBirthday());
+            int state = tencentImService.getUserState(user.getAccount());
+            if(state==1){
+               msg.add("state","在线");
+            }else{
+                msg.add("state","离线");
+            }
             return msg;
         }else {
             System.out.println("鉴权失败");

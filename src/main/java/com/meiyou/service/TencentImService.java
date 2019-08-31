@@ -12,5 +12,11 @@ public interface TencentImService {
 
      boolean registTencent(User user); //注册腾讯通信云账号
 
+     /**
+      * 获取用户在线状态
+      * @param account
+      * @return
+      */
+     int getUserState(String account);
 
 }

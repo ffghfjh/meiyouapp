@@ -75,6 +75,8 @@ public class UserServiceImpl implements UserService {
     AmqpTemplate rabbitTemplate;
     @Autowired
     VideoChatMapper videoChatMapper;
+    @Autowired
+    TencentImService tencentImService;
 
 
 
@@ -941,6 +943,12 @@ public class UserServiceImpl implements UserService {
             msg.add("signature",user.getSignature());
             msg.add("sex",user.getSex());
             msg.add("age",user.getBirthday());
+            int state = tencentImService.getUserState(user.getAccount());
+            if(state==1){
+               msg.add("state","在线");
+            }else{
+                msg.add("state","离线");
+            }
             return msg;
         }else {
             System.out.println("鉴权失败");

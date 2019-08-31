@@ -108,6 +108,38 @@ public class TencentImServiceImpl implements TencentImService {
         return false;
     }
 
+    @Override
+    public int getUserState(String account) {
+        Random rand = new Random();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 1; i <= 32; i++) {
+            int randNum = rand.nextInt(9) + 1;
+            String num = randNum + "";
+            sb = sb.append(num);
+        }
+        String random = String.valueOf(sb); // 32未随机数
+        String usersig = tls_sigature.genSig(Constants.SDKAPPID, Constants.IDENTIFIER, Constants.PRIKEY).urlSig;
+        String url = "https://console.tim.qq.com/v4/openim/querystate?sdkappid="+Constants.SDKAPPID+"&identifier="+Constants.IDENTIFIER+"&usersig="+usersig+"&random="+random+"&contenttype=json";
+        Map<String,Object> map = new HashMap<String,Object>();
+        List<String> list = new ArrayList<String>();
+        list.add(account);
+        map.put("To_Account",list);
+        JSONObject object = HttpUtil.postToJSONObject(url, map);
+        System.out.println("获取在线状态："+object.toString());
+        if(object.getString("ActionStatus").equals("OK")) {
+            List<Map<String,String>> list1 = (List<Map<String,String>>) object.get("QueryResult");
+            Map<String,String> map1 = list1.get(0);
+            String state = map1.get("State");
+            if(state.equals("Online")) {
+                return 1;
+            }else {
+                return 0;
+            }
+        }else {
+            return 3;
+        }
+    }
+
     public boolean userSendMsg(String fromUser, String toUser, String context, Integer syncOtherMachine) {
         // TODO Auto-generated method stub
 

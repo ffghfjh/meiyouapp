@@ -226,5 +226,4 @@ public class UserController {
         System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
         return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
     }
-
 }

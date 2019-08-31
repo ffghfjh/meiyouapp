@@ -30,25 +30,33 @@
     </table>
 
     <!--    模板引擎：配置动态屏蔽状态转化-->
-    <script type="text/html" id="aTpl">
-        {{#  if(d.reportedBoolClose == 0){ }}
-        不屏蔽
+    <script type="text/html" id="chargeTypeTpl">
+        {{#  if(d.type == 1){ }}
+        支付宝
         {{#  } else { }}
-        屏蔽
+        其他
         {{#  } }}
     </script>
 
+    <!--    模板引擎：配置动态屏蔽状态转化-->
+    <script type="text/html" id="stateTpl">
+        {{#  if(d.state == 1){ }}
+        通过
+        {{#  } else { }}
+        不通过
+        {{#  } }}
+    </script>
 
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
-<!--            <button class="layui-btn layui-btn-sm" lay-event="getCheckData">通过账号搜索</button>-->
-<!--            <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>-->
+            <!--            <button class="layui-btn layui-btn-sm" lay-event="getCheckData">通过账号搜索</button>-->
+            <!--            <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>-->
         </div>
     </script>
 
     <script type="text/html" id="barDemoActivity">
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="aHide">屏蔽</a>
-        <a class="layui-btn layui-btn-xs" lay-event="aCancle">不屏蔽</a>
+        <a class="layui-btn layui-btn-xs" lay-event="aHide">通过</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="aCancle">不通过</a>
     </script>
 
     <script>
@@ -58,13 +66,12 @@
             //监听提交
         });
 
-        var urlstr = 'data-err.json';//通过修改此变量进行图书的修改
         //数据表格模块化
         layui.use('table', function() {
             var table = layui.table;
             table.render({
                 elem: '#test',
-                url: "/AdminUserReport/listUserReport",
+                url: "/AdminRecharge/listRecharge",
                 parseData: function(res){ //res 即为原始返回的数据
                     return {
                         "code": res.code, //解析接口状态
@@ -80,38 +87,36 @@
                         type: 'checkbox',
                         fixed: 'left'
                     }, {
-                        field: 'report_id',
-                        title: '举报编号',
+                        field: 'orderNum',
+                        title: '订单编号',
                         fixed: 'left',
                         unresize: true,
                         sort: true
                     }, {
-                        field: 'reporter',
-                        title: '举报人',
+                        field: 'account',
+                        title: '充值账号',
                         sort: true
                     }, {
-                        field: 'reported',
-                        title: '被举报人',
+                        field: 'money',
+                        title: '充值美金',
+                        sort: true
                     }, {
                         field: 'type',
-                        title: '举报类型',
-                        sort: true
-                    }, {
-                        field: 'content',
-                        title: '举报备注',
+                        title: '支付方式',
+                        templet: '#chargeTypeTpl',
                         sort: true
                     }, {
                         field: 'time',
-                        title: '举报时间',
+                        title: '支付时间',
                         sort: true
                     }, {
-                        field: 'reportedBoolClose',
-                        title: '被举报人是否屏蔽',
-                        templet: '#aTpl',
+                        field: 'state',
+                        title: '审核状态',
+                        templet: '#stateTpl',
                         sort: true
                     }, {
                         fixed: 'right',
-                        title: '操作被举报人',
+                        title: '操作',
                         toolbar: '#barDemoActivity',
                         width: 150
                     }]
@@ -147,20 +152,20 @@
             table.on('tool(test)', function(obj) {
                 var data = obj.data;
                 if(obj.event === 'aHide') {
-                    layer.confirm('确定对被举报人封号吗?', function(index) {
+                    layer.confirm('确定审核通过吗?', function(index) {
                         obj.del();
                         table.reload('test', {
-                            url:"/AdminUserReport/hideReportedPersonById",//如果这个是变量的话无法重载表格
-                            where: {uid:data.pid, type:1} //设定异步数据接口的额外参数,这里的参数可以是data变量
+                            url:"/AdminRecharge/checkPassById",//如果这个是变量的话无法重载表格
+                            where: {id:data.id, type:1} //设定异步数据接口的额外参数,这里的参数可以是data变量
                         });
                         layer.close(index);
                     });
                 } else if(obj.event === 'aCancle') {
-                    layer.confirm('确定取消屏蔽举报人吗?', function(index) {
+                    layer.confirm('审核不通过是么?', function(index) {
                         obj.del();
                         table.reload('test', {
-                            url:"/AdminUserReport/hideReportedPersonById",//如果这个是变量的话无法重载表格
-                            where: {uid:data.pid, type:0} //设定异步数据接口的额外参数,这里的参数可以是data变量
+                            url:"/AdminRecharge/checkPassById",//如果这个是变量的话无法重载表格
+                            where: {id:data.id, type:0} //设定异步数据接口的额外参数,这里的参数可以是data变量
                         });
                         layer.close(index);
                     });

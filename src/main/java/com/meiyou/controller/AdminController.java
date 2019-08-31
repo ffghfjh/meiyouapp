@@ -247,4 +247,14 @@ public class AdminController {
             return Msg.noLogin();
         }
     }
+    @RequestMapping(value = "hideUserById",method = RequestMethod.GET)
+    @ApiOperation(value = "通过id对用户进行封号",notes = "uid为用户id, type为1时封号，为0时取消封号")
+    public Msg hideUserById(String uid, String type) {
+        return userService.hideUserById(uid, type);
+    }
+
+
+
+
+
 }

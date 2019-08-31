@@ -1,5 +1,6 @@
 package com.meiyou.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -153,7 +154,7 @@ public class UserServiceImpl implements UserService {
 
 
                         User user = new User();
-                        String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                        String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                         user.setAccount(userAccount);
                         user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                         user.setBindAlipay(false);//未绑定支付宝
@@ -277,7 +278,7 @@ public class UserServiceImpl implements UserService {
             }else{
 
                 User user = new User();
-                String account = RandomUtil.randomNumbers(10);//用户账号
+                String account = RandomUtil.randomNumbers(8);//用户账号
                 String shareCode = ShareCodeUtil.toSerialCode(1);//邀请码生成
                 user.setShareCode(shareCode);//邀请码
                 user.setAccount(account);
@@ -407,7 +408,7 @@ public class UserServiceImpl implements UserService {
 
                 WXUserInfo info = getWxUserInfo(access_token,openid);
                 User user = new User();
-                String userAccount = RandomUtil.randomNumbers(6);//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -454,6 +455,51 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 通过用户id对用户进行封号
+     *
+     * @param uuid
+     * @param ttype
+     * @return
+     */
+    @Override
+    public Msg hideUserById(String uuid, String ttype) {
+        int uid = Integer.parseInt(uuid);
+        int type = Integer.parseInt(ttype);
+        Msg msg = new Msg();
+        //先判断用户是否存在
+        User user = userMapper.selectByPrimaryKey(uid);
+        if (user == null) {
+            msg.setCode(1001);
+            msg.setMsg("用户不存在");
+            return msg;
+        }
+        user.setId(uid);
+        user.setUpdateTime(new Date());
+        if (type == 1) {
+            user.setBoolClose(true);
+            int i = userMapper.updateByPrimaryKeySelective(user);
+            if (i == 0) {
+                msg.setCode(1002);
+                msg.setMsg("封号失败");
+                return msg;
+            }
+            msg.setCode(1003);
+            msg.setMsg("封号成功");
+            return msg;
+        }
+        user.setBoolClose(false);
+        int i = userMapper.updateByPrimaryKeySelective(user);
+        if (i == 0) {
+            msg.setCode(1004);
+            msg.setMsg("取消封号失败");
+            return msg;
+        }
+        msg.setCode(1005);
+        msg.setMsg("取消封号成功");
+        return msg;
     }
 
 
@@ -852,7 +898,6 @@ public class UserServiceImpl implements UserService {
                 Authorization authorization = authorizations.get(0);
                 User user = userMapper.selectByPrimaryKey(authorization.getUserId());
                 if(authorization.getBoolVerified()) { //已激活
-
                     msg = Msg.success();
                     msg.add("uid", user.getId());
                     msg.add("account", user.getAccount());
@@ -889,7 +934,7 @@ public class UserServiceImpl implements UserService {
 
 
                 User user = new User();
-                String userAccount = RandomUtil.randomNumbers(10);//UUID生成账号
+                String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                 user.setAccount(userAccount);
                 user.setBgPicture(Constants.USER_BAC_DEFAULT);//设置默认背景
                 user.setBindAlipay(false);//未绑定支付宝
@@ -1041,7 +1086,7 @@ public class UserServiceImpl implements UserService {
             }
             map.put("age",user.getBirthday());
             map.put("nickName",user.getNickname());
-            map.put("createTime",user.getCreateTime());
+            map.put("createTime", DateUtil.formatDateTime(user.getCreateTime()));
             map.put("money",user.getMoney());
             map.put("close",user.getBoolClose());
             list.add(map);
@@ -1065,7 +1110,6 @@ public class UserServiceImpl implements UserService {
             return user;
         }
         return null;
-
     }
 
     @Override

@@ -65,12 +65,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         Integer charges = charge * time;
 
         Msg msg = new Msg();
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password.toString())){
+        if(!password.toString().equals(payWord)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
@@ -154,8 +154,8 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 //            return Msg.noLogin();
 //        }
 
-//        从系统数据表获取置顶费用
-//        String ask_money = getRootMessage("ask_money");
+//        从系统数据表获取报名费用
+        String ask_money = getRootMessage("ask_money");
 
         Msg msg = new Msg();
         ShopBuy buy = shopBuyMapper.selectByPrimaryKey(shopBuyId);
@@ -178,7 +178,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //执行退款
         User user = getUserByUid(uid);
-        user.setMoney(user.getMoney() + Float.valueOf(money));
+        user.setMoney(user.getMoney() + Float.valueOf(money)+Float.valueOf(ask_money));
         user.setUpdateTime(new Date());
 
         UserExample userExample = new UserExample();

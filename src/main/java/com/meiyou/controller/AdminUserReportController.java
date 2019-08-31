@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author ：huangzhaoyang
  * @date ：Created in 2019/8/30 14:22
@@ -25,16 +27,25 @@ public class AdminUserReportController {
     @Autowired
     UserReportService userReportService;
 
+    @Autowired
+    AdminController adminController;
+
     @ApiOperation(value = "获得所有用户举报", notes = "page为页码，limit为条数", httpMethod = "POST")
     @RequestMapping(value = "/listUserReport") //必须以Get方式获取，如果用Post方式就获取不到
-    public LayuiTableJson listUserReport(int page, int limit) {
-        return userReportService.listUserReport(page, limit);
+    public LayuiTableJson listUserReport(int page, int limit, HttpServletRequest request) {
+        if (adminController.authAdmin(request)) {
+            return userReportService.listUserReport(page, limit);
+        }
+        return LayuiTableJson.fail();
     }
 
     @ApiOperation(value = "获得所有用户举报", notes = "page为页码，limit为条数, uid为被举报的人, type=0不屏蔽，type=1屏蔽", httpMethod = "POST")
     @RequestMapping(value = "/hideReportedPersonById") //必须以Get方式获取，如果用Post方式就获取不到
-    public LayuiTableJson hideReportedPersonById(int page, int limit, int uid, int type) {
-        return userReportService.hideReportedPersonById(page, limit, uid, type);
+    public LayuiTableJson hideReportedPersonById(int page, int limit, int uid, int type, HttpServletRequest request) {
+        if (adminController.authAdmin(request)) {
+            return userReportService.hideReportedPersonById(page, limit, uid, type);
+        }
+        return LayuiTableJson.fail();
     }
 
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author ：huangzhaoyang
  * @date ：Created in 2019/8/31 13:44
@@ -25,16 +27,27 @@ public class AdminRechargeController {
     @Autowired
     RechargeService rechargeService;
 
+    @Autowired
+    AdminController adminController;
+
     @ApiOperation(value = "获取所有充值记录", notes = "page为页码，limit为条数", httpMethod = "GET")
     @RequestMapping("/listRecharge")
-    public LayuiTableJson listRecharge(int page, int limit) {
-        return rechargeService.listRecharge(page, limit);
+    public LayuiTableJson listRecharge(int page, int limit, HttpServletRequest request) {
+        if (adminController.authAdmin(request)) {
+            return rechargeService.listRecharge(page, limit);
+        }
+        System.out.println("管理员未登录");
+        return LayuiTableJson.fail();
     }
 
     @ApiOperation(value = "审核充值记录", notes = "page为页码，limit为条数，id为充值记录id，type为0审核不通过，为1审核通过", httpMethod = "GET")
     @RequestMapping("/checkPassById")
-    public LayuiTableJson checkPassById(int page, int limit, int id, int type) {
-        return rechargeService.checkPassById(page, limit, id, type);
+    public LayuiTableJson checkPassById(int page, int limit, int id, int type, HttpServletRequest request) {
+        if (adminController.authAdmin(request)) {
+            return rechargeService.checkPassById(page, limit, id, type);
+        }
+        System.out.println("管理员未登录");
+        return LayuiTableJson.fail();
     }
 
 }

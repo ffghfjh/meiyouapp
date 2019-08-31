@@ -222,7 +222,7 @@ public class AdminController {
     @RequestMapping(value = "getUserInfoByAccount",method = RequestMethod.GET)
     @ApiOperation(("账号获取用户信息"))
     public Msg getUserInfoByAccount(String account,HttpServletRequest req){
-//        if(authAdmin(req)){
+        if(authAdmin(req)){
             Msg msg = Msg.success();
             User user = userService.selUserInfoByAdmin(account);
             if(user!=null){
@@ -232,10 +232,10 @@ public class AdminController {
                 msg.setCode(1000);
                 return msg;
             }
-//        }
-//        else{
-//            return Msg.noLogin();
-//        }
+        }
+        else{
+            return Msg.noLogin();
+        }
     }
 
     @RequestMapping(value = "hideUserById",method = RequestMethod.GET)
@@ -243,9 +243,5 @@ public class AdminController {
     public Msg hideUserById(String uid, String type) {
         return userService.hideUserById(uid, type);
     }
-
-
-
-
 
 }

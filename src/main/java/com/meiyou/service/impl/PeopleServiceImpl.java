@@ -4,6 +4,7 @@ import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.User;
 import com.meiyou.service.PeopleService;
+import com.meiyou.service.TencentImService;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import java.util.Map;
 public class PeopleServiceImpl implements PeopleService {
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    TencentImService tencentImService;
     @Override
     public Msg selPeoples(Coordinate coordinate, double radius) {
         Msg msg;
@@ -52,6 +55,13 @@ public class PeopleServiceImpl implements PeopleService {
                     map.put("age",Integer.parseInt(user.getBirthday()));
                     map.put("bg",user.getBgPicture());
                     map.put("id",user.getId());
+                    int i = tencentImService.getUserState(user.getAccount());
+                    if(i==1){
+                        map.put("state","在线");
+                    }
+                    else {
+                        map.put("state","离线");
+                    }
                     list.add(map);
                 }
             }

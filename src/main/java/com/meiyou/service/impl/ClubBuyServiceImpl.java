@@ -109,9 +109,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     @Transactional
     @Override
     public Msg updateBuyClub(Integer uid,Integer clubBuyId,String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         //从系统数据表获取置顶费用
@@ -158,9 +158,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg updateClubBuyComplete(Integer uid, Integer clubBuyId, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
@@ -186,9 +186,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCidAndUid(Integer uid, Integer cid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
@@ -220,9 +220,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCid(Integer uid, Integer cid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者
@@ -280,9 +280,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg addClubStar(Integer uid, String token, Integer clubBuyId,Integer star) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ClubBuy result = clubBuyMapper.selectByPrimaryKey(clubBuyId);
 

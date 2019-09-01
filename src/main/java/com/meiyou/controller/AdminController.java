@@ -76,6 +76,7 @@ public class AdminController {
     public boolean updRange(String money, HttpServletRequest req) {
         System.out.println("范围设置：参数：" + money);
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("range", money).getCode() == 100) {
@@ -88,6 +89,7 @@ public class AdminController {
     @ApiOperation("视频通话费")
     public boolean updVideo_money(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("video_money", money).getCode() == 100) {
@@ -101,6 +103,7 @@ public class AdminController {
     @ApiOperation("提现费率")
     public boolean updCash(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("cash", money).getCode() == 100) {
@@ -114,6 +117,7 @@ public class AdminController {
     @ApiOperation("发布金设置")
     public boolean updPublish_money(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("publish_money", money).getCode() == 100) {
@@ -127,6 +131,7 @@ public class AdminController {
     @ApiOperation("分享金设置")
     public boolean updShare_money(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("share_money", money).getCode() == 100) {
@@ -140,6 +145,7 @@ public class AdminController {
     @ApiOperation("一天置顶费设置")
     public boolean updOnday(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("一天", money).getCode() == 100) {
@@ -153,6 +159,7 @@ public class AdminController {
     @ApiOperation("一周置顶费")
     public boolean updWeek(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("一周", money).getCode() == 100) {
@@ -166,6 +173,7 @@ public class AdminController {
     @ApiOperation("一月置顶费")
     public boolean updMonth(String money, HttpServletRequest req) {
         if (!authAdmin(req)) {
+            System.out.println("管理员没有登录...");
             return false;
         }
         if (rootMessageService.updateMessageByName("一月", money).getCode() == 100) {

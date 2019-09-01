@@ -43,9 +43,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg addShopBuy(ShopBuy shopBuy, String token, Integer password) {
-//        if(!RedisUtil.authToken(shopBuy.getBuyerId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(shopBuy.getBuyerId().toString(),token)){
+            return Msg.noLogin();
+        }
 
         shopBuy.setCreateTime(new Date());
         shopBuy.setUpdateTime(new Date());
@@ -107,9 +107,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg addShopStar(Integer uid, String token, Integer shopBuyId, Integer star) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ShopBuy result = shopBuyMapper.selectByPrimaryKey(shopBuyId);
 
@@ -149,9 +149,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     @Override
     @Transactional
     public Msg updateShopBuy(Integer uid, String token, Integer shopBuyId) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
 //        从系统数据表获取报名费用
         String ask_money = getRootMessage("ask_money");
@@ -196,9 +196,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg updateShopBuyComplete(Integer uid, Integer shopBuyId, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         ShopBuy shopBuy = new ShopBuy();
         shopBuy.setState(StateEnum.COMPLETE.getValue());
         shopBuy.setUpdateTime(new Date());
@@ -222,9 +222,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectBySidAndUid(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
         shopBuyExample.createCriteria().andIdEqualTo(sid).andBuyerIdEqualTo(uid);
@@ -256,9 +256,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectBySid(Integer uid, Integer sid, String token) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者

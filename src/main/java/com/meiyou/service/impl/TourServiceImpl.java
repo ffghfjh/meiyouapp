@@ -13,7 +13,6 @@ import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import com.meiyou.utils.RootMessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -517,8 +516,8 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 tourAskExample1.createCriteria().andAskState0EqualTo(1)
                         .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
                 TourAsk tourAsk1 = new TourAsk();
-                //退还报名金后，报名者状态从1变成3
-                tourAsk1.setAskState0(3);
+                //退还报名金后，报名者状态从1变成8
+                tourAsk1.setAskState0(8);
                 tourAsk1.setUpdateTime(new Date());
                 i2 = tourAskMapper.updateByExampleSelective(tourAsk1, tourAskExample1);
                 if (i2 != 1){
@@ -553,8 +552,8 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             tourAskExample.createCriteria().andAskState0EqualTo(2)
                     .andAppointIdEqualTo(id);
             TourAsk tourAsk = new TourAsk();
-            //取消选中，报名者状态从2变成3
-            tourAsk.setAskState0(3);
+            //取消选中，报名者状态从2变成8
+            tourAsk.setAskState0(8);
             tourAsk.setUpdateTime(new Date());
             i2 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
@@ -594,8 +593,8 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             tourAskExample.createCriteria().andAskState0EqualTo(6)
                     .andAppointIdEqualTo(id);
             TourAsk tourAsk = new TourAsk();
-            //取消选中，报名者状态从6变成3
-            tourAsk.setAskState0(3);
+            //取消选中，报名者状态从6变成8
+            tourAsk.setAskState0(8);
             tourAsk.setUpdateTime(new Date());
             i2 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 

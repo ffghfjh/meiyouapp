@@ -7,14 +7,10 @@ import com.meiyou.model.ShopVO;
 import com.meiyou.model.TourVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
-import com.meiyou.utils.Msg;
-import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -79,6 +75,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             //添加约会信息
             appointmentVO.setId(ask.getId());
+            appointmentVO.setAppointId(ask.getAppointId());
             appointmentVO.setAppointContext(appointment.getAppointContext());
             appointmentVO.setAppointAddress(appointment.getAppointAddress());
             appointmentVO.setAppointTime(appointment.getAppointTime());
@@ -121,7 +118,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             tourVO.setPublishBirthday(publish.getBirthday());
 
             //添加旅游信息
-            tourVO.setId(ask.getId());
+            tourVO.setId(ask.getAppointId());
+            tourVO.setAppointId(ask.getAppointId());
             tourVO.setStartAddress(tour.getStartAddress());
             tourVO.setEndAddress(tour.getEndAddress());
             tourVO.setGoMessage(tour.getGoMessage());

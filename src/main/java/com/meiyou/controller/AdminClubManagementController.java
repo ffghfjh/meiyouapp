@@ -5,9 +5,12 @@ import com.meiyou.service.AdminClubManagementService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,37 +26,49 @@ public class AdminClubManagementController {
     @Autowired
     AdminClubManagementService service;
 
+    @Autowired
+    AdminController adminController;
+
     @PostMapping("/findAllClub")
     @ApiOperation(value = "查找全部推拿会所",notes = "查找")
-    public Msg findAllClub(){
+    public Msg findAllClub(HttpServletRequest request){
         Msg msg = new Msg();
-        List<Club> clubs = service.selectAll();
-        if(clubs == null && clubs.size() == 0){
-            msg.setCode(404);
-            msg.setMsg("没找到");
+        if (adminController.authAdmin(request)) {
+            List<Club> clubs = service.selectAll();
+            if(clubs == null && clubs.size() == 0){
+                msg.setCode(404);
+                msg.setMsg("没找到");
+                return msg;
+            }
+            msg.setCode(100);
+            msg.setMsg("已找到");
+            msg.add("clubs",clubs);
             return msg;
         }
-        msg.setCode(100);
-        msg.setMsg("已找到");
-        msg.add("clubs",clubs);
+        msg.setCode(404);
+        msg.setMsg("管理员未登录");
         return msg;
     }
 
     @GetMapping("/findByCid")
     @ApiOperation(value = "查找指定的推拿会所",notes = "查找")
-    public Msg findByCid(@RequestParam("cid") Integer cid){
-        System.out.println("cid:"+cid);
+    public Msg findByCid(@RequestParam("cid") Integer cid, HttpServletRequest request){
         Msg msg = new Msg();
-        Club club = service.selectByCid(cid);
-        if(club == null){
-            msg.setMsg("没有找到");
-            msg.setCode(404);
+        if (adminController.authAdmin(request)) {
+            Club club = service.selectByCid(cid);
+            if(club == null){
+                msg.setMsg("没有找到");
+                msg.setCode(404);
+                return msg;
+            }
+            System.out.println("club2:"+club);
+            msg.setCode(100);
+            msg.setMsg("成功");
+            msg.add("club",club);
             return msg;
         }
-        System.out.println("club2:"+club);
-        msg.setCode(100);
-        msg.setMsg("成功");
-        msg.add("club",club);
+        msg.setCode(404);
+        msg.setMsg("管理员未登录");
         return msg;
     }
 
@@ -64,7 +79,14 @@ public class AdminClubManagementController {
      */
     @ApiOperation(value = "分页查询所有的推拿会所", notes = "分页查询所有的推拿会所", httpMethod = "POST")
     @RequestMapping(value = "selectAllClubByPage")
-    public Map<String,Object> selectAllClubByPage(Integer page, Integer limit, Integer publisherId, Integer state){
-        return service.selectAllClubByPage(page,limit,publisherId,state);
+    public Map<String,Object> selectAllClubByPage(Integer page, Integer limit
+            , Integer publisherId, Integer state, HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            return service.selectAllClubByPage(page,limit,publisherId,state);
+        }
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("Huangzhaoyang", "管理员不存在");
+        return hashMap;
     }
+
 }

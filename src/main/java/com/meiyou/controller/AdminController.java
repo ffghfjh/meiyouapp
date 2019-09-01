@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -202,20 +203,27 @@ public class AdminController {
 
     @RequestMapping(value = "getAllValue", method = RequestMethod.GET)
     @ApiOperation("获取所有后台数据")
-    public Msg getAllValue() {
-
-        return rootMessageService.listMessage();
+    public Msg getAllValue(HttpServletRequest request) {
+        if (authAdmin(request)) {
+            return rootMessageService.listMessage();
+        }
+        return Msg.noLogin();
 
     }
 
     @RequestMapping(value="getUserInfo",method = RequestMethod.GET)
     @ApiOperation("分页用户数据")
-    public Map<String,Object> getUserInfo(int page,int limit){
-        Page<Map<String,Object>> pages = new Page<Map<String, Object>>();
-        int count = userService.selAllUser().size();
-        pages.setCount(count);
-        pages.setList(userService.selUserInfoByPage(page,limit));
-        return LayuiDataUtil.getLayuiData(pages);
+    public Map<String,Object> getUserInfo(int page,int limit, HttpServletRequest request){
+        if (authAdmin(request)) {
+            Page<Map<String,Object>> pages = new Page<Map<String, Object>>();
+            int count = userService.selAllUser().size();
+            pages.setCount(count);
+            pages.setList(userService.selUserInfoByPage(page,limit));
+            return LayuiDataUtil.getLayuiData(pages);
+        }
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("huang zhaoyang", "美游app");
+        return hashMap;
     }
 
 
@@ -249,8 +257,11 @@ public class AdminController {
     }
     @RequestMapping(value = "hideUserById",method = RequestMethod.GET)
     @ApiOperation(value = "通过id对用户进行封号",notes = "uid为用户id, type为1时封号，为0时取消封号")
-    public Msg hideUserById(String uid, String type) {
-        return userService.hideUserById(uid, type);
+    public Msg hideUserById(String uid, String type, HttpServletRequest request) {
+        if (authAdmin(request)) {
+            return userService.hideUserById(uid, type);
+        }
+        return Msg.noLogin();
     }
 
 }

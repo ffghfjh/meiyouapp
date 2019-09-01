@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,34 +25,44 @@ public class AdminShopManagementController {
     @Autowired
     AdminShopManagementService service;
 
+    @Autowired
+    AdminController adminController;
+
     @PostMapping("/findAllShop")
     @ApiOperation(value = "查找全部同城导游",notes = "查找")
-    public Msg findAllShop(){
-        Msg msg = new Msg();
-        List<Shop> shops = service.selectAll();
-        if(shops == null && shops.size() == 0){
-            return Msg.fail();
+    public Msg findAllShop(HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            Msg msg = new Msg();
+            List<Shop> shops = service.selectAll();
+            if(shops == null && shops.size() == 0){
+                return Msg.fail();
+            }
+            msg.setCode(100);
+            msg.setMsg("已找到");
+            msg.add("shops",shops);
+            return msg;
         }
-        msg.setCode(100);
-        msg.setMsg("已找到");
-        msg.add("shops",shops);
-        return msg;
+        return Msg.noLogin();
+
     }
 
     @GetMapping("/findBySid")
     @ApiOperation(value = "查找指定的景点商家",notes = "查找")
-    public Msg findBySid(@RequestParam("sid") Integer sid){
-        Msg msg = new Msg();
-        Shop shop = service.selectBySid(sid);
-        if(shop == null){
-            msg.setMsg("没有找到");
-            msg.setCode(404);
+    public Msg findBySid(@RequestParam("sid") Integer sid, HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            Msg msg = new Msg();
+            Shop shop = service.selectBySid(sid);
+            if(shop == null){
+                msg.setMsg("没有找到");
+                msg.setCode(404);
+                return msg;
+            }
+            msg.setCode(100);
+            msg.setMsg("成功");
+            msg.add("shop",shop);
             return msg;
         }
-        msg.setCode(100);
-        msg.setMsg("成功");
-        msg.add("shop",shop);
-        return msg;
+        return Msg.noLogin();
     }
 
     /**
@@ -60,7 +72,13 @@ public class AdminShopManagementController {
     */
     @ApiOperation(value = "分页查询所有的导游", notes = "分页查询所有的导游", httpMethod = "POST")
     @RequestMapping(value = "selectAllShopByPage")
-    public Map<String,Object> selectAllShopByPage(Integer page, Integer limit, Integer publisherId, Integer state){
-        return service.selectAllShopByPage(page,limit,publisherId,state);
+    public Map<String,Object> selectAllShopByPage(Integer page, Integer limit
+            , Integer publisherId, Integer state, HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            return service.selectAllShopByPage(page,limit,publisherId,state);
+        }
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("huang zhaoyang", "美游");
+        return hashMap;
     }
 }

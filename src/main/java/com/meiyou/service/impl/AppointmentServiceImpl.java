@@ -260,7 +260,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 .andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1);
         AppointAsk appointAsk = new AppointAsk();
-        appointAsk.setAskState(0);
+        appointAsk.setAskState(4);
         appointAsk.setUpdateTime(new Date());
 
 
@@ -478,6 +478,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
+        System.out.println(state);
         if (state == 2) {
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1)
@@ -510,8 +511,8 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 AppointAskExample appointAskExample1 = new AppointAskExample();
                 appointAskExample1.createCriteria().andAskStateEqualTo(1)
                         .andAppointIdEqualTo(id).andAskerIdEqualTo(askerId);
-                //退还报名金后，报名者状态从1变成3
-                appointAsk1.setAskState(3);
+                //退还报名金后，报名者状态从1变成8
+                appointAsk1.setAskState(8);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
 
@@ -558,14 +559,14 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             appointAskExample.createCriteria().andAskStateEqualTo(2)
                     .andAppointIdEqualTo(id);
             AppointAsk appointAsk = new AppointAsk();
-            //退还报名金后，报名者状态从2变成1
-            appointAsk.setAskState(1);
+            //退还报名金后，报名者状态从2变成8
+            appointAsk.setAskState(8);
             appointAsk.setUpdateTime(new Date());
             i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            appointment.setState(2);
+            appointment.setState(1);
             appointment.setUpdateTime(new Date());
             int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 
@@ -600,8 +601,8 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             appointAskExample.createCriteria().andAskStateEqualTo(6)
                     .andAppointIdEqualTo(id);
             AppointAsk appointAsk = new AppointAsk();
-            //退还报名金后，报名者状态从2变成3
-            appointAsk.setAskState(3);
+            //退还报名金后，报名者状态从2变成8
+            appointAsk.setAskState(8);
             appointAsk.setUpdateTime(new Date());
             i2 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
@@ -632,7 +633,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (!authToken) {
             return Msg.noLogin();
         }
-        AppointAskExample appointAskExample = new AppointAskExample();
+         AppointAskExample appointAskExample = new AppointAskExample();
         appointAskExample.createCriteria().andAskStateEqualTo(2)
                 .andAppointIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
@@ -686,7 +687,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (i == 1){
             appointAsk.setAskState(7);
         }
-        appointAsk.setAskState(6);
         //更改报名者状态为7，报名者已到达，订单完成
         int i1 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
         int i2 = i + i1;

@@ -61,6 +61,18 @@ public class OwnController {
         return ownService.changeHeader(uid,img,req);
     }
 
+    @PostMapping("/updateBgpicture")
+    @ApiOperation(value = "修改我的头像", notes = "503-->背景图片更改失败,504-->更改背景图片失败")
+    public Msg updateBgpicture(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token,
+                            @RequestParam("img") MultipartFile img,
+                            HttpServletRequest req){
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+        return ownService.changeBackGroudPicture(uid,img,req);
+    }
+
 
     @PostMapping("/updatePassword")
     @ApiOperation(value = "修改登录密码", notes = "修改")

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +23,9 @@ public class AppointmentManagementController {
     @Autowired
     private AppointmentManagementService appointmentManagementService;
 
+    @Autowired
+    AdminController adminController;
+
     /**
     * @Description: 分页查询所有的约会
     * @Author: JK
@@ -29,8 +34,14 @@ public class AppointmentManagementController {
     @ApiOperation(value = "分页查询所有的约会", notes = "分页查询所有的约会", httpMethod = "POST")
     @RequestMapping(value = "selectAllAppointmentByPage")
     public Map<String,Object> selectAllAppointmentByPage(Integer page, Integer limit,
-                                                                Integer publisherId,Integer state){
-        return  appointmentManagementService.selectAllAppointmentByPage(page, limit, publisherId,state);
+                                                         Integer publisherId, Integer state
+            , HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            return  appointmentManagementService.selectAllAppointmentByPage(page, limit, publisherId,state);
+        }
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("admin", "管理员未登录");
+        return hashMap;
     }
 
 
@@ -41,8 +52,15 @@ public class AppointmentManagementController {
     */
     @ApiOperation(value = "分页查询所有的旅游", notes = "分页查询所有的旅游", httpMethod = "POST")
     @RequestMapping(value = "selectAllTourByPage")
-    public Map<String,Object> selectAllTourByPage(Integer page, Integer limit,Integer publisherId,Integer state){
-        return appointmentManagementService.selectAllTourByPage(page,limit,publisherId,state);
+    public Map<String,Object> selectAllTourByPage(Integer page, Integer limit
+            ,Integer publisherId,Integer state
+            , HttpServletRequest request){
+        if (adminController.authAdmin(request)) {
+            return appointmentManagementService.selectAllTourByPage(page,limit,publisherId,state);
+        }
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("hzy", "管理员未登录");
+        return hashMap;
     }
 
 }

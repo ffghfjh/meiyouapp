@@ -47,7 +47,7 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
 
     @Override
     public Msg changeHeader(Integer uid, MultipartFile img, HttpServletRequest req) {
-        Msg fileMsg = FileUploadUtil.uploadUtil(img, "", req);
+        Msg fileMsg = FileUploadUtil.uploadUtil(img, "headers", req);
         Msg msg = new Msg();
         if(fileMsg.getCode() != 100){
             msg.setCode(500);
@@ -66,6 +66,30 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
         }
         msg.setCode(100);
         msg.setMsg("更新头像成功");
+        return msg;
+    }
+
+    @Override
+    public Msg changeBackGroudPicture(Integer uid, MultipartFile img, HttpServletRequest req) {
+        Msg fileMsg = FileUploadUtil.uploadUtil(img, "bg-picture", req);
+        Msg msg = new Msg();
+        if(fileMsg.getCode() != 100){
+            msg.setCode(503);
+            msg.setMsg("背景图片更改失败");
+            return msg;
+        }
+        User user = new User();
+        user.setBgPicture(fileMsg.getExtend().get("path").toString());
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().andIdEqualTo(uid);
+        Integer rows = userMapper.updateByExampleSelective(user, userExample);
+        if(rows != 1){
+            msg.setMsg("更改背景图片失败");
+            msg.setCode(504);
+            return msg;
+        }
+        msg.setCode(100);
+        msg.setMsg("更改背景图片成功");
         return msg;
     }
 

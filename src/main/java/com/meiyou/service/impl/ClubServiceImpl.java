@@ -55,9 +55,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Transactional
     @Cacheable()
     public Msg addClub(Club club,String token, String timeType, String password, Double longitude, Double latitude) {
-//        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         Date now = new Date();
         club.setCreateTime(now);
@@ -164,9 +164,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @CachePut(key = "#result.id")
     public Msg updateClub(Integer uid,String token, Integer cid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Integer state = clubMapper.selectByPrimaryKey(cid).getState();
         if(state != StateEnum.INIT.getValue()){
@@ -195,9 +195,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     @Override
     @Cacheable()
     public Msg selectByCid(Integer uid,String token,Integer cid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         ClubExample example = new ClubExample();
@@ -238,9 +238,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             }
     )
     public Msg selectClubByPosition(Integer uid, String token, Double longitude, Double latitude) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
 
         //查找附近的key

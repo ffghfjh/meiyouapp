@@ -50,9 +50,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Cacheable()
     public Msg addShop(Shop shop, String token, Integer time, String password,
                        Double longitude, Double latitude)  {
-//        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
+            return Msg.noLogin();
+        }
 
         Msg msg = new Msg();
         Date now = new Date();
@@ -131,9 +131,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     @CachePut(key = "#result.id")
     public Msg updateShop(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Integer status = shopMapper.selectByPrimaryKey(sid).getState();
         if(status!=StateEnum.INIT.getValue()){
             return Msg.fail();
@@ -162,9 +162,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     @Override
     @Cacheable()
     public Msg selectBySid(Integer uid, String token, Integer sid) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         ShopExample shopExample = new ShopExample();
         shopExample.createCriteria().andIdEqualTo(sid);
@@ -204,9 +204,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
     )
     public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
 
         //查找附近的key

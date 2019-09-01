@@ -264,7 +264,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 .andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskState0EqualTo(1);
         TourAsk tourAsk = new TourAsk();
-        tourAsk.setAskState0(0);
+        tourAsk.setAskState0(4);
         tourAsk.setUpdateTime(new Date());
 
         //将报名人员从报名态改为未报名态
@@ -635,7 +635,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             return Msg.noLogin();
         }
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAskState0EqualTo(3)
+        tourAskExample.createCriteria().andAskState0EqualTo(2)
                 .andAppointIdEqualTo(id);
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskState0(6);
@@ -688,7 +688,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         if (i == 1){
             tourAsk.setAskState0(7);
         }
-        tourAsk.setAskState0(6);
         //更改报名者状态为7，报名者已到达，订单完成
         int i1 = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
         int i2 = i + i1;

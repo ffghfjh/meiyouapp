@@ -123,7 +123,6 @@ public class RootMessageServiceImpl implements RootMessageService {
     public Msg listMessage() {
 
         List<RootMessage> rootMessages = rootMessageMapper.selectByExample(null);
-        System.out.println("查询系统参数哦"+rootMessages.size());
         if (rootMessages.isEmpty()) {
             return Msg.fail();
         }

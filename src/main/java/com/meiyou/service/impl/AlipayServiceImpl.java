@@ -238,10 +238,8 @@ public class AlipayServiceImpl implements AlipayService {
             try {
                 flag = AlipaySignature.rsaCheckV1(params, Constants.ALIPAY_PUBLIC_KEY, Constants.CHARSET, "RSA2");
                 if (flag) {
-                    System.out.println("验证成功");
                     // 商户订单号
                     String out_trade_no = params.get("out_trade_no");
-                    System.out.println("商户订单号：" + out_trade_no);
                     // 修改叮当状态，改为 支付成功，已付款; 同时新增支付流水
                     RechargeExample example = new RechargeExample();
                     RechargeExample.Criteria criteria = example.createCriteria();

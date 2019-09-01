@@ -633,8 +633,8 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (!authToken) {
             return Msg.noLogin();
         }
-        AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskStateEqualTo(3)
+         AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAskStateEqualTo(2)
                 .andAppointIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
         appointAsk.setAskState(6);
@@ -687,7 +687,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (i == 1){
             appointAsk.setAskState(7);
         }
-        appointAsk.setAskState(6);
         //更改报名者状态为7，报名者已到达，订单完成
         int i1 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
         int i2 = i + i1;

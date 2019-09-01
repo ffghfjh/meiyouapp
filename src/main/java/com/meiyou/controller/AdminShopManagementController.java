@@ -42,6 +42,7 @@ public class AdminShopManagementController {
             msg.add("shops",shops);
             return msg;
         }
+        System.out.println("管理员没有登录...");
         return Msg.noLogin();
 
     }
@@ -62,6 +63,7 @@ public class AdminShopManagementController {
             msg.add("shop",shop);
             return msg;
         }
+        System.out.println("管理员没有登录...");
         return Msg.noLogin();
     }
 
@@ -77,8 +79,9 @@ public class AdminShopManagementController {
         if (adminController.authAdmin(request)) {
             return service.selectAllShopByPage(page,limit,publisherId,state);
         }
+        System.out.println("管理员没有登录...");
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("huang zhaoyang", "美游");
+        hashMap.put("huang zhaoyang", "管理员没有登录");
         return hashMap;
     }
 }

@@ -35,6 +35,7 @@ public class AdminActivityController {
         if (adminController.authAdmin(request)) {
             return adminActivityService.noHideActvityById(page, limit, aid);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
     }
 
@@ -44,6 +45,7 @@ public class AdminActivityController {
         if (adminController.authAdmin(request)) {
             return adminActivityService.noHideUserById(page, limit, uid);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
 
     }
@@ -54,6 +56,7 @@ public class AdminActivityController {
         if (adminController.authAdmin(request)) {
             return adminActivityService.hideUserById(page, limit, uid);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
     }
 
@@ -63,6 +66,7 @@ public class AdminActivityController {
         if (adminController.authAdmin(request)) {
             return adminActivityService.hideActivityById(page, limit, aid);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
 
     }
@@ -74,8 +78,8 @@ public class AdminActivityController {
         if (adminController.authAdmin(request)) {
             return adminActivityService.listActivityReport(page, limit);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
-
     }
 
 }

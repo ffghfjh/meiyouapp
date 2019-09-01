@@ -264,7 +264,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 .andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskState0EqualTo(1);
         TourAsk tourAsk = new TourAsk();
-        tourAsk.setAskState0(0);
+        tourAsk.setAskState0(4);
         tourAsk.setUpdateTime(new Date());
 
         //将报名人员从报名态改为未报名态

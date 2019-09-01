@@ -634,7 +634,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             return Msg.noLogin();
         }
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskStateEqualTo(2)
+        appointAskExample.createCriteria().andAskStateEqualTo(3)
                 .andAppointIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
         appointAsk.setAskState(6);

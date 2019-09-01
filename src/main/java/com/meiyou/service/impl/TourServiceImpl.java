@@ -635,7 +635,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             return Msg.noLogin();
         }
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAskState0EqualTo(2)
+        tourAskExample.createCriteria().andAskState0EqualTo(3)
                 .andAppointIdEqualTo(id);
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskState0(6);

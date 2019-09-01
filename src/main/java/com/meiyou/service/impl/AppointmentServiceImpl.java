@@ -565,7 +565,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
 
             AppointmentExample appointmentExample = new AppointmentExample();
             appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(3);
-            appointment.setState(2);
+            appointment.setState(1);
             appointment.setUpdateTime(new Date());
             int i3 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 
@@ -633,7 +633,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             return Msg.noLogin();
         }
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAskStateEqualTo(2)
+        appointAskExample.createCriteria().andAskStateEqualTo(3)
                 .andAppointIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
         appointAsk.setAskState(6);

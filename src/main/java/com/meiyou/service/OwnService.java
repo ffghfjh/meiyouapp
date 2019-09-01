@@ -2,6 +2,9 @@ package com.meiyou.service;
 
 import com.meiyou.pojo.User;
 import com.meiyou.utils.Msg;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @description: 个人用户业务层接口
@@ -11,6 +14,8 @@ import com.meiyou.utils.Msg;
 public interface OwnService {
 
     Msg changeInfo(User user);
+
+    Msg changeHeader(Integer uid, MultipartFile img, HttpServletRequest req);
 
     Msg changePassword(Integer uid,String newPassword);
 

@@ -66,12 +66,12 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice()
                 +Integer.valueOf(ask_money);
 
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password.toString())){
+        if(!password.toString().equals(payWord)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
@@ -102,22 +102,30 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     /**
      * 取消购买(退款全部)
      * @param uid
-     * @param cid
+     * @param clubBuyId
      * @param token
      * @return
      */
     @Transactional
     @Override
-    public Msg updateBuyClub(Integer uid,Integer cid,String token) {
+    public Msg updateBuyClub(Integer uid,Integer clubBuyId,String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
 
+        Msg msg = new Msg();
         //从系统数据表获取置顶费用
         String ask_money = getRootMessage("ask_money");
 
+        ClubBuy buy = clubBuyMapper.selectByPrimaryKey(clubBuyId);
+        if(buy == null){
+            msg.setMsg("没找到这条记录");
+            msg.setCode(404);
+            return msg;
+        }
+
         //获取项目金额
-        Integer projectPrice = clubMapper.selectByPrimaryKey(cid).getProjectPrice();
+        Integer projectPrice = clubMapper.selectByPrimaryKey(buy.getClubId()).getProjectPrice();
 
         //修改购买表状态
         ClubBuy clubBuy = new ClubBuy();
@@ -125,7 +133,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        clubBuyExample.createCriteria().andIdEqualTo(clubBuyId);
         clubBuyMapper.updateByExampleSelective(clubBuy,clubBuyExample);
 
         //退钱操作
@@ -144,12 +152,12 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     /**
      * 修改状态为已到店(已完成)--->>1
      * @param uid
-     * @param cid
+     * @param clubBuyId 购买按摩会所这条记录的ID
      * @param token
      * @return
      */
     @Override
-    public Msg updateClubBuyComplete(Integer uid, Integer cid, String token) {
+    public Msg updateClubBuyComplete(Integer uid, Integer clubBuyId, String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -160,7 +168,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuy.setUpdateTime(new Date());
 
         ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid).andClubIdEqualTo(cid);
+        clubBuyExample.createCriteria().andIdEqualTo(clubBuyId);
         int rows = clubBuyMapper.updateByExampleSelective(clubBuy, clubBuyExample);
         if(rows < 1){
             return Msg.fail();
@@ -266,32 +274,31 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      * 评星
      * @param uid
      * @param token
-     * @param cid
+     * @param clubBuyId 购买会所的记录Id
      * @param star
      * @return
      */
     @Override
-    public Msg addClubStar(Integer uid, String token, Integer cid,Integer star) {
+    public Msg addClubStar(Integer uid, String token, Integer clubBuyId,Integer star) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
 
-        ClubBuyExample clubBuyExample = new ClubBuyExample();
-        clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
-        List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        ClubBuy result = clubBuyMapper.selectByPrimaryKey(clubBuyId);
 
         Msg msg = new Msg();
-        if(result == null && result.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
+
         //判断订单状态是否完成(完成了才可以评星)
-        if(result.get(0).getState() != StateEnum.COMPLETE.getValue()){
+        if(result.getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
         ClubStar clubStar = new ClubStar();
-        clubStar.setClubId(cid);
+        clubStar.setClubId(result.getClubId());
         clubStar.setEvaluationId(uid);
         clubStar.setStar(star);
         clubStar.setCreateTime(new Date());

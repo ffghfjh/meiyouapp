@@ -1,5 +1,5 @@
 <html class="x-admin-sm">
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>欢迎页面-X-admin2.1</title>
     <meta name="renderer" content="webkit">
@@ -13,156 +13,161 @@
     <script type="text/javascript" src="./js/cookie.js"></script>
     <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
     <!--[if lt IE 9]>
-      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
-
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  
-  <body>
-  <script type="text/html" id="incrementId">
+</head>
+
+<body>
+<script type="text/html" id="incrementId">
     {{d.LAY_TABLE_INDEX+1}}
-  </script>
-    <div class="x-nav">
+</script>
+<div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="">首页</a>
         <a href="">演示</a>
         <a>
           <cite>导航元素</cite></a>
       </span>
-      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
-    </div>
-    <div class="x-body">
-      <div class="layui-row">
+</div>
+<div class="x-body">
+    <div class="layui-row">
         <form class="layui-form layui-col-md12 x-so">
-          <!-- <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
-          <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end"> -->
-          <input type="text" id="uCount"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
-          <button class="layui-btn"  id="select_btn"><i class="layui-icon">&#xe615;</i></button>
+            <!-- <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
+            <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end"> -->
+            <input type="text" id="uCount"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            <button class="layui-btn"  id="select_btn"><i class="layui-icon">&#xe615;</i></button>
         </form>
-      </div>
-      <xblock>
-        <span class="x-right" style="line-height:40px" id="totality"></span>
-      </xblock>
-
-      <table class="layui-table x-admin" id="users"></table>
     </div>
-    <script>
+    <xblock>
+        <span class="x-right" style="line-height:40px" id="totality"></span>
+    </xblock>
+<!--数据表格-->
+    <table class="layui-table x-admin" id="users"></table>
+    <!--    模板引擎：用户是否被封状态转化-->
+    <script type="text/html" id="aTpl">
+        {{#  if(d.close == 0){ }}
+        没封号
+        {{#  } else { }}
+        已封号
+        {{#  } }}
+    </script>
 
-      layui.use('table', function(){
+    <!--    模板引擎：用户是否被激活状态转化-->
+    <script type="text/html" id="pTpl">
+        {{#  if(d.verified == 0){ }}
+        没激活
+        {{#  } else { }}
+        已激活
+        {{#  } }}
+    </script>
+</div>
+</div>
+<script>
+    layui.use('table', function(){
         var table = layui.table;
-
         //第一个实例
         table.render({
-          elem: '#users'
-          ,url: 'getUserInfo' //数据接口
-          ,page: true //开启分页
-          ,cols: [[ //表头
-            //{type: 'checkbox', fixed: 'left'},
-            {type: 'numbers', title: '序号', templet: '#incrementId', fixed: 'left', width: 50,fixed: 'left',align: 'center'},
-            {field: 'id', title: 'ID', width:50,align: 'center'}
-            ,{field: 'phone', title: '手机号', width:120,align: 'center'}
-            ,{field: 'account', title: '账号', width:255,align: 'center'}
-            ,{field: 'sex', title: '性别', width: 60,align: 'center'}
-            ,{field: 'nickName', title: '昵称', width: 80,align: 'center'}
-            ,{field: 'createTime', title: '创建时间', width: 145,align: 'center'}
-            ,{field: 'money', title: '美金', width: 80,align: 'center'}
-            ,{field: 'close', title: '是否被封', width: 80,align: 'center'}
-            ,{field: 'verified', title: '是否激活', width: 80,align: 'center'}
-          ]]
+            elem: '#users'
+            ,url: '/admin/getUserInfo' //数据接口
+            ,page: true //开启分页
+            ,cols: [[ //表头
+                //{type: 'checkbox', fixed: 'left'},
+                {type: 'numbers', title: '序号', templet: '#incrementId', fixed: 'left', width: 50,fixed: 'left',align: 'center'},
+                {field: 'id', title: 'ID', width:50,align: 'center'}
+                ,{field: 'phone', title: '手机号', width:120,align: 'center'}
+                ,{field: 'account', title: '账号', width:255,align: 'center'}
+                ,{field: 'sex', title: '性别', width: 60,align: 'center'}
+                ,{field: 'nickName', title: '昵称', width: 80,align: 'center'}
+                ,{field: 'createTime', title: '注册时间', width: 145,align: 'center'}
+                ,{field: 'money', title: '美金', width: 80,align: 'center'}
+                ,{field: 'close', title: '是否被封', width: 80,align: 'center', templet: '#aTpl'}
+                ,{field: 'verified', title: '是否激活', width: 80,align: 'center', templet:'#pTpl'}
+            ]]
         });
-
-      });
-        //查询按钮事件
-		$('#select_btn').click(function() {
-			var uCount = $('#uCount').val();
-			if (uCount == null || uCount == '') {
-				layer.msg('查询失败,请检查查询条件', {
-					icon : 2,
-					time : 1000
-				//2秒关闭（如果不配置，默认是3秒）
-				});
-				return false;
-			}
-			if (uCount != null && uCount != '') {
-				layer.alert("搜索")
-                $.ajax({
-                  url:"getUserInfoByAccount",
-                  data:{
+    });
+    //查询按钮事件
+    $('#select_btn').click(function() {
+        var uCount = $('#uCount').val();
+        if (uCount == null || uCount == '') {
+            layer.msg('查询失败,请检查查询条件', {
+                icon : 2,
+                time : 1000
+                //2秒关闭（如果不配置，默认是3秒）
+            });
+            return false;
+        }
+        if (uCount != null && uCount != '') {
+            $.ajax({
+                url:"getUserInfoByAccount",
+                data:{
                     "account":uCount
-                  },
-                  success: function(res){
-
+                },
+                success: function(res){
                     if(res.code==100){
-
-                      var user1 = res.extend.user;
-                      var id = user1.id;
-                      var nickName = user1.nickname;
-                      var account = user1.account;
-                      var header = user1.header;
-                      var sex = user1.sex;
-                      var age = user1.birthday;
-                      var signature = user1.signature;
-                      var bgPicture = user1.bgPicture;
-                      var payWord = user1.payWord;
-                      var money = user1.money;
-                      var shareCode = user1.shareCode;
-                      var createTime = user1.createTime;
-                      layer.alert("成功"+nickName);
-
-
-                      //iframe窗
-                      layer.open({
-                        type: 2,
-                        title: '很多时候，我们想最大化看，比如像这个页面。',
-                        shadeClose: true,
-                        shade: false,
-                        maxmin: true, //开启最大化最小化按钮
-                        area: ['893px', '600px'],
-                        content: 'userInfo.html'
-                      });
+                        var user1 = res.extend.user;
+                        var id = user1.id;
+                        var nickName = user1.nickname;
+                        var account = user1.account;
+                        var header = user1.header;
+                        var sex = user1.sex;
+                        var age = user1.birthday;
+                        var signature = user1.signature;
+                        var bgPicture = user1.bgPicture;
+                        var payWord = user1.payWord;
+                        var money = user1.money;
+                        var shareCode = user1.shareCode;
+                        var createTime = user1.createTime;
+                        //iframe窗
+                        layer.open({
+                            type: 2,
+                            title: '用户详情窗口',
+                            shadeClose: true,
+                            shade: false,
+                            maxmin: true, //开启最大化最小化按钮
+                            area: ['600px', '600px'],
+                            content: ['userInfo.html'],
+                            success: function(layero, index){
+                                var body = layer.getChildFrame('body', index);
+                                body.find('#uid').val(id);
+                                body.find('#nickName').val(nickName);
+                                body.find('#account').val(account);
+                                body.find('#header').val(header);
+                                body.find("#imageId").attr("src",header);
+                                body.find('#sex').val(sex);
+                                body.find('#age').val(age);
+                                body.find('#signature').val(signature);
+                                body.find('#bgPicture').val(bgPicture);
+                                body.find("#bgImageId").attr("href",bgPicture);
+                                body.find('#payWord').val(payWord);
+                                body.find('#money').val(money);
+                                body.find('#shareCode').val(shareCode);
+                                body.find('#createTime').val(createTime);
+                            }
+                        });
                     }
                     if(res.code == 300){
-                      layer.alert("未登录")
+                        layer.alert("未登录")
                     }
                     if(res.code ==1000){
-                      layer.alert("未找打该用户")
+                        layer.alert("未找打该用户")
                     }
+                }
+            });
+            return false;
+        }
+    });
 
-                  }
-                });
-				return false;
-			}
-		});
-
-		// /***
-		// 获取url地址上参数
-		//  */
-		// function getUrlParam(url, name) {
-		// 	var pattern = new RegExp("[?&]" + name + "\=([^&]+)", "g");
-		// 	var matcher = pattern.exec(url);
-		// 	var items = null;
-		// 	if (matcher != null) {
-		// 		try {
-		// 			items = decodeURIComponent(decodeURIComponent(matcher[1]));
-		// 		} catch (e) {
-		// 			try {
-		// 				items = decodeURIComponent(matcher[1]);
-		// 			} catch (e) {
-		// 				items = matcher[1];
-		// 			}
-		// 		}
-		// 	}
-		// 	return items;
-		// }
-    </script>
-    <script>var _hmt = _hmt || []; (function() {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();</script>
-  </body>
+</script>
+<script>var _hmt = _hmt || []; (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();</script>
+</body>
 
 </html>
+若加载缓慢，请稍等一下下~

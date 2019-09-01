@@ -52,7 +52,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
-        //String ask_money = getRootMessage("ask_money");
+        String ask_money = getRootMessage("ask_money");
 
         //获取购买者的支付密码和余额
         User result = getUserByUid(shopBuy.getBuyerId());
@@ -65,12 +65,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         Integer charges = charge * time;
 
         Msg msg = new Msg();
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password.toString())){
+        if(!password.toString().equals(payWord)){
             msg.setMsg("支付密码错误!");
             msg.setCode(1001);
             return msg;
@@ -84,7 +84,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
             //计算剩余金额
             User user = new User();
-            money = money - Float.valueOf(charges);
+            money = money - Float.valueOf(charges) - Float.valueOf(ask_money);
             user.setMoney(money);
             user.setUpdateTime(new Date());
 
@@ -101,27 +101,26 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      * 给完成了的景点商家评星
      * @param uid
      * @param token
-     * @param sid
+     * @param shopBuyId shopBuy的Id
      * @param star
      * @return
      */
     @Override
-    public Msg addShopStar(Integer uid, String token, Integer sid, Integer star) {
+    public Msg addShopStar(Integer uid, String token, Integer shopBuyId, Integer star) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
-        ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
-        List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
+
+        ShopBuy result = shopBuyMapper.selectByPrimaryKey(shopBuyId);
 
         Msg msg = new Msg();
-        if(shopBuys == null && shopBuys.size() == 0){
+        if(result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;
         }
         //判断订单状态是否完成(完成了才可以评星)
-        if(shopBuys.get(0).getState() != StateEnum.COMPLETE.getValue()){
+        if(result.getState() != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
 
@@ -130,7 +129,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopStar.setCreateTime(new Date());
         shopStar.setUpdateTime(new Date());
         shopStar.setEvaluationId(uid);
-        shopStar.setGuideId(sid);
+        shopStar.setGuideId(result.getGuideId());
 
         int i = shopStarMapper.insertSelective(shopStar);
         if(i != 1){
@@ -144,25 +143,27 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      * 取消聘请导游
      * @param uid
      * @param token
-     * @param sid shop_id
+     * @param shopBuyId 聘请导游这条记录的Id
      * @return
      */
     @Override
     @Transactional
-    public Msg updateShopBuy(Integer uid, String token, Integer sid) {
+    public Msg updateShopBuy(Integer uid, String token, Integer shopBuyId) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
 
-//        从系统数据表获取置顶费用
-//        String ask_money = getRootMessage("ask_money");
+//        从系统数据表获取报名费用
+        String ask_money = getRootMessage("ask_money");
 
+        Msg msg = new Msg();
+        ShopBuy buy = shopBuyMapper.selectByPrimaryKey(shopBuyId);
         //获取每小时收费和聘请时间
-        Integer charge = shopMapper.selectByPrimaryKey(sid).getCharge();
+        Integer charge = shopMapper.selectByPrimaryKey(buy.getGuideId()).getCharge();
 
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andGuideIdEqualTo(sid).andBuyerIdEqualTo(uid);
-        Integer time = shopBuyMapper.selectByExample(example).get(0).getTime();
+        example.createCriteria().andIdEqualTo(shopBuyId);
+        Integer time = shopBuyMapper.selectByPrimaryKey(shopBuyId).getTime();
         Integer money = time * charge;
 
         //修改聘用表状态-->取消状态-2
@@ -171,12 +172,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         shopBuy.setUpdateTime(new Date());
 
         ShopBuyExample shopBuyExample = new ShopBuyExample();
-        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid).andIdEqualTo(sid);
+        shopBuyExample.createCriteria().andIdEqualTo(shopBuyId);
         shopBuyMapper.updateByExampleSelective(shopBuy,shopBuyExample);
 
         //执行退款
         User user = getUserByUid(uid);
-        user.setMoney(user.getMoney() + Float.valueOf(money));
+        user.setMoney(user.getMoney() + Float.valueOf(money)+Float.valueOf(ask_money));
         user.setUpdateTime(new Date());
 
         UserExample userExample = new UserExample();
@@ -189,12 +190,12 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     /**
      * 修改状态为已赴约(已完成)--->>1
      * @param uid
-     * @param sid 景点商家(导游Id)
+     * @param shopBuyId 购买景点商家这条记录的ID
      * @param token
      * @return
      */
     @Override
-    public Msg updateShopBuyComplete(Integer uid, Integer sid, String token) {
+    public Msg updateShopBuyComplete(Integer uid, Integer shopBuyId, String token) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
 //        }
@@ -204,7 +205,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //修改购买表状态
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andBuyerIdEqualTo(uid).andGuideIdEqualTo(sid);
+        example.createCriteria().andIdEqualTo(shopBuyId);
         int rows = shopBuyMapper.updateByExampleSelective(shopBuy, example);
         if(rows != 1){
             return Msg.fail();

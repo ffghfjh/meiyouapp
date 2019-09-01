@@ -53,7 +53,7 @@ public class ActivityController {
 
     @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
     @PostMapping(value = "/postActivity")
-    public Msg postActivity(int uid,String token, double latitude, double longitude, String content,  MultipartFile[] files
+    public Msg postActivity(int uid, String token, double latitude, double longitude, String content,  MultipartFile[] files
             ,HttpServletRequest request) {
         if(RedisUtil.authToken(String.valueOf(uid),token)){
             int i = activityService.postActivity(uid,latitude,longitude,content,files, request);

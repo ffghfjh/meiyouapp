@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @description: 个人用户控制器层
@@ -27,7 +30,6 @@ public class OwnController {
     @ApiOperation(value = "修改资料", notes = "修改")
     public Msg updateInfo(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
-                          @RequestParam("header") String header,
                           @RequestParam("nickname") String nickname,
                           @RequestParam("sex") Boolean sex,
                           @RequestParam("birthday") String birthday,
@@ -39,13 +41,25 @@ public class OwnController {
         User user = new User();
         user.setId(uid);
         user.setNickname(nickname);
-        user.setHeader(header);
         user.setSex(sex);
         user.setBirthday(birthday);
         user.setSignature(signature);
 
         return ownService.changeInfo(user);
     }
+
+    @PostMapping("/updateHeader")
+    @ApiOperation(value = "修改我的头像", notes = "500-->头像上传失败,501-->更新用户头像失败")
+    public Msg updateHeader(@RequestParam("uid") Integer uid,
+                            @RequestParam("token") String token,
+                            @RequestParam("img") MultipartFile img,
+                            HttpServletRequest req){
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+        return ownService.changeHeader(uid,img,req);
+    }
+
 
     @PostMapping("/updatePassword")
     @ApiOperation(value = "修改登录密码", notes = "修改")

@@ -25,29 +25,29 @@ public interface ShopBuyService {
      * 添加导游评星
      * @param uid
      * @param token
-     * @param sid
+     * @param shopBuyId shopBuy的Id
      * @param star
      * @return
      */
-    Msg addShopStar(Integer uid, String token, Integer sid, Integer star);
+    Msg addShopStar(Integer uid, String token, Integer shopBuyId, Integer star);
 
     /**
      * 通过景点商家(同城导游)id 取消购买指定的景点商家(同城导游)
      * @param uid
      * @param token
-     * @param sid
+     * @param shopBuyId
      * @return
      */
-    Msg updateShopBuy(Integer uid, String token, Integer sid);
+    Msg updateShopBuy(Integer uid, String token, Integer shopBuyId);
 
     /**
      * 修改状态为已完成状态
      * @param uid
-     * @param sid 景点商家(导游Id)
+     * @param shopBuyId 购买景点商家这条记录的Id
      * @param token
      * @return
      */
-    Msg updateShopBuyComplete(Integer uid,Integer sid,String token);
+    Msg updateShopBuyComplete(Integer uid,Integer shopBuyId,String token);
 
     /**
      * 查找指定的景点商家(同城导游)购买记录

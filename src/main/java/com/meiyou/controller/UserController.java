@@ -1,5 +1,6 @@
 package com.meiyou.controller;
 
+import com.meiyou.service.RootMessageService;
 import com.meiyou.service.SendCodeApiService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +27,8 @@ public class UserController {
 
     @Autowired
     SendCodeApiService sendCodeApiService;
-
+    @Autowired
+    RootMessageService rootMessageService;
     @Autowired
     RedisTemplate<String,String> redis;
 
@@ -76,7 +79,7 @@ public class UserController {
         System.out.println("用户注册");
         if(phone==null||password==null||phone.equals("")||password.equals("")){
             return Msg.nullParam();
-        }else{
+        } else {
             Msg msg = userService.userRegist(code,shareCode,phone,password,nickname,birthday,sex,signature,img,req);
             return msg;
         }
@@ -194,6 +197,12 @@ public class UserController {
     }
 
 
+    @RequestMapping(value="getShareMoney",method = RequestMethod.GET)
+    @ApiOperation("获取分享金")
+    public Msg getShareMoney(){
+       String shareMoney = rootMessageService.getMessageByName("share_money");
+       return Msg.success().add("shareMoney",shareMoney);
+    }
 
     /**
     * @Description: 查询用户余额
@@ -226,5 +235,4 @@ public class UserController {
         System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
         return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
     }
-
 }

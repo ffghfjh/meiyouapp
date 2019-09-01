@@ -47,7 +47,7 @@ public class BaseServiceImpl {
         RootMessageExample rootMessageExample = new RootMessageExample();
         rootMessageExample.createCriteria().andNameEqualTo(message);
         List<RootMessage> rootMessages = rootMessageMapper.selectByExample(rootMessageExample);
-        if(rootMessages == null && rootMessages.size() == 0){
+        if(rootMessages == null && rootMessages.isEmpty()){
             return null;
         }
         return rootMessages.get(0).getValue();
@@ -154,6 +154,7 @@ public class BaseServiceImpl {
 
         //查找此club的星级
         Integer starNums = getStarNumsByClubId(club.getId());
+        System.out.println("set:"+starNums);
 
         clubVO.setStar(starNums);
 
@@ -241,13 +242,14 @@ public class BaseServiceImpl {
         for(ClubStar clubStar: clubStars){
             starNums = starNums + clubStar.getStar();
         }
-
+        System.out.println(starNums);
         //求平均星个数
         int size = clubStars.size();
         if(size == 0){
             return 5;
         }
         starNums = starNums/size;
+        System.out.println(starNums);
         return starNums;
     }
 

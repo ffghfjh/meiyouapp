@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.GeoRadiusResponse;
@@ -72,12 +73,12 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         //计算出支付费用
         Float pay_money = Float.valueOf(publish_money) + Float.valueOf(top_money)*time;
 
-        if(payWord.equals("")){
+        if(payWord == null){
             msg.setMsg("请设置支付密码!!");
             msg.setCode(1000);
             return msg;
         }
-        if(!payWord.equals(password)){
+        if(!password.equals(payWord)){
             msg.setMsg("支付密码错误!!!");
             msg.setCode(1001);
             return msg;
@@ -193,7 +194,15 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
-    @Cacheable(value = "nearShop")
+    @Caching(
+            cacheable = {
+                    @Cacheable(value = "nearShop")
+            },
+            put = {
+                    //先执行方法
+                    @CachePut(value = "nearShop"),
+            }
+    )
     public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
 //        if(!RedisUtil.authToken(uid.toString(),token)){
 //            return Msg.noLogin();
@@ -203,7 +212,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         //查找附近的key
         List<GeoRadiusResponse> geoRadiusResponses = getShopGeoRadiusResponse(uid,longitude,latitude);
 
-        if(geoRadiusResponses == null && geoRadiusResponses.size() ==0){
+        if(geoRadiusResponses == null){
             return Msg.fail();
         }
 
@@ -217,6 +226,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             if (dis != null) {
                 dis = 0.00;
             }
+
             Integer id = Integer.valueOf(member);
 
             //通过id查找shop

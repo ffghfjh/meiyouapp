@@ -140,7 +140,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
      * @return
      */
     @Override
-    @Cacheable(cacheNames = "buy")
+    //@Cacheable(cacheNames = "buy")
     public List<ClubVO> selectMyClubAsk(Integer uid) {
 
         //查找购买按摩会所的记录
@@ -149,6 +149,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
+        System.out.println(result);
 
         //对查找出来的ClubBuy进行封装
         List<ClubVO> clubVOS = new ArrayList<>();
@@ -163,6 +164,9 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             //设置购买者状态
             clubVO.setId(c.getId());
             clubVO.setAskState(c.getState());
+
+            //设置按摩会所id
+            clubVO.setPublishId(c.getClubId());
 
             clubVOS.add(clubVO);
         }
@@ -196,6 +200,9 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             //设置购买者状态
             shopVO.setId(shopBuy.getId());
             shopVO.setAskState(shopBuy.getState());
+
+            //设置经典商家id
+            shopVO.setPublishId(shopBuy.getGuideId());
 
             shopVOS.add(shopVO);
         }

@@ -32,9 +32,9 @@ public class MyPublishController {
     @ApiOperation(value = "通过用户id查找指定用户id发布的全部景点商家",notes = "返回为ShopVO类,nums为报名人数")
     public Msg selectMyPublishList(@RequestParam("uid") String uid,
                             @RequestParam("token") String token){
-//        if(!RedisUtil.authToken(uid,token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid,token)){
+            return Msg.noLogin();
+        }
         Msg msg = new Msg();
         List<AppointmentVO> appointmentList = myPublishService.selectAppointmentList(uid, token);
         if(appointmentList.isEmpty()){

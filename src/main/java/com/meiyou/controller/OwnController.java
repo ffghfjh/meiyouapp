@@ -3,6 +3,7 @@ package com.meiyou.controller;
 import com.meiyou.pojo.User;
 import com.meiyou.service.OwnService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,9 @@ public class OwnController {
                           @RequestParam("birthday") String birthday,
                           @RequestParam("signature") String signature
                           ){
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         User user = new User();
         user.setId(uid);
         user.setNickname(nickname);
@@ -54,9 +55,9 @@ public class OwnController {
                             @RequestParam("token") String token,
                             @RequestParam("img") MultipartFile img,
                             HttpServletRequest req){
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         return ownService.changeHeader(uid,img,req);
     }
 
@@ -66,9 +67,9 @@ public class OwnController {
     public Msg updatePassword(@RequestParam("uid") Integer uid,
                               @RequestParam("token") String token,
                               @RequestParam("newPassword") String newPassword){
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         return ownService.changePassword(uid,newPassword);
     }
 
@@ -77,9 +78,9 @@ public class OwnController {
     public Msg updatePayWord(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
                              @RequestParam("newPassword") String newPassword){
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         return ownService.changePayPassword(uid,newPassword);
 
     }
@@ -88,9 +89,9 @@ public class OwnController {
     @ApiOperation(value = "查找用户资料", notes = "查找")
     public Msg selectByUid(@RequestParam("uid") Integer uid,
                            @RequestParam("token") String token){
-//        if(!RedisUtil.authToken(uid.toString(),token)){
-//            return Msg.noLogin();
-//        }
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
         return ownService.selectByUid(uid);
     }
 }

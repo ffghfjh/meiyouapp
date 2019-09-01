@@ -47,7 +47,7 @@ public class BaseServiceImpl {
         RootMessageExample rootMessageExample = new RootMessageExample();
         rootMessageExample.createCriteria().andNameEqualTo(message);
         List<RootMessage> rootMessages = rootMessageMapper.selectByExample(rootMessageExample);
-        if(rootMessages == null && rootMessages.isEmpty()){
+        if(rootMessages.isEmpty()&& rootMessages == null){
             return null;
         }
         return rootMessages.get(0).getValue();

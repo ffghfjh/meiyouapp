@@ -194,7 +194,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         clubBuyExample.createCriteria().andClubIdEqualTo(cid).andBuyerIdEqualTo(uid);
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
         Msg msg = new Msg();
-        if(result == null && result.size() ==0){
+        if(result.size() ==0 && result == null){
             msg.setCode(404);
             msg.setMsg("找不到指定的会所购买记录");
             return msg;

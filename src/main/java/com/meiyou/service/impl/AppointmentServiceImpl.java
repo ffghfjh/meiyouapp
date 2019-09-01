@@ -260,7 +260,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 .andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1);
         AppointAsk appointAsk = new AppointAsk();
-        appointAsk.setAskState(0);
+        appointAsk.setAskState(4);
         appointAsk.setUpdateTime(new Date());
 
 

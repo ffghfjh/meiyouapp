@@ -64,9 +64,10 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
 
-        if (password == null) {
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
 
@@ -209,9 +210,10 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-        if (password == null) {
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
         //判断用户输入密码是否正确

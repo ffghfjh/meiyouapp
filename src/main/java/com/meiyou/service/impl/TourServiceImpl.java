@@ -68,9 +68,10 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //获取发布金
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
-        if (password == null){
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
         //判断用户输入密码是否正确
@@ -211,9 +212,10 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-        if (password == null){
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
         //判断用户输入密码是否正确

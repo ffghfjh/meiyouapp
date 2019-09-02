@@ -4,6 +4,7 @@ import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
 import com.meiyou.model.ShopVO;
 import com.meiyou.myEnum.StateEnum;
+import com.meiyou.myEnum.TimeTypeEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ShopService;
 import com.meiyou.utils.Constants;
@@ -27,7 +28,7 @@ import java.util.List;
  * @author: Mr.Z
  * @create: 2019-08-21 17:38
  **/
-@CacheConfig(cacheNames = "shop")
+//@CacheConfig()
 @Service
 public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
@@ -41,14 +42,14 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * 发布
      * @param shop
      * @param token
-     * @param time
+     * @param timeType 置顶天数类型
      * @param password
      * @return
      */
     @Override
     @Transactional
-    @Cacheable()
-    public Msg addShop(Shop shop, String token, Integer time, String password,
+    @Cacheable(cacheNames = "shop")
+    public Msg addShop(Shop shop, String token, String timeType, String password,
                        Double longitude, Double latitude)  {
         if(!RedisUtil.authToken(shop.getPublishId().toString(),token)){
             return Msg.noLogin();
@@ -59,19 +60,52 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         shop.setUpdateTime(now);
         shop.setCreateTime(now);
         shop.setState(StateEnum.INIT.getValue());
+
+        Integer days = 0;
+        String top_money = null;
+
+        TimeTypeEnum type = TimeTypeEnum.getTimeTypeByDesc(timeType);
+        if(type == null){
+            msg.setMsg("传入的时间类型有错");
+            msg.setCode(506);
+            return msg;
+        }
+        switch (type){
+            case DAY:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+                break;
+            case WEEK:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+                break;
+            case MONTH:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+                break;
+            case QUARTER:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+                break;
+            case YEAR:
+                days = type.getValue();
+                top_money = getRootMessage(timeType);
+                break;
+        }
+
         //添加过期时间
-        Long millisecond = System.currentTimeMillis()+time*1000*60*60*24L;
+        Long millisecond = System.currentTimeMillis()+days*1000*60*60*24L;
         shop.setOutTime(new Date(millisecond));
 
         //获取用户密码和余额
         Float money = getUserByUid(shop.getPublishId()).getMoney();
         String payWord = getUserByUid(shop.getPublishId()).getPayWord();
 
-        //从系统数据表获取置顶费用和发布费用
-        String top_money = getRootMessage("top_money");
+        //从系统数据表获取发布费用
         String publish_money = getRootMessage("publish_money");
+
         //计算出支付费用
-        Float pay_money = Float.valueOf(publish_money) + Float.valueOf(top_money)*time;
+        Float pay_money = Float.valueOf(publish_money) + Float.valueOf(top_money);
 
         if(payWord == null){
             msg.setMsg("请设置支付密码!!");
@@ -128,8 +162,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @param sid
      * @return
      */
+    @Transactional
     @Override
-    @CachePut(key = "#result.id")
+    //@CachePut(key = "#result.id")
     public Msg updateShop(Integer uid, String token, Integer sid) {
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
@@ -149,6 +184,38 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         if (rows != 1){
             return Msg.fail();
         }
+
+        //取消发布退钱(发布金+置顶金)
+
+        String publish_money = getRootMessage("publish_money");
+
+        Shop sp = shopMapper.selectByPrimaryKey(sid);
+        Date outTime = sp.getOutTime();
+        Date createTime = sp.getCreateTime();
+
+        Long second = outTime.getTime() - createTime.getTime();
+        Long days = second/(1000*24*60*60);
+
+        //获取置顶金额
+        TimeTypeEnum timeTypeEnum = TimeTypeEnum.getTimeTypeByValue(Integer.parseInt(String.valueOf(days)));
+        String top_money = getRootMessage(timeTypeEnum.getDesc());
+
+        //获取用户的钱进行计算退款
+        User user = getUserByUid(uid);
+        Float money = user.getMoney();
+
+        money = money + Float.valueOf(publish_money)+Float.valueOf(top_money);
+
+        //执行退款
+        User own = new User();
+        own.setMoney(money);
+        own.setId(uid);
+        own.setUpdateTime(new Date());
+        int i = userMapper.updateByPrimaryKeySelective(own);
+        if (i != 1){
+            return Msg.fail();
+        }
+
         return Msg.success();
     }
 
@@ -160,7 +227,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      * @return
      */
     @Override
-    @Cacheable()
+    //@Cacheable()
     public Msg selectBySid(Integer uid, String token, Integer sid) {
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();

@@ -31,7 +31,7 @@ import java.util.List;
  * @author: Mr.Z
  * @create: 2019-08-21 14:31
  **/
-@CacheConfig(cacheNames = "club")
+//@CacheConfig(cacheNames = "club")
 @Service
 public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
@@ -53,7 +53,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      */
     @Override
     @Transactional
-    @Cacheable()
+    @Cacheable(cacheNames = "club")
     public Msg addClub(Club club,String token, String timeType, String password, Double longitude, Double latitude) {
         if(!RedisUtil.authToken(club.getPublishId().toString(),token)){
             return Msg.noLogin();
@@ -62,6 +62,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         Date now = new Date();
         club.setCreateTime(now);
         club.setUpdateTime(now);
+
         Integer days = 0;
         String top_money = null;
 
@@ -103,7 +104,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         String payWord = getUserByUid(club.getPublishId()).getPayWord();
         Float money = getUserByUid(club.getPublishId()).getMoney();
 
-        //从系统数据表获取置顶费用和发布费用
+        //从系统数据表获取发布费用
         String publish_money = getRootMessage("publish_money");
 
         //计算支付金额
@@ -161,8 +162,9 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @param cid
      * @return
      */
+    @Transactional
     @Override
-    @CachePut(key = "#result.id")
+    //@CachePut(key = "#result.id")
     public Msg updateClub(Integer uid,String token, Integer cid) {
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
@@ -184,6 +186,38 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         if(rows != 1){
             return Msg.fail();
         }
+
+        //取消发布退钱(发布金+置顶金)
+
+        String publish_money = getRootMessage("publish_money");
+
+        Club cb = clubMapper.selectByPrimaryKey(cid);
+        Date outTime = cb.getOutTime();
+        Date createTime = cb.getCreateTime();
+
+        Long second = outTime.getTime() - createTime.getTime();
+        Long days = second/(1000*24*60*60);
+
+        //获取置顶金额
+        TimeTypeEnum timeTypeEnum = TimeTypeEnum.getTimeTypeByValue(Integer.parseInt(String.valueOf(days)));
+        String top_money = getRootMessage(timeTypeEnum.getDesc());
+
+        //获取用户的钱进行计算退款
+        User user = getUserByUid(uid);
+        Float money = user.getMoney();
+
+        money = money + Float.valueOf(publish_money)+Float.valueOf(top_money);
+
+        //执行退款
+        User own = new User();
+        own.setMoney(money);
+        own.setId(uid);
+        own.setUpdateTime(new Date());
+        int i = userMapper.updateByPrimaryKeySelective(own);
+        if (i != 1){
+            return Msg.fail();
+        }
+
         return Msg.success();
     }
 
@@ -193,7 +227,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
      * @return
      */
     @Override
-    @Cacheable()
     public Msg selectByCid(Integer uid,String token,Integer cid) {
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();

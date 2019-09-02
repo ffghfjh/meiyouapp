@@ -38,7 +38,7 @@ public class ShopController {
                        @RequestParam("service_area") String service_area,
                        @RequestParam("travel_time") String travel_time,
                        @RequestParam("charge") Integer charge,
-                       @RequestParam("time") Integer time,
+                       @RequestParam("timeType") String timeType,
                        @RequestParam("password") String password,
                        @RequestParam("files") MultipartFile[] files,
                        Double longitude, Double latitude, HttpServletRequest request){
@@ -61,7 +61,7 @@ public class ShopController {
         shop.setServiceArea(service_area);
         shop.setTravelTime(travel_time);
         shop.setCharge(charge);
-        return shopService.addShop(shop,token,time, password, longitude, latitude);
+        return shopService.addShop(shop,token,timeType, password, longitude, latitude);
     }
 
     @PostMapping("/addShopStar")

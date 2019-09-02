@@ -105,8 +105,8 @@ public class UserReportServiceImpl implements UserReportService {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //举报编号
             hashMap.put("report_id", report.getId());
-            hashMap.put("reporter", "[" + reporter.getId() + "]" + reporter.getNickname());
-            hashMap.put("reported", "[" + reportedPerson.getId() + "]" + reportedPerson.getNickname());
+            hashMap.put("reporter", "[" + reporter.getAccount() + "] " + reporter.getNickname());
+            hashMap.put("reported", "[" + reportedPerson.getAccount() + "] " + reportedPerson.getNickname());
             //在前端不展示的被举报人id
             hashMap.put("pid", reportedPerson.getId());
             hashMap.put("reportedBoolClose", reportedPerson.getBoolClose());

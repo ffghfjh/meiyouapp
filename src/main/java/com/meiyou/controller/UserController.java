@@ -55,6 +55,7 @@ public class UserController {
             return msg;
         }
     }
+
     @RequestMapping(value = "getUserInfo",method = RequestMethod.POST)
     @ApiOperation(value = "获取用户资料")
     public Msg getUserInfo(int uId,String token){

@@ -777,6 +777,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 String header = user.getHeader();
                 String birthday = user.getBirthday();
                 Boolean sex = user.getSex();
+                Integer userId = user.getId();
                 String appointContext = appointment.getAppointContext();
                 String appointTime = appointment.getAppointTime();
                 String appointAddress = appointment.getAppointAddress();
@@ -793,6 +794,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                     int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
                     map.put("sincerityMoneyValue", sincerityMoneyValue);
                 }
+                map.put("publishId",userId);
                 map.put("nickname", nickname);
                 map.put("header", header);
                 map.put("birthday", birthday);

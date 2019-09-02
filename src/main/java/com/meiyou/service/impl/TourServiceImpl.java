@@ -778,6 +778,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 String header = user.getHeader();
                 String birthday = user.getBirthday();
                 Boolean sex = user.getSex();
+                Integer userId = user.getId();
                 String goMessage = tour.getGoMessage();
                 String startAddress = tour.getStartAddress();
                 String endAddress = tour.getEndAddress();
@@ -794,6 +795,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                     int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
                     map.put("sincerityMoneyValue",sincerityMoneyValue);
                 }
+                map.put("publishId",userId);
                 map.put("nickname",nickname);
                 map.put("header",header);
                 map.put("birthday",birthday);

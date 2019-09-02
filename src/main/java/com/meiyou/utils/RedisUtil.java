@@ -94,7 +94,7 @@ public class RedisUtil {
      * 查询附近人
      * key 经度  维度  距离
      * return GeoRadiusResponse*/
-    public static List<GeoRadiusResponse> geoQueryUser(Coordinate coordinate,double radius) {
+    public static List<GeoRadiusResponse> geoQueryUser(Coordinate coordinate, double radius) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -159,7 +159,7 @@ public class RedisUtil {
      * @param radius
      * @return
      */
-    public static List<GeoRadiusResponse> geoQueryTour(Coordinate coordinate,double radius) {
+    public static List<GeoRadiusResponse> geoQueryTour(Coordinate coordinate, double radius) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -303,4 +303,5 @@ public class RedisUtil {
         }
         return false;
     }
+
 }

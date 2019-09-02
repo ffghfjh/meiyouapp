@@ -45,6 +45,7 @@ public class AdminClubManagementController {
             msg.add("clubs",clubs);
             return msg;
         }
+        System.out.println("管理员没有登录...");
         msg.setCode(404);
         msg.setMsg("管理员未登录");
         return msg;
@@ -67,6 +68,7 @@ public class AdminClubManagementController {
             msg.add("club",club);
             return msg;
         }
+        System.out.println("管理员没有登录...");
         msg.setCode(404);
         msg.setMsg("管理员未登录");
         return msg;
@@ -84,6 +86,7 @@ public class AdminClubManagementController {
         if (adminController.authAdmin(request)) {
             return service.selectAllClubByPage(page,limit,publisherId,state);
         }
+        System.out.println("管理员没有登录...");
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
         hashMap.put("Huangzhaoyang", "管理员不存在");
         return hashMap;

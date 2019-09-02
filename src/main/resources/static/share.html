@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/reset.css">
+</head>
+<style>
+    body{
+        text-align: center;
+    }
+    .share{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: -webkit-linear-gradient(#00cfd7, #0295d1); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#00cfd7, #0295d1); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#00cfd7, #0295d1); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#00cfd7, #0295d1); /* 标准的语法 */
+    }
+    .share_logo,.share_name{
+        text-align: center;
+    }
+    .share_logo img{
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+    }
+    .share_name img{
+        width: 80px;
+        display: inline-block;
+        background:#00cfd7 ;
+    }
+    .share_ul{
+        padding-top: 30%;
+        list-style:none;
+    }
+    li{
+        list-style: none;
+    }
+    .share_code{
+        text-align: center;
+    }
+    .share_code span:nth-child(1){
+        color: #fff;
+        font-size: 16px;
+    }
+    .share_code span:nth-child(2){
+        color: #e9ed5d;
+    }
+    .app_download_top{
+        text-align: center;
+        color: #fff;
+        font-size: 22px;
+    }
+    .download a{
+        float: left;
+        width: 50%;
+        text-align: center;
+        display: block;
+    }
+    .download img{
+        width: 85%;
+        display: inline-block;
+    }
+    .app_download{
+        padding-top:15%;
+    }
+    .app_download_top{
+        padding: 8% 0;
+    }
+    .down_load_android{
+        margin-left: 45%;
+        margin: 0 auto;
+    }
+</style>
+<body>
+<div class="share">
+    <ul class="share_ul">
+        <li class="share_logo"><img src="images/logo.png" alt=""></li>
+        <li class="share_name"><img src="images/name.png" alt=""></li>
+        <li class="share_code">
+            <span>邀请码:</span>
+            <span id="mycode">123456</span>
+        </li>
+    </ul>
+    <ul class="app_download">
+        <li class="app_download_top">应用下载</li>
+        <li class="download clearfix">
+            <div class="down_load_android"><a href="http://www.meiyou8.cn/commotity/images/meiyou.apk"><img src="images/az.png" alt=""></a></div>
+        </li>
+    </ul>
+</div>
+<script>
+    var code = getQueryVariable("code");
+    var myElement = document.getElementById("mycode");
+    myElement.innerHTML = code;
+    alert('请在浏览器下载app');
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+</script>
+</body>
+</html>

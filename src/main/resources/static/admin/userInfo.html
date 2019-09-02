@@ -146,6 +146,8 @@
             function() {
                 //uid的获取要放在此处
                 var uid = $("#uid").val();
+                //弹出层下标
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                 //点击封号按钮后发出异步请求
                 $.ajax({
                     url:"hideUserById",
@@ -163,18 +165,24 @@
                                     icon: 5,
                                     anim: 6 //动画类型
                                 });
+                                parent.layer.reload();
+                                parent.layer.close(index); //再执行关闭
                                 break;
                             case 1005:
                                 layer.msg('取消封号成功', {
                                     icon: 1,
                                     anim: 6 //动画类型
                                 });
+                                parent.layer.reload();
+                                parent.layer.close(index); //再执行关闭
                                 break;
                             default:
                                 layer.msg('不要到处溜达', {
                                     icon: 5,
                                     anim: 6 //动画类型
                                 });
+                                parent.layer.reload();
+                                parent.layer.close(index); //再执行关闭
                         }
                     }
                 });
@@ -183,6 +191,7 @@
         $(document).on('click', '#closeBtn',
             function() {
                 var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.reload();
                 parent.layer.close(index); //再执行关闭
             });
     });

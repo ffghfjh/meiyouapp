@@ -17,13 +17,7 @@ public class TourVO implements Serializable {
     private String publishSignature;
 
     private Integer nums;
-    private String goMessage;
-    private String startAddress;
-    private String endAddress;
-    private String goTime;
-    private Integer state;
-    private Integer askState;
-    private List<String> askerHeader;
+    private Integer appointId;
 
     @Override
     public String toString() {
@@ -34,6 +28,7 @@ public class TourVO implements Serializable {
                 ", publishBirthday='" + publishBirthday + '\'' +
                 ", publishSignature='" + publishSignature + '\'' +
                 ", nums=" + nums +
+                ", appointId=" + appointId +
                 ", goMessage='" + goMessage + '\'' +
                 ", startAddress='" + startAddress + '\'' +
                 ", endAddress='" + endAddress + '\'' +
@@ -43,6 +38,22 @@ public class TourVO implements Serializable {
                 ", askerHeader=" + askerHeader +
                 '}';
     }
+
+    public Integer getAppointId() {
+        return appointId;
+    }
+
+    public void setAppointId(Integer appointId) {
+        this.appointId = appointId;
+    }
+
+    private String goMessage;
+    private String startAddress;
+    private String endAddress;
+    private String goTime;
+    private Integer state;
+    private Integer askState;
+    private List<String> askerHeader;
 
     public Integer getId() {
         return id;

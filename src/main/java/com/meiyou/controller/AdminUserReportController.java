@@ -36,6 +36,7 @@ public class AdminUserReportController {
         if (adminController.authAdmin(request)) {
             return userReportService.listUserReport(page, limit);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
     }
 
@@ -45,6 +46,7 @@ public class AdminUserReportController {
         if (adminController.authAdmin(request)) {
             return userReportService.hideReportedPersonById(page, limit, uid, type);
         }
+        System.out.println("管理员没有登录...");
         return LayuiTableJson.fail();
     }
 

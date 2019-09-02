@@ -17,12 +17,7 @@ public class AppointmentVO implements Serializable {
     private String publishSignature;
 
     private Integer nums;
-    private String appointContext;
-    private String appointTime;
-    private String appointAddress;
-    private Integer state;
-    private Integer askState;
-    private List<String> askerHeader;
+    private Integer appointId;
 
     @Override
     public String toString() {
@@ -33,6 +28,7 @@ public class AppointmentVO implements Serializable {
                 ", publishBirthday='" + publishBirthday + '\'' +
                 ", publishSignature='" + publishSignature + '\'' +
                 ", nums=" + nums +
+                ", appointId=" + appointId +
                 ", appointContext='" + appointContext + '\'' +
                 ", appointTime='" + appointTime + '\'' +
                 ", appointAddress='" + appointAddress + '\'' +
@@ -41,6 +37,21 @@ public class AppointmentVO implements Serializable {
                 ", askerHeader=" + askerHeader +
                 '}';
     }
+
+    public Integer getAppointId() {
+        return appointId;
+    }
+
+    public void setAppointId(Integer appointId) {
+        this.appointId = appointId;
+    }
+
+    private String appointContext;
+    private String appointTime;
+    private String appointAddress;
+    private Integer state;
+    private Integer askState;
+    private List<String> askerHeader;
 
     public Integer getId() {
         return id;

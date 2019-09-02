@@ -143,7 +143,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         //获取当前订单状态
         Integer state = tour.getState();
-        int i = 0;
         if (state == 1) {
             //根据发布者id查询出他所有信息
             User user = userMapper.selectByPrimaryKey(tour.getPublishId());
@@ -166,13 +165,20 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 user.setMoney(balance);
             }
 
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(tour.getPublishId());
+            //更新用户账户余额
+            int i1 = userMapper.updateByExample(user, userExample);
+
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id)
                         .andPublishIdEqualTo(tour.getPublishId());
             tour.setState(0);
             tour.setUpdateTime(new Date());
-            i = tourMapper.updateByExample(tour, tourExample);
-            if (i == 1) {
+            int i2 = tourMapper.updateByExample(tour, tourExample);
+
+            int i = i1 + i2;
+            if (i == 2) {
                 return Msg.success();
             }
             return Msg.fail();

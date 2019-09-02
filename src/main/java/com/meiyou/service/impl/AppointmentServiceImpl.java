@@ -140,7 +140,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         }
         //获取当前订单状态
         Integer state = appointment.getState();
-        int i = 0;
         if (state == 1) {
             //根据发布者id查询出他所有信息
             User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
@@ -163,15 +162,21 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 user.setMoney(balance);
             }
 
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(appointment.getPublisherId());
+            //更新用户账户余额
+            int i1 = userMapper.updateByExample(user, userExample);
+
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id)
                     .andPublisherIdEqualTo(appointment.getPublisherId());
             appointment.setState(0);
             appointment.setUpdateTime(new Date());
-            i = appointmentMapper.updateByExample(appointment, example);
+            int i2 = appointmentMapper.updateByExample(appointment, example);
 
+            int i = i1 + i2;
 
-            if (i == 1) {
+            if (i == 2) {
                 return Msg.success();
             }
             return Msg.fail();

@@ -145,6 +145,27 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         Integer state = tour.getState();
         int i = 0;
         if (state == 1) {
+            //根据发布者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(tour.getPublishId());
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取发布金
+            String publishMoneyName = "publish_money";
+            int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
+            //获取诚意金
+            String sincerityMoneyName = "sincerity_money";
+            int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
+
+            if (tour.getPayType() == 0) {
+                //选择平台担保取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + tour.getReward());
+                user.setMoney(balance);
+            }else {
+                //选择线下付款取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + sincerityMoneyValue + tour.getReward());
+                user.setMoney(balance);
+            }
+
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id)
                         .andPublishIdEqualTo(tour.getPublishId());

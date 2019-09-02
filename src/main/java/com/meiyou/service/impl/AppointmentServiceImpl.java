@@ -64,7 +64,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
 
-        if (password == null){
+        if (password == null) {
             msg.setCode(1000);
             msg.setMsg("请输入密码");
             return msg;
@@ -116,7 +116,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             coordinate.setLongitude(longitude);
             coordinate.setKey(appointment.getId().toString());
             Long aLong = RedisUtil.addReo(coordinate, Constants.GEO_APPOINTMENT);
-            if (aLong == 1){
+            if (aLong == 1) {
                 return Msg.success();
             }
         }
@@ -142,12 +142,35 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         Integer state = appointment.getState();
         int i = 0;
         if (state == 1) {
+            //根据发布者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取发布金
+            String publishMoneyName = "publish_money";
+            int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
+            //获取诚意金
+            String sincerityMoneyName = "sincerity_money";
+            int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
+
+            if (appointment.getPayType() == 0) {
+                //选择平台担保取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + appointment.getReward());
+                user.setMoney(balance);
+            }else {
+                //选择线下付款取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + sincerityMoneyValue + appointment.getReward());
+                user.setMoney(balance);
+            }
+
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id)
-                        .andPublisherIdEqualTo(appointment.getPublisherId());
+                    .andPublisherIdEqualTo(appointment.getPublisherId());
             appointment.setState(0);
             appointment.setUpdateTime(new Date());
             i = appointmentMapper.updateByExample(appointment, example);
+
+
             if (i == 1) {
                 return Msg.success();
             }
@@ -181,7 +204,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-        if (password == null){
+        if (password == null) {
             msg.setCode(1000);
             msg.setMsg("请输入密码");
             return msg;
@@ -207,7 +230,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid))
                 .andAskStateEqualTo(1).andAppointIdEqualTo(id);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
-        if (appointAsks.size() > 0){
+        if (appointAsks.size() > 0) {
             msg.setCode(250);
             msg.setMsg("请勿重复报名");
             return msg;
@@ -352,7 +375,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         Appointment appointment = appointmentMapper.selectByPrimaryKey(appointId);
         AppointmentExample example = new AppointmentExample();
         example.createCriteria().andIdEqualTo(appointId)
-                    .andPublisherIdEqualTo(Integer.parseInt(uid));
+                .andPublisherIdEqualTo(Integer.parseInt(uid));
         appointment.setConfirmId(askerId);
         //在约会表中3是选中人员等待赴约状态
         appointment.setState(3);
@@ -396,7 +419,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 appointAsk1.setAskState(3);
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
-                if (i2 != 1){
+                if (i2 != 1) {
                     return Msg.fail();
                 }
 
@@ -406,7 +429,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 user1.setMoney(balance);
                 user1.setUpdateTime(new Date());
                 i3 = userMapper.updateByExampleSelective(user1, userExample);
-                if (i3 != 1){
+                if (i3 != 1) {
                     return Msg.fail();
                 }
             }
@@ -503,7 +526,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 user1.setMoney(balance);
                 user1.setUpdateTime(new Date());
                 i1 = userMapper.updateByExampleSelective(user1, userExample);
-                if (i1 != 1){
+                if (i1 != 1) {
                     return Msg.fail();
                 }
 
@@ -515,7 +538,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 appointAsk1.setUpdateTime(new Date());
                 i2 = appointAskMapper.updateByExampleSelective(appointAsk1, appointAskExample1);
 
-                if (i2 != 1){
+                if (i2 != 1) {
                     return Msg.fail();
                 }
             }
@@ -550,7 +573,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             //修改金额
             i1 = userMapper.updateByExampleSelective(user1, userExample);
 
-            if (i1 != 1){
+            if (i1 != 1) {
                 return Msg.fail();
             }
 
@@ -616,7 +639,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 return Msg.success();
             }
         }
-            return Msg.fail();
+        return Msg.fail();
     }
 
     /**
@@ -650,7 +673,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         int i1 = appointmentMapper.updateByExampleSelective(appointment, appointmentExample);
 
         int i2 = i + i1;
-        if (i2 == 2){
+        if (i2 == 2) {
             return Msg.success();
         }
         return Msg.fail();
@@ -683,26 +706,26 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointAskExample.createCriteria().andAskStateEqualTo(6)
                 .andAppointIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
-        if (i == 1){
+        if (i == 1) {
             appointAsk.setAskState(7);
         }
         appointAsk.setAskState(6);
         //更改报名者状态为7，报名者已到达，订单完成
         int i1 = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
         int i2 = i + i1;
-        if (i2 == 2){
+        if (i2 == 2) {
             return Msg.success();
         }
         return Msg.fail();
     }
 
     /**
-    * @Description: 查看热门约会
-    * @Author: JK
-    * @Date: 2019/8/24
-    */
+     * @Description: 查看热门约会
+     * @Author: JK
+     * @Date: 2019/8/24
+     */
     @Override
-    public Msg selectHotAppointment(String uid, String token,double latitude, double longitude) {
+    public Msg selectHotAppointment(String uid, String token, double latitude, double longitude) {
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(uid, token);
         //判断是否登录
@@ -718,7 +741,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         coordinate.setKey(uid);
         coordinate.setLongitude(longitude);
         coordinate.setLatitude(latitude);
-        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryAppointment(coordinate,radius);
+        List<GeoRadiusResponse> responseList = RedisUtil.geoQueryAppointment(coordinate, radius);
         //判断附近是否有热门约会
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
@@ -727,7 +750,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
-            if (memberByString == null){
+            if (memberByString == null) {
                 return Msg.fail();
             }
 
@@ -737,12 +760,12 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             Integer publisherId = appointment.getPublisherId();
 
             //如果发布者等于报名者，则跳出本次循环
-            if (publisherId == Integer.parseInt(uid)){
+            if (publisherId == Integer.parseInt(uid)) {
                 continue;
             }
             User user = userMapper.selectByPrimaryKey(publisherId);
             HashMap<String, Object> map = new HashMap<>();
-            if (state == 1 || state == 2){
+            if (state == 1 || state == 2) {
                 String nickname = user.getNickname();
                 String header = user.getHeader();
                 String birthday = user.getBirthday();
@@ -757,26 +780,26 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 Integer confirmId = appointment.getConfirmId();
                 Integer state1 = appointment.getState();
                 Integer id = appointment.getId();
-                if (appointment.getPayType() == 1){
+                if (appointment.getPayType() == 1) {
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
                     int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
-                    map.put("sincerityMoneyValue",sincerityMoneyValue);
+                    map.put("sincerityMoneyValue", sincerityMoneyValue);
                 }
-                map.put("nickname",nickname);
-                map.put("header",header);
-                map.put("birthday",birthday);
-                map.put("sex",sex);
-                map.put("appointContext",appointContext);
-                map.put("appointTime",appointTime);
-                map.put("appointAddress",appointAddress);
-                map.put("appointImgs",appointImgs);
-                map.put("needNumber",needNumber);
-                map.put("reward",reward);
-                map.put("payType",payType);
-                map.put("confirmId",confirmId);
-                map.put("state1",state1);
-                map.put("id",id);
+                map.put("nickname", nickname);
+                map.put("header", header);
+                map.put("birthday", birthday);
+                map.put("sex", sex);
+                map.put("appointContext", appointContext);
+                map.put("appointTime", appointTime);
+                map.put("appointAddress", appointAddress);
+                map.put("appointImgs", appointImgs);
+                map.put("needNumber", needNumber);
+                map.put("reward", reward);
+                map.put("payType", payType);
+                map.put("confirmId", confirmId);
+                map.put("state1", state1);
+                map.put("id", id);
                 list.add(map);
 
             }
@@ -784,14 +807,14 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         }
         msg.setCode(100);
         msg.setMsg("获取附近热门约会成功");
-        return msg.add("list",list);
+        return msg.add("list", list);
     }
 
     /**
-    * @Description: 查询报名约会的全部人员
-    * @Author: JK
-    * @Date: 2019/8/29
-    */
+     * @Description: 查询报名约会的全部人员
+     * @Author: JK
+     * @Date: 2019/8/29
+     */
     @Override
     public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
         if (!RedisUtil.authToken(uid.toString(), token)) {

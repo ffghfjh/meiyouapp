@@ -150,9 +150,12 @@ public class UserServiceImpl implements UserService {
                         alipayinfo.setGender(infoShareResponse.getGender()); // 支付宝性别
                         System.out.println("手机号" + infoShareResponse.getPhone());//
                         alipayinfo.setIs_certied(infoShareResponse.getIsCertified()); // 支付宝是否实名
-                        alipayinfo.setNick_name(infoShareResponse.getNickName()); // 支付宝昵称
+                        if(infoShareResponse.getNickName()==null){
+                            alipayinfo.setNick_name("未命名");
+                        }else{
+                            alipayinfo.setNick_name(infoShareResponse.getNickName()); // 支付宝昵称
 
-
+                        }
                         User user = new User();
                         String userAccount = RandomUtil.randomNumbers(8);//UUID生成账号
                         user.setAccount(userAccount);

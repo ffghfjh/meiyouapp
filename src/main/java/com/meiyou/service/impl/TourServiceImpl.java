@@ -68,9 +68,10 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //获取发布金
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
-        if (password == null){
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
         //判断用户输入密码是否正确
@@ -143,15 +144,42 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         //获取当前订单状态
         Integer state = tour.getState();
-        int i = 0;
         if (state == 1) {
+            //根据发布者id查询出他所有信息
+            User user = userMapper.selectByPrimaryKey(tour.getPublishId());
+            //获取发布者账户余额
+            Float money = user.getMoney();
+            //获取发布金
+            String publishMoneyName = "publish_money";
+            int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
+            //获取诚意金
+            String sincerityMoneyName = "sincerity_money";
+            int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
+
+            if (tour.getPayType() == 0) {
+                //选择平台担保取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + tour.getReward());
+                user.setMoney(balance);
+            }else {
+                //选择线下付款取消发布后返回金额后的剩余余额
+                float balance = money + (publishMoneyValue + sincerityMoneyValue + tour.getReward());
+                user.setMoney(balance);
+            }
+
+            UserExample userExample = new UserExample();
+            userExample.createCriteria().andIdEqualTo(tour.getPublishId());
+            //更新用户账户余额
+            int i1 = userMapper.updateByExample(user, userExample);
+
             TourExample tourExample = new TourExample();
             tourExample.createCriteria().andIdEqualTo(id)
                         .andPublishIdEqualTo(tour.getPublishId());
             tour.setState(0);
             tour.setUpdateTime(new Date());
-            i = tourMapper.updateByExample(tour, tourExample);
-            if (i == 1) {
+            int i2 = tourMapper.updateByExample(tour, tourExample);
+
+            int i = i1 + i2;
+            if (i == 2) {
                 return Msg.success();
             }
             return Msg.fail();
@@ -184,9 +212,10 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         String askMoneyName = "ask_money";
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
-        if (password == null){
+        String payWord = user.getPayWord();
+        if (payWord == null) {
             msg.setCode(1000);
-            msg.setMsg("请输入密码");
+            msg.setMsg("请设置支付密码");
             return msg;
         }
         //判断用户输入密码是否正确

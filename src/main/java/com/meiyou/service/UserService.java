@@ -207,4 +207,12 @@ public interface UserService {
      * @return
      */
     public Msg cashAudit(int cashId,int result);
+
+
+    /**
+     * 通过ID获取用户显示资料，包括是否在线
+     * @param uId
+     * @return
+     */
+    public Msg selUserInfoById(int uId);
 }

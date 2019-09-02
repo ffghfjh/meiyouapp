@@ -34,6 +34,15 @@ public enum TimeTypeEnum {
         return null;
     }
 
+    public static  TimeTypeEnum getTimeTypeByValue(int value){
+        for(TimeTypeEnum timeTypeEnum : TimeTypeEnum.values()){
+            if(timeTypeEnum.getValue() == value){
+                return timeTypeEnum;
+            }
+        }
+        return null;
+    }
+
     public int getValue() {
         return value;
     }

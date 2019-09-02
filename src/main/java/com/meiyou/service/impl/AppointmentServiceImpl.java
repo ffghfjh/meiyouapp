@@ -64,7 +64,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
 
-        if (password == null) {
+        if (password == null||password.equals("")) {
             msg.setCode(1000);
             msg.setMsg("请输入密码");
             return msg;

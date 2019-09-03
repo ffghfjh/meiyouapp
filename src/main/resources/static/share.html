@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="share">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../css/reset.css">
 </head>
-<style>
+<style class="share">
     body{
         text-align: center;
     }
@@ -76,22 +76,28 @@
     }
 </style>
 <body>
-<div class="share">
-    <ul class="share_ul">
-        <li class="share_logo"><img src="images/logo.png" alt=""></li>
-        <li class="share_name"><img src="images/name.png" alt=""></li>
-        <li class="share_code">
-            <span>邀请码:</span>
-            <span id="mycode">123456</span>
-        </li>
-    </ul>
-    <ul class="app_download">
-        <li class="app_download_top">应用下载</li>
-        <li class="download clearfix">
-            <div class="down_load_android"><a href="http://www.meiyou8.cn/commotity/images/meiyou.apk"><img src="images/az.png" alt=""></a></div>
-        </li>
-    </ul>
-</div>
+
+    <div style="margin-top: 125px">
+        <div >
+            <div class="share_logo"><img src="images/logo.png" alt=""></div>
+            <div class="share_name"><img src="images/name.png" alt=""></div>
+            <div class="share_code">
+                <span>邀请码:</span>
+                <span id="mycode">123456</span>
+            </div>
+        </div>
+        <div class="app_download">
+            <div class="app_download_top">应用下载</div>
+        </div>
+        <div>
+            <div class="down_load_android" >
+                <a href="http://www.meiyou8.cn/commotity/images/meiyou.apk">
+                    <img src="images/az.png" style="width: 155px" >
+                </a>
+            </div>
+        </div>
+    </div>
+
 <script>
     var code = getQueryVariable("code");
     var myElement = document.getElementById("mycode");
@@ -108,5 +114,6 @@
         return(false);
     }
 </script>
+
 </body>
 </html>

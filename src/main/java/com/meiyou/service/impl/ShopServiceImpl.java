@@ -298,7 +298,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
             //通过id查找shop
             ShopExample example = new ShopExample();
-            example.createCriteria().andIdEqualTo(id).andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue());
+            example.createCriteria().andIdEqualTo(id).andOutTimeGreaterThan(new Date());
             List<Shop> shops = shopMapper.selectByExample(example);
             if(shops.isEmpty()){
                 msg.setCode(404);
@@ -306,7 +306,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
                 return msg;
             }
 
-            if(uid == shops.get(0).getPublishId()){
+            if(uid.equals(shops.get(0).getPublishId())){
                 continue;
             }
 

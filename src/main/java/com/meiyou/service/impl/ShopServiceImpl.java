@@ -298,7 +298,7 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
             //通过id查找shop
             ShopExample example = new ShopExample();
-            example.createCriteria().andIdEqualTo(id);
+            example.createCriteria().andIdEqualTo(id).andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue());
             List<Shop> shops = shopMapper.selectByExample(example);
             if(shops.isEmpty()){
                 msg.setCode(404);

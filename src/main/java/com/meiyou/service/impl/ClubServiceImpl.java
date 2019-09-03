@@ -298,7 +298,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
             //通过id查找club
             ClubExample example = new ClubExample();
-            example.createCriteria().andIdEqualTo(id);
+            example.createCriteria().andIdEqualTo(id).andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue());
             List<Club> clubs = clubMapper.selectByExample(example);
             if(clubs.isEmpty()){
                 msg.setCode(404);

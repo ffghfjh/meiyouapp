@@ -61,7 +61,7 @@
             limit: 10, //要传向后台的每页显示条数
             page: 1, //当前页数
             // 表格ID，必须设置，重载部分需要用到
-            url: 'http://localhost:8080/selectAllAppointmentByPage', //数据接口
+            url: '/AppointmentManagement/selectAllAppointmentByPage', //数据接口
 
             page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
                 layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']//自定义分页布局

@@ -1,5 +1,7 @@
 package com.meiyou.model;
 
+import org.springframework.context.annotation.Bean;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +35,7 @@ public class LayuiTableJson implements Serializable {
 	private int count;
 	
 	//用户要返回给浏览器的数据
-	private Object data = new Object();
+	private Object data;
 	
 	public static LayuiTableJson success(){
 		LayuiTableJson ltj = new LayuiTableJson();
@@ -45,7 +47,7 @@ public class LayuiTableJson implements Serializable {
 	public static LayuiTableJson fail(){
 		LayuiTableJson ltj = new LayuiTableJson();
 		ltj.setCode(200);
-		ltj.setMsg("处理失败!");
+		ltj.setMsg("没有数据");
 		return ltj;
 	}
 	

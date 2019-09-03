@@ -35,7 +35,7 @@ spring:
 
   redis:
     database: 0
-    host: 192.168.0.114
+    host: 127.0.0.1
     port: 6379
     password: 123456
     jedis:
@@ -50,7 +50,7 @@ spring:
   cache:
     cache-names: MeiyouCache
   rabbitmq:
-    addresses: 47.103.24.19
+    addresses: 127.0.0.1
     username: guest
     password: guest
 

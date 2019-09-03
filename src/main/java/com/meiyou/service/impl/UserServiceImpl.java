@@ -709,7 +709,7 @@ public class UserServiceImpl implements UserService {
                 criteria.andUserIdEqualTo(uId);
                 criteria.andIdentifierEqualTo(aliId);
                 criteria.andCredentialEqualTo(aliToken);
-                criteria.andIdentityTypeEqualTo(3);
+                criteria.andIdentityTypeEqualTo(2);
                 criteria.andBoolVerifiedEqualTo(false);
                 List<Authorization> authorizations = authMapper.selectByExample(example);
                 if(authorizations.size()>0){
@@ -776,7 +776,7 @@ public class UserServiceImpl implements UserService {
             criteria.andUserIdEqualTo(uId);
             criteria.andIdentifierEqualTo(openId);
             criteria.andCredentialEqualTo(accesssToken);
-            criteria.andIdentityTypeEqualTo(4);//QQ方式
+            criteria.andIdentityTypeEqualTo(3);//微信方式
             criteria.andBoolVerifiedEqualTo(false);
             List<Authorization> authorizations = authMapper.selectByExample(example);
             if(authorizations.size()>0) {
@@ -809,7 +809,7 @@ public class UserServiceImpl implements UserService {
                     System.out.println("更新用户数据失败");
                 }
               }else {
-                System.out.println("未找到该QQ用户");
+                System.out.println("未找到该微信用户");
                 }
         }else {
             msg = Msg.fail();

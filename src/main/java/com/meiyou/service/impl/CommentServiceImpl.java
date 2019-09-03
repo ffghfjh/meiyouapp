@@ -3,7 +3,6 @@ package com.meiyou.service.impl;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.meiyou.mapper.ActivityMapper;
-import com.meiyou.mapper.CommentLikeMapper;
 import com.meiyou.mapper.CommentMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.pojo.*;

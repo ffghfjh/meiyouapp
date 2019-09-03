@@ -73,13 +73,16 @@
                 elem: '#test',
                 url: "/AdminRecharge/listRecharge",
                 parseData: function(res){ //res 即为原始返回的数据
-                    return {
-                        "code": res.code, //解析接口状态
-                        "msg": res.msg, //解析提示文本
-                        "count": res.count, //解析数据长度
-                        "data": res.data.list //解析数据列表
-                    };
+                        return {
+                            "code": res.code, //解析接口状态
+                            "msg": res.msg, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": res.data.list //解析数据列表
+                        };
+
                 },
+                loading:true,//分页加载条
+                text: {none: "无数据"},
                 toolbar: '#toolbarDemo',
                 title: '用户数据表',
                 cols: [

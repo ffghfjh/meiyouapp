@@ -49,7 +49,17 @@ public class AdminCashServiceImpl implements AdminCashService {
         cashExample.setOrderByClause("id desc");
         List<Cash> cashList = cashMapper.selectByExample(cashExample);
         if (cashList.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("cash_number", "无数据");
+            hashMap.put("account", "无数据");
+            hashMap.put("cash_money", "无数据");
+            hashMap.put("cash_type", "无数据");
+            hashMap.put("state", "无数据");
+            hashMap.put("time", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         //遍历提现记录
         for (Cash cash : cashList) {
@@ -69,8 +79,17 @@ public class AdminCashServiceImpl implements AdminCashService {
             list.add(hashMap);
         }
         if (list.isEmpty()) {
-            System.out.println("hzy---数据为空");
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("cash_number", "无数据");
+            hashMap.put("account", "无数据");
+            hashMap.put("cash_money", "无数据");
+            hashMap.put("cash_type", "无数据");
+            hashMap.put("state", "无数据");
+            hashMap.put("time", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         PageInfo pageInfo = new PageInfo(list);
         return LayuiTableJson.success().addCount(getCashTotalCount()).addData(pageInfo);

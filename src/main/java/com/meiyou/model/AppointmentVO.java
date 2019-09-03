@@ -15,9 +15,7 @@ public class AppointmentVO implements Serializable {
     private String publishHeader;
     private String publishBirthday;
     private String publishSignature;
-
-    private Integer nums;
-    private Integer appointId;
+    private Integer publishId;
 
     @Override
     public String toString() {
@@ -27,6 +25,7 @@ public class AppointmentVO implements Serializable {
                 ", publishHeader='" + publishHeader + '\'' +
                 ", publishBirthday='" + publishBirthday + '\'' +
                 ", publishSignature='" + publishSignature + '\'' +
+                ", publishId=" + publishId +
                 ", nums=" + nums +
                 ", appointId=" + appointId +
                 ", appointContext='" + appointContext + '\'' +
@@ -37,6 +36,17 @@ public class AppointmentVO implements Serializable {
                 ", askerHeader=" + askerHeader +
                 '}';
     }
+
+    public Integer getPublishId() {
+        return publishId;
+    }
+
+    public void setPublishId(Integer publishId) {
+        this.publishId = publishId;
+    }
+
+    private Integer nums;
+    private Integer appointId;
 
     public Integer getAppointId() {
         return appointId;

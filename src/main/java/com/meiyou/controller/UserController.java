@@ -55,6 +55,7 @@ public class UserController {
             return msg;
         }
     }
+
     @RequestMapping(value = "getUserInfo",method = RequestMethod.POST)
     @ApiOperation(value = "获取用户资料")
     public Msg getUserInfo(int uId,String token){
@@ -234,5 +235,11 @@ public class UserController {
     public Msg registBindQQ(int uId,String qqOpenId,String qqTokenn,String phone,String code,String password,String shareCode){
         System.out.println("参数：qqOpenId:"+qqOpenId+",qqToken:"+qqTokenn+",uid:"+uId);
         return userService.registBindWeChat(uId,qqOpenId,qqTokenn,phone,code,password,shareCode);
+    }
+
+    @RequestMapping(value = "selUserInfoById",method = RequestMethod.POST)
+    @ApiOperation("查询用户资料")
+    public Msg selUserInfoById(int uId){
+        return userService.selUserInfoById(uId);
     }
 }

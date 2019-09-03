@@ -279,7 +279,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         //查找附近的key
         List<GeoRadiusResponse> geoRadiusResponses = getClubGeoRadiusResponse(uid,longitude,latitude);
 
-        if(geoRadiusResponses == null){
+           if( geoRadiusResponses.isEmpty() && geoRadiusResponses == null){
             return Msg.fail();
         }
 
@@ -298,7 +298,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
             //通过id查找club
             ClubExample example = new ClubExample();
-            example.createCriteria().andIdEqualTo(id);
+            example.createCriteria().andIdEqualTo(id).andOutTimeGreaterThan(new Date());
             List<Club> clubs = clubMapper.selectByExample(example);
             if(clubs.isEmpty()){
                 msg.setCode(404);
@@ -306,7 +306,7 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 return msg;
             }
 
-            if(uid == clubs.get(0).getPublishId()){
+            if(uid.equals(clubs.get(0).getPublishId())){
                 continue;
             }
 

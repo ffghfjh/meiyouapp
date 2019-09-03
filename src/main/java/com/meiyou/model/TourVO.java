@@ -11,6 +11,7 @@ import java.util.List;
 public class TourVO implements Serializable {
 
     private Integer id;
+    private Integer publishId;
     private String publishNickName;
     private String publishHeader;
     private String publishBirthday;
@@ -23,6 +24,7 @@ public class TourVO implements Serializable {
     public String toString() {
         return "TourVO{" +
                 "id=" + id +
+                ", publishId=" + publishId +
                 ", publishNickName='" + publishNickName + '\'' +
                 ", publishHeader='" + publishHeader + '\'' +
                 ", publishBirthday='" + publishBirthday + '\'' +
@@ -37,6 +39,14 @@ public class TourVO implements Serializable {
                 ", askState=" + askState +
                 ", askerHeader=" + askerHeader +
                 '}';
+    }
+
+    public Integer getPublishId() {
+        return publishId;
+    }
+
+    public void setPublishId(Integer publishId) {
+        this.publishId = publishId;
     }
 
     public Integer getAppointId() {

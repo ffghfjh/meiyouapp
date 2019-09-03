@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,11 +55,10 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
             msg.setMsg("头像上传失败");
             return msg;
         }
-        User user = new User();
+        User user = userMapper.selectByPrimaryKey(uid);
         user.setHeader(fileMsg.getExtend().get("path").toString());
-        UserExample userExample = new UserExample();
-        userExample.createCriteria().andIdEqualTo(uid);
-        Integer rows = userMapper.updateByExampleSelective(user, userExample);
+        user.setUpdateTime(new Date());
+        Integer rows = userMapper.updateByPrimaryKey(user);
         if(rows != 1){
             msg.setMsg("更新用户头像失败");
             msg.setCode(501);

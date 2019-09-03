@@ -154,7 +154,7 @@ public class BaseServiceImpl {
 
         //查找此club的星级
         Integer starNums = getStarNumsByClubId(club.getId());
-        System.out.println("set:"+starNums);
+        //System.out.println("set:"+starNums);
 
         clubVO.setStar(starNums);
 
@@ -242,14 +242,14 @@ public class BaseServiceImpl {
         for(ClubStar clubStar: clubStars){
             starNums = starNums + clubStar.getStar();
         }
-        System.out.println(starNums);
+        //System.out.println(starNums);
         //求平均星个数
         int size = clubStars.size();
         if(size == 0){
             return 5;
         }
         starNums = starNums/size;
-        System.out.println(starNums);
+        //System.out.println(starNums);
         return starNums;
     }
 

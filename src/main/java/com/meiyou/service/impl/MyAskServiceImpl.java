@@ -58,8 +58,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if (appointAsks == null && appointAsks.size() == 0) {
             return appointmentVOS;
         }
+        AppointmentVO appointmentVO = new AppointmentVO();
         for (AppointAsk ask : appointAsks) {
-            AppointmentVO appointmentVO = new AppointmentVO();
             Appointment appointment = appointmentMapper.selectByPrimaryKey(ask.getAppointId());
             if(appointment == null){
                 continue;
@@ -68,6 +68,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             User publish = getUserByUid(appointment.getPublisherId());
 
             //添加发布者信息
+            appointmentVO.setPublishId(publish.getId());
+            System.out.println("发布者id"+publish.getId());
             appointmentVO.setPublishNickName(publish.getNickname());
             appointmentVO.setPublishHeader(publish.getHeader());
             appointmentVO.setPublishSignature(publish.getSignature());
@@ -102,8 +104,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if (tourAsks == null && tourAsks.size() == 0) {
             return tourVOS;
         }
+        TourVO tourVO= new TourVO();
         for (TourAsk ask : tourAsks) {
-            TourVO tourVO= new TourVO();
             Tour tour = tourMapper.selectByPrimaryKey(ask.getAppointId());
             if(tour == null){
                 continue;
@@ -112,6 +114,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             User publish = getUserByUid(tour.getPublishId());
 
             //添加发布者信息
+            tourVO.setPublishId(publish.getId());
             tourVO.setPublishNickName(publish.getNickname());
             tourVO.setPublishHeader(publish.getHeader());
             tourVO.setPublishSignature(publish.getSignature());
@@ -165,6 +168,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             //设置按摩会所id
             clubVO.setPublishId(c.getClubId());
+            //设置按摩会所的发布者id
+            clubVO.setClubId(club.getPublishId());
 
             clubVOS.add(clubVO);
         }
@@ -201,6 +206,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
             //设置经典商家id
             shopVO.setPublishId(shopBuy.getGuideId());
+            //设置设置经典商家的发布者id
+            shopVO.setShopId(shop.getPublishId());
 
             shopVOS.add(shopVO);
         }

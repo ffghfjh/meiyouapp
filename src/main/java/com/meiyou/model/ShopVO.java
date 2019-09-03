@@ -12,6 +12,7 @@ import java.util.List;
 public class ShopVO implements Serializable {
     private Integer id;
     private Integer publishId;
+    private Integer shopId;
     // 导游头像 导游昵称 导游性别 导游年龄 导游个性签名
     private String publishIdHeader;
     private String publishIdNickname;
@@ -46,6 +47,7 @@ public class ShopVO implements Serializable {
                 ", publishIdSex=" + publishIdSex +
                 ", publishIdBirthday='" + publishIdBirthday + '\'' +
                 ", publishIdSignature='" + publishIdSignature + '\'' +
+                ", shopId=" + shopId +
                 ", serviceArea='" + serviceArea + '\'' +
                 ", travelTime='" + travelTime + '\'' +
                 ", charge=" + charge +
@@ -114,6 +116,14 @@ public class ShopVO implements Serializable {
 
     public void setPublishIdSignature(String publishIdSignature) {
         this.publishIdSignature = publishIdSignature;
+    }
+
+    public Integer getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Integer shopId) {
+        this.shopId = shopId;
     }
 
     public String getServiceArea() {

@@ -10,6 +10,9 @@ import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +35,15 @@ public class MyAskController {
     * @Author: JK
     * @Date: 2019/8/26
     */
+    @Caching(
+            cacheable = {
+                    @Cacheable(value = "myAsk")
+            },
+            put = {
+                    //先执行方法
+                    @CachePut(value = "myAsk"),
+            }
+    )
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名")
     @PostMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {

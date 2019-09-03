@@ -37,7 +37,7 @@
         <form class="layui-form layui-col-md12 x-so">
             <!-- <input class="layui-input"  autocomplete="off" placeholder="开始日" name="start" id="start">
             <input class="layui-input"  autocomplete="off" placeholder="截止日" name="end" id="end"> -->
-            <input type="text" id="uCount"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            <input type="text" id="uCount"  placeholder="请输入用户账号" autocomplete="off" class="layui-input">
             <button class="layui-btn"  id="select_btn"><i class="layui-icon">&#xe615;</i></button>
         </form>
     </div>
@@ -88,7 +88,7 @@
             ]]
         });
     });
-    //查询按钮事件
+
     $('#select_btn').click(function() {
         var uCount = $('#uCount').val();
         if (uCount == null || uCount == '') {
@@ -159,7 +159,6 @@
             return false;
         }
     });
-
 </script>
 <script>var _hmt = _hmt || []; (function() {
     var hm = document.createElement("script");

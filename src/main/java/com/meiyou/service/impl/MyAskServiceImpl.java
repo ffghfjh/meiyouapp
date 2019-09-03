@@ -58,8 +58,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if (appointAsks == null && appointAsks.size() == 0) {
             return appointmentVOS;
         }
+        AppointmentVO appointmentVO = new AppointmentVO();
         for (AppointAsk ask : appointAsks) {
-            AppointmentVO appointmentVO = new AppointmentVO();
             Appointment appointment = appointmentMapper.selectByPrimaryKey(ask.getAppointId());
             if(appointment == null){
                 continue;
@@ -104,8 +104,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         if (tourAsks == null && tourAsks.size() == 0) {
             return tourVOS;
         }
+        TourVO tourVO= new TourVO();
         for (TourAsk ask : tourAsks) {
-            TourVO tourVO= new TourVO();
             Tour tour = tourMapper.selectByPrimaryKey(ask.getAppointId());
             if(tour == null){
                 continue;

@@ -117,7 +117,21 @@ public class AdminActivityServiceImpl implements AdminActivityService {
         //获得所有举报信息
         List<ActivityReport> activityReports = activityReportMapper.selectByExample(example);
         if (activityReports == null || activityReports.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("reporter", "无数据");
+            hashMap.put("activityContent", "无数据");
+            hashMap.put("activityId", 0);
+            hashMap.put("activityMan", 0);
+            hashMap.put("userBoolHide", "无数据");
+            hashMap.put("activityManId", 0);
+            hashMap.put("activityBoolHide", "无数据");
+            hashMap.put("type", "无数据");
+            hashMap.put("time", "无数据");
+            hashMap.put("activityStatus", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         //遍历举报表
         for (ActivityReport report : activityReports) {
@@ -140,8 +154,6 @@ public class AdminActivityServiceImpl implements AdminActivityService {
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             hashMap.put("id", report.getId());
             hashMap.put("reporter", "["+ reporter.getId() +"]" + reporter.getNickname());
-            hashMap.put("" +
-                    "", reporter.getBoolClose());
             hashMap.put("activityContent", activity1.getContent());
             hashMap.put("activityId", activity1.getId());
             hashMap.put("activityMan", "[" + user.getId() +"]" + user.getNickname());
@@ -154,7 +166,21 @@ public class AdminActivityServiceImpl implements AdminActivityService {
             list.add(hashMap);
         }
         if (list.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("reporter", "无数据");
+            hashMap.put("activityContent", "无数据");
+            hashMap.put("activityId", 0);
+            hashMap.put("activityMan", 0);
+            hashMap.put("userBoolHide", "无数据");
+            hashMap.put("activityManId", 0);
+            hashMap.put("activityBoolHide", "无数据");
+            hashMap.put("type", "无数据");
+            hashMap.put("time", "无数据");
+            hashMap.put("activityStatus", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         PageInfo pageInfo = new PageInfo(list);
         return LayuiTableJson.success().addCount(getActivityReportTotalCount()).addData(pageInfo);

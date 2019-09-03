@@ -45,10 +45,10 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
             appointmentExample.createCriteria().andPublisherIdEqualTo(publisherId);
             List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
             if (list.size() == 0){
-                Map<String, Object> map = new HashMap<>();
-                map.put("code",200);
-                map.put("msg","没有数据");
-                return map;
+//                Map<String, Object> map = new HashMap<>();
+//                map.put("code",200);
+//                map.put("msg","没有数据");
+//                return map;
             }
             appointmentExample.setPageNo(offset);
             appointmentExample.setPageSize(pageSize);
@@ -62,10 +62,10 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
             appointmentExample.createCriteria().andStateEqualTo(state);
             List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
             if (list.size() == 0){
-                Map<String, Object> map = new HashMap<>();
-                map.put("code",200);
-                map.put("msg","没有数据");
-                return map;
+//                Map<String, Object> map = new HashMap<>();
+//                map.put("code",200);
+//                map.put("msg","没有数据");
+//                return map;
             }
             appointmentExample.setPageNo(offset);
             appointmentExample.setPageSize(pageSize);
@@ -78,10 +78,10 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
 
         List<Appointment> list = appointmentMapper.selectByExample(appointmentExample);
         if (list.size() == 0){
-            Map<String, Object> map = new HashMap<>();
-            map.put("code",200);
-            map.put("msg","没有数据");
-            return map;
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("code",200);
+//            map.put("msg","没有数据");
+//            return map;
         }
 
         appointmentExample.setPageNo(offset);

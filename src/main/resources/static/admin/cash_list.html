@@ -31,7 +31,7 @@
 
     <!--    模板引擎-->
     <script type="text/html" id="cashTypeTpl">
-        {{#  if(d.cash_type == 0){ }}
+        {{#  if(d.cash_type == 1){ }}
         支付宝
         {{#  } else { }}
         其他
@@ -40,11 +40,18 @@
 
     <!--    模板引擎-->
     <script type="text/html" id="stateTpl">
-        {{#  if(d.state == 1){ }}
-        通过
-        {{#  } else { }}
-        不通过
-        {{#  } }}
+        {{# if(d.state === 0) { }}
+            未审核
+        {{# } else if (d.state === 1) { }}
+            通过
+        {{# } else if (d.state === 2) { }}
+            不通过
+        {{# } }}
+<!--        {{#  if(d.state == 1){ }}-->
+<!--        通过-->
+<!--        {{#  } else { }}-->
+<!--        不通过-->
+<!--        {{#  } }}-->
     </script>
 
     <script type="text/html" id="toolbarDemo">
@@ -165,7 +172,7 @@
                         obj.del();
                         table.reload('test', {
                             url:"/AdminCash/checkPassCash",//如果这个是变量的话无法重载表格
-                            where: {id:data.id, type:0} //设定异步数据接口的额外参数,这里的参数可以是data变量
+                            where: {id:data.id, type:2} //设定异步数据接口的额外参数,这里的参数可以是data变量
                         });
                         layer.close(index);
                     });

@@ -97,7 +97,7 @@ public class AdminCashServiceImpl implements AdminCashService {
             return listCash(page, limit);
         }
         //审核不通过
-        cash.setState(0);
+        cash.setState(2);
         cashMapper.updateByPrimaryKeySelective(cash);
         return listCash(page, limit);
     }

@@ -59,4 +59,5 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.meiyou.pojo
 server:
+  #服务器端口设置为80，使用localhost://直接访问，不需要加8080
   port: 80

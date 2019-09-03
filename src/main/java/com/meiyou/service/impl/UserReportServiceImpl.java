@@ -87,7 +87,20 @@ public class UserReportServiceImpl implements UserReportService {
         //获得所有举报信息
         List<UserReport> userReportList = userReportMapper.selectByExample(example);
         if (userReportList == null || userReportList.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            //举报编号
+            hashMap.put("report_id", 0);
+            hashMap.put("reporter", "无数据");
+            hashMap.put("reported", "无数据");
+            //在前端不展示的被举报人id
+            hashMap.put("pid", 0);
+            hashMap.put("reportedBoolClose", "无数据");
+            hashMap.put("type", "无数据");
+            hashMap.put("content", "无数据");
+            hashMap.put("time", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         //遍历举报表
         for (UserReport report : userReportList) {
@@ -116,15 +129,20 @@ public class UserReportServiceImpl implements UserReportService {
             list.add(hashMap);
         }
         if (list.isEmpty()) {
-            HashMap<String, Object> hashMapNo = new HashMap<String, Object>();
-            hashMapNo.put("report_id", 0);
-            hashMapNo.put("reporter", "没有举报人");
-            hashMapNo.put("reported", "没有被举报人");
-            hashMapNo.put("reportedBoolClose", false);
-            hashMapNo.put("type", "[无类型]");
-            hashMapNo.put("content", "无举报内容");
-            hashMapNo.put("time", "时间不存在");
-            list.add(hashMapNo);
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            //举报编号
+            hashMap.put("report_id", 0);
+            hashMap.put("reporter", "无数据");
+            hashMap.put("reported", "无数据");
+            //在前端不展示的被举报人id
+            hashMap.put("pid", 0);
+            hashMap.put("reportedBoolClose", "无数据");
+            hashMap.put("type", "无数据");
+            hashMap.put("content", "无数据");
+            hashMap.put("time", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         PageInfo pageInfo = new PageInfo(list);
         return LayuiTableJson.success().addCount(getUserReportTotolCount()).addData(pageInfo);

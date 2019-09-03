@@ -49,6 +49,7 @@ public class AppointmentController {
                                  HttpServletRequest request
     ) {
 
+        System.out.println("发布约会："+files.length);
         //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
         for (MultipartFile file : files) {

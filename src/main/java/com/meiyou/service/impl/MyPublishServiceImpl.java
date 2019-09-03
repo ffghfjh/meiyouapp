@@ -54,10 +54,10 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             return appointmentVOS;
         }
 
-        AppointAskExample appointAskExample = new AppointAskExample();
         //获取报名者头像集合
         List<String> askerHears = new ArrayList<>();
         for (Appointment appointment : appointments) {
+            AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1).andAppointIdEqualTo(appointment.getId());
             List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
 
@@ -116,10 +116,10 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             return tourVOS;
         }
 
-        TourAskExample tourAskExample = new TourAskExample();
         //获取报名者头像集合
         List<String> askerHears = new ArrayList<>();
         for (Tour tour : tours) {
+            TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1).andAppointIdEqualTo(tour.getId());
             List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
 
@@ -214,7 +214,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             //把每一个重新赋值的shopVOS类加到新的集合中
             shopVOS.add(setShopToShopVO(shop));
         }
-
         return shopVOS;
     }
 

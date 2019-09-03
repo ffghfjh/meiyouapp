@@ -18,6 +18,7 @@ import java.util.Map;
  * @create: 2019-08-27 09:15
  **/
 @Api(value = "约会服务后台管理控制层", tags = {"约会服务后台管理控制层"})
+@RequestMapping(value = "/AppointmentManagement")
 @RestController
 public class AppointmentManagementController {
     @Autowired
@@ -32,7 +33,7 @@ public class AppointmentManagementController {
     * @Date: 2019/8/29
     */
     @ApiOperation(value = "分页查询所有的约会", notes = "分页查询所有的约会", httpMethod = "POST")
-    @RequestMapping(value = "selectAllAppointmentByPage")
+    @RequestMapping(value = "/selectAllAppointmentByPage")
     public Map<String,Object> selectAllAppointmentByPage(Integer page, Integer limit,
                                                          Integer publisherId, Integer state
             , HttpServletRequest request){
@@ -51,7 +52,7 @@ public class AppointmentManagementController {
     * @Date: 2019/8/27
     */
     @ApiOperation(value = "分页查询所有的旅游", notes = "分页查询所有的旅游", httpMethod = "POST")
-    @RequestMapping(value = "selectAllTourByPage")
+    @RequestMapping(value = "/selectAllTourByPage")
     public Map<String,Object> selectAllTourByPage(Integer page, Integer limit
             ,Integer publisherId,Integer state
             , HttpServletRequest request){

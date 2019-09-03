@@ -1,3 +1,4 @@
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -49,7 +50,7 @@ spring:
   cache:
     cache-names: MeiyouCache
   rabbitmq:
-    addresses: 47.103.24.19
+    addresses: 127.0.0.1
     username: guest
     password: guest
 
@@ -57,4 +58,6 @@ mybatis:
   config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.meiyou.pojo
-
+server:
+  #服务器端口设置为80，使用localhost://直接访问，不需要加8080
+  port: 80

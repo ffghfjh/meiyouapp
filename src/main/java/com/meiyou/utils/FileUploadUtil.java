@@ -26,6 +26,7 @@ public class FileUploadUtil {
     public static Msg uploadUtil(MultipartFile uploadFile,String fileDir, HttpServletRequest request) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         String realPath = request.getSession().getServletContext().getRealPath("/upload/" + fileDir+"/");
+        System.out.println("文件上传："+realPath);
         String format = sdf.format(new Date());
         File folder = new File(realPath + format);
         //是否目录

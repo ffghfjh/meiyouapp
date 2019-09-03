@@ -46,7 +46,17 @@ public class RechargeServiceImpl implements RechargeService {
         //获取所有充值记录
         List<Recharge> recharges = rechargeMapper.selectByExample(rechargeExample);
         if (recharges.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("orderNum", "无数据");
+            hashMap.put("money", "无数据");
+            hashMap.put("account", "无数据");;
+            hashMap.put("type", "无数据");
+            hashMap.put("time", "无数据");
+            hashMap.put("state", "无数据");
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         //遍历充值表
         for (Recharge recharge : recharges) {
@@ -66,7 +76,17 @@ public class RechargeServiceImpl implements RechargeService {
             list.add(hashMap);
         }
         if (list.isEmpty()) {
-            return LayuiTableJson.fail();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("id", 0);
+            hashMap.put("orderNum", 0);
+            hashMap.put("money", 0);
+            hashMap.put("account", 0);;
+            hashMap.put("type", 0);
+            hashMap.put("time", 0);
+            hashMap.put("state", 0);
+            list.add(hashMap);
+            PageInfo pageInfo = new PageInfo(list);
+            return LayuiTableJson.success().addCount(0).addData(pageInfo);
         }
         PageInfo pageInfo = new PageInfo(list);
         return LayuiTableJson.success().addCount(getRechargeTotalCount()).addData(pageInfo);

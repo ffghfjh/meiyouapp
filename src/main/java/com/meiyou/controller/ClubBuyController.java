@@ -73,6 +73,8 @@ public class ClubBuyController {
                           @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid,
                           @RequestParam("star") Integer star){
+        System.out.println("进入会所评星");
+        System.out.println("cid"+cid);
         return clubBuyService.addClubStar(uid,token,cid,star);
     }
 }

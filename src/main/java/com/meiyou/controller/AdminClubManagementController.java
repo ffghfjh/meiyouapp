@@ -21,6 +21,7 @@ import java.util.Map;
  **/
 @RestController
 @Api(value = "管理员按摩会所控制器",tags = "用来查看整个按摩会所情况")
+@RequestMapping(value = "/AdminClubManagement")
 public class AdminClubManagementController {
 
     @Autowired
@@ -80,7 +81,7 @@ public class AdminClubManagementController {
      * @Date: 2019/8/29
      */
     @ApiOperation(value = "分页查询所有的推拿会所", notes = "分页查询所有的推拿会所", httpMethod = "POST")
-    @RequestMapping(value = "selectAllClubByPage")
+    @RequestMapping(value = "/selectAllClubByPage")
     public Map<String,Object> selectAllClubByPage(Integer page, Integer limit
             , Integer publisherId, Integer state, HttpServletRequest request){
         if (adminController.authAdmin(request)) {

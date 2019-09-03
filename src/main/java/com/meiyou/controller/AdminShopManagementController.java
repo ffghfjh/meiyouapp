@@ -19,6 +19,7 @@ import java.util.Map;
  * @create: 2019-08-28 11:10
  **/
 @RestController
+@RequestMapping(value = "/AdminShopManagement" )
 @Api(value = "管理员同城导游控制器",tags = "用来查看整个同城导游情况")
 public class AdminShopManagementController {
 

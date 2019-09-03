@@ -35,15 +35,15 @@ public class MyAskController {
     * @Author: JK
     * @Date: 2019/8/26
     */
-    @Caching(
-            cacheable = {
-                    @Cacheable(value = "myAsk")
-            },
-            put = {
-                    //先执行方法
-                    @CachePut(value = "myAsk"),
-            }
-    )
+//    @Caching(
+//            cacheable = {
+//                    @Cacheable(value = "myAsk")
+//            },
+//            put = {
+//                    //先执行方法
+//                    @CachePut(value = "myAsk"),
+//            }
+//    )
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名")
     @PostMapping(value = "/selectMyAppointmentAsk")
     public Msg selectMyAppointmentAsk(String uid, String token) {
@@ -74,7 +74,7 @@ public class MyAskController {
         }
 
         List<ShopVO> shopVOS = myAskService.selectMyShopAsk(Integer.valueOf(uid));
-        if(clubVOS.isEmpty()){
+        if(shopVOS.isEmpty()){
             msg.add("shopVOS",null);
         }else {
             msg.add("shopVOS",shopVOS);
@@ -82,6 +82,7 @@ public class MyAskController {
 
         msg.setCode(100);
         msg.setMsg("成功");
+        System.out.println(msg);
         return msg;
     }
 }

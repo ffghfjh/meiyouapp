@@ -1,33 +1,16 @@
 package com.meiyou.controller;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
-import com.meiyou.mapper.ActivityMapper;
-import com.meiyou.model.Coordinate;
 import com.meiyou.pojo.Activity;
-import com.meiyou.pojo.RootMessage;
 import com.meiyou.service.ActivityService;
-import com.meiyou.service.RootMessageService;
-import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import redis.clients.jedis.GeoRadiusResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -59,10 +42,10 @@ public class ActivityController {
 
     @ApiOperation(value = "用户发布动态", notes = "用户发布动态", httpMethod = "POST")
     @PostMapping(value = "/postActivity")
-    public Msg postActivity(int uid, String token, double latitude, double longitude, String content,  MultipartFile[] files
+    public Msg postActivity(int uid, String token, double latitude, double longitude, String content,  MultipartFile[] files,int fileType
             ,HttpServletRequest request) {
         if(RedisUtil.authToken(String.valueOf(uid),token)){
-            int i = activityService.postActivity(uid,latitude,longitude,content,files, request);
+            int i = activityService.postActivity(uid,latitude,longitude,content,files, fileType,request);
             if (i == 1) {
                 return Msg.success();
             }

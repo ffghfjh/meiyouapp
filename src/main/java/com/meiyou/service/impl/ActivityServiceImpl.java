@@ -1,11 +1,9 @@
 package com.meiyou.service.impl;
 
 import cn.hutool.core.date.BetweenFormater;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
-import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.Coordinate;
@@ -17,21 +15,12 @@ import com.meiyou.service.ActivityService;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.*;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import redis.clients.jedis.GeoRadiusResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -100,7 +89,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public int postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files
+    public int postActivity(int uid, double latitude, double longitude, String content,  MultipartFile[] files,int fileType
             ,HttpServletRequest request){
         Activity activity = new Activity();
         activity.setCreateTime(new Date());
@@ -109,13 +98,28 @@ public class ActivityServiceImpl implements ActivityService {
         //使用Hutool进行json操作
         JSONArray array = JSONUtil.createArray();
         for (MultipartFile file : files) {
-            Msg msg = FileUploadUtil.uploadUtil(file, "activity", request);
-            if (msg.getCode() == 100) {
-                array.add(msg.getExtend().get("path"));
+            if(fileType==1){
+                Msg msg = FileUploadUtil.uploadUtil(file, "activity/img", request);
+                if (msg.getCode() == 100) {
+                    array.add(msg.getExtend().get("path"));
+                }
+
             }
+            else if(fileType==2){
+                Msg msg = FileUploadUtil.uploadUtil(file, "activity/video", request);
+                if (msg.getCode() == 100) {
+                    array.add(msg.getExtend().get("path"));
+                }
+            }
+
         }
         if (array.size() == 0) {
             return 0;
+        }
+        if(fileType==1){
+            activity.setFileType(1);
+        }else if(fileType==2){
+            activity.setFileType(2);
         }
         activity.setImgsUrl(array.toString());//以json数组的形式存图片
         activity.setContent(content);
@@ -320,6 +324,7 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("boolLike", boolLike);
             hashMap.put("uid", activity.getPublishId());
             hashMap.put("aid", activity.getId());
+            hashMap.put("fileType",activity.getFileType());
             list.add(hashMap);
         }
         //对动态id从最新到最晚排序（按id递减排序）

@@ -6,7 +6,6 @@ import com.meiyou.mapper.ActivityLikeMapper;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.pojo.*;
 import com.meiyou.service.ActivityLikeService;
-import com.meiyou.service.ActivityService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;

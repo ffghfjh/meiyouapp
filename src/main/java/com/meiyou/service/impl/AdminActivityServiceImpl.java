@@ -9,10 +9,8 @@ import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.LayuiTableJson;
 import com.meiyou.pojo.*;
 import com.meiyou.service.AdminActivityService;
-import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Date;

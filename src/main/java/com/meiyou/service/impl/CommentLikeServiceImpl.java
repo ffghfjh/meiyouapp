@@ -4,7 +4,6 @@ import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.CommentLikeMapper;
 import com.meiyou.mapper.CommentMapper;
 import com.meiyou.pojo.*;
-import com.meiyou.service.ActivityService;
 import com.meiyou.service.CommentLikeService;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;

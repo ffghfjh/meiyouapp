@@ -59,6 +59,35 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     ActivityLikeService activityLikeService;
 
+    @Override
+    public Msg remove(String uid, String token, int aid) {
+        Msg msg = new Msg();
+        int persionId = Integer.parseInt(uid);
+        if (RedisUtil.authToken(uid, token)) {
+            //判断动态是否是动态主人
+            Activity activity = activityMapper.selectByPrimaryKey(aid);
+            User user = userMapper.selectByPrimaryKey(persionId);
+            boolean boolHost = ((activity != null) && (user != null) && (activity.getPublishId() == user.getId()));
+            if (boolHost) {
+                int i = activityMapper.deleteByPrimaryKey(aid);
+                if (i == 1) {
+                    msg.setCode(100);
+                    msg.setMsg("删除动态成功！");
+                    return msg;
+                }
+                msg.setCode(200);
+                msg.setMsg("删除动态失败");
+                return msg;
+            }
+            msg.setCode(200);
+            msg.setMsg("动态不存在或用户不存在或删除的是非动态主人");
+            return msg;
+        }
+        msg.setCode(200);
+        msg.setMsg("鉴权失败，非用户本人");
+        return msg;
+    }
+
     /**
      * hzy
      * 用户发布动态

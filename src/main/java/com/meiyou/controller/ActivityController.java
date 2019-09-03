@@ -45,6 +45,12 @@ public class ActivityController {
     @Autowired
     ActivityService activityService;
 
+    @ApiOperation(value = "删除动态", notes = "删除动态", httpMethod = "POST")
+    @PostMapping(value = "/remove")
+    public Msg remove(String uid, String token, int aid) {
+        return activityService.remove(uid, token, aid);
+    }
+
     @ApiOperation(value = "获取附近所有动态", notes = "获取附近所有动态", httpMethod = "POST")
     @PostMapping(value = "/listNeighborActivity")
     public Msg listNeighborActivity(int uid, double latitude, double longitude) {

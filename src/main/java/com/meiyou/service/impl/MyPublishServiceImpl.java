@@ -7,12 +7,10 @@ import com.meiyou.model.ShopVO;
 import com.meiyou.model.TourVO;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyPublishService;
-import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -56,9 +54,10 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             return appointmentVOS;
         }
 
+        AppointAskExample appointAskExample = new AppointAskExample();
+        //获取报名者头像集合
+        List<String> askerHears = new ArrayList<>();
         for (Appointment appointment : appointments) {
-
-            AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1).andAppointIdEqualTo(appointment.getId());
             List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
 
@@ -68,8 +67,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 appointmentVO.setNums(0);
                 appointmentVO.setAskerHeader(null);
             }else {
-                //获取报名者头像集合
-                List<String> askerHears = new ArrayList<>();
                 for (AppointAsk appointAsk : appointAsks) {
                     Integer askerId = appointAsk.getAskerId();
                     User user = getUserByUid(askerId);
@@ -119,8 +116,10 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
             return tourVOS;
         }
 
+        TourAskExample tourAskExample = new TourAskExample();
+        //获取报名者头像集合
+        List<String> askerHears = new ArrayList<>();
         for (Tour tour : tours) {
-            TourAskExample tourAskExample = new TourAskExample();
             tourAskExample.createCriteria().andAskState0EqualTo(1).andAppointIdEqualTo(tour.getId());
             List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
 
@@ -130,8 +129,6 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 tourVO.setAskerHeader(null);
                 tourVO.setNums(0);
             }else {
-                //获取报名者头像集合
-                List<String> askerHears = new ArrayList<>();
                 for (TourAsk tourAsk : tourAsks) {
                     Integer askerId = tourAsk.getAskerId();
                     User user = getUserByUid(askerId);

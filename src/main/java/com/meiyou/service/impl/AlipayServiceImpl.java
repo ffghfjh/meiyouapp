@@ -152,6 +152,8 @@ public class AlipayServiceImpl implements AlipayService {
                                 } catch (AlipayApiException e) {
                                     e.printStackTrace();
                                 }
+                            }else{
+                                return Msg.success();
                             }
                         }
                     }

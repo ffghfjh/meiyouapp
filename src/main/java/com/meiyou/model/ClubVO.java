@@ -14,6 +14,8 @@ public class ClubVO implements Serializable {
     private Integer id;
     private Integer publishId;
     private String publishHeader;
+
+    private Integer clubId;
     private String imgsUrl;
     private String projectName;
     private String projectDesc;
@@ -39,6 +41,7 @@ public class ClubVO implements Serializable {
                 "id=" + id +
                 ", publishId=" + publishId +
                 ", publishHeader='" + publishHeader + '\'' +
+                ", clubId=" + clubId +
                 ", imgsUrl='" + imgsUrl + '\'' +
                 ", projectName='" + projectName + '\'' +
                 ", projectDesc='" + projectDesc + '\'' +
@@ -76,6 +79,14 @@ public class ClubVO implements Serializable {
 
     public void setPublishHeader(String publishHeader) {
         this.publishHeader = publishHeader;
+    }
+
+    public Integer getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(Integer clubId) {
+        this.clubId = clubId;
     }
 
     public String getImgsUrl() {

@@ -69,7 +69,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         String publishMoneyName = "publish_money";
         int publishMoneyValue = rootMessageUtil.getRootMessage(publishMoneyName);
         String payWord = user.getPayWord();
-        if (payWord == null) {
+        if (payWord == null||payWord.equals("")) {
             msg.setCode(1000);
             msg.setMsg("请设置支付密码");
             return msg;
@@ -213,7 +213,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         int askMoneyValue = rootMessageUtil.getRootMessage(askMoneyName);
 
         String payWord = user.getPayWord();
-        if (payWord == null) {
+        if (payWord == null||payWord.equals("")) {
             msg.setCode(1000);
             msg.setMsg("请设置支付密码");
             return msg;

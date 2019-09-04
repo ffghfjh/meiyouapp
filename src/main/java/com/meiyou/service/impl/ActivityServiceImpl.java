@@ -192,6 +192,7 @@ public class ActivityServiceImpl implements ActivityService {
             hashMap.put("content", activity.getContent());
             hashMap.put("imgsUrl", activity.getImgsUrl());
             hashMap.put("distance", "0.00");
+            hashMap.put("fileType", activity.getFileType());
             //发布时间
             Date createTime = activity.getCreateTime();
             //当前时间

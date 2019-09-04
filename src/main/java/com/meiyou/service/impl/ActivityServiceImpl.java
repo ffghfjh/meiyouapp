@@ -234,7 +234,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public List<Activity> listActivity() {
-        List<Activity> activities = activityMapper.listActivityByExample(null);
+        List<Activity> activities = activityMapper.selectByExample(null);
         if (activities == null || activities.size()==0) {
             List<Activity> activities1 = new ArrayList<>();
             Activity activity = new Activity();

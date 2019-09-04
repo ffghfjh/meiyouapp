@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import com.alipay.api.domain.Activity;
 import com.meiyou.mapper.ActivityMapper;
 import com.meiyou.mapper.CommentMapper;
 import com.meiyou.mapper.UserMapper;
@@ -75,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
         criteria.andActivityIdEqualTo(aid);
         int count = commentMapper.countByExample(example);
         System.out.println("获取到的count：" + count);
-        Activity activity = new Activity();
+        com.meiyou.pojo.Activity activity = new com.meiyou.pojo.Activity();
         activity.setId(aid);
         System.out.println("aid: " + aid);
         activity.setCommontNum(count);
@@ -145,14 +146,14 @@ public class CommentServiceImpl implements CommentService {
         example.setOrderByClause("id desc");
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
-        List<Activity> activities = activityMapper.selectByExample(example);
+        List<com.meiyou.pojo.Activity> activities = activityMapper.selectByExample(example);
         if (activities.isEmpty()) {
             msg.setCode(200);
             msg.setMsg("我没有发布任何动态");
             msg.add("黄朝阳", 666);
             return msg;
         }
-        for (Activity activity : activities) {
+        for (com.meiyou.pojo.Activity activity : activities) {
             //查询对此条动态的所有评论
             CommentExample example1 = new CommentExample();
             //根据更新时间升序排序，使得每次新评论都在最前面
@@ -224,7 +225,7 @@ public class CommentServiceImpl implements CommentService {
         ActivityExample example = new ActivityExample();
         ActivityExample.Criteria criteria = example.createCriteria();
         criteria.andPublishIdEqualTo(uid);
-        List<Activity> activities = activityMapper.selectByExample(example);
+        List<com.meiyou.pojo.Activity> activities = activityMapper.selectByExample(example);
         if (activities.isEmpty()) {
             msg.setCode(200);
             msg.setMsg("我没有发布过任何动态");
@@ -232,7 +233,7 @@ public class CommentServiceImpl implements CommentService {
             return msg;
         }
         //遍历所有动态
-        for (Activity activity : activities) {
+        for (com.meiyou.pojo.Activity activity : activities) {
             //查询此条动态下的所有评论
             CommentExample example1 = new CommentExample();
             CommentExample.Criteria criteria1 = example1.createCriteria();

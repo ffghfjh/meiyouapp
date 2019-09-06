@@ -1,0 +1,7 @@
+From hub.c.163.com/library/java:8-jre
+
+ADD target/*.jar meiYou.jar
+
+EXPOSE 8888
+
+ENTRYPOINT ["java", "-jar", "/meiYou.jar"]

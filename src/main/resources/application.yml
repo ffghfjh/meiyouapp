@@ -2,9 +2,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-bp1msl568beq541b6ro.mysql.rds.aliyuncs.com:3306/meiyouapp?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://47.103.24.19:3306/meiyouapp?useUnicode=true&characterEncoding=UTF-8&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     username: root
-    password: SHIlin24664266
+    password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
 
     #连接池的配置信息
@@ -35,7 +35,7 @@ spring:
 
   redis:
     database: 0
-    host: 192.168.0.114
+    host: 47.103.24.19
     port: 6379
     password: 123456
     jedis:
@@ -50,7 +50,7 @@ spring:
   cache:
     cache-names: MeiyouCache
   rabbitmq:
-    addresses: 127.0.0.1
+    addresses: 47.103.24.19
     username: guest
     password: guest
 

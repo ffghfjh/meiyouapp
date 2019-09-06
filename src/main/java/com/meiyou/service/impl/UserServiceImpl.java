@@ -1332,4 +1332,39 @@ public class UserServiceImpl implements UserService {
 
         return (int)min;
     }
+
+    /**
+     * 忘记密码
+     * @param phone 电话号码
+     * @param code 验证码
+     * @param password 新密码
+     * @return
+     */
+    @Override
+    public Msg forgetPassword(String phone, String code, String password) {
+        Msg msg = new Msg();
+        if(RedisUtil.authCode(phone, code)){
+            AuthorizationExample authorizationExample = new AuthorizationExample();
+            authorizationExample.createCriteria().andIdentifierEqualTo(phone);
+            List<Authorization> authorizations = authMapper.selectByExample(authorizationExample);
+            if(authorizations.isEmpty()){
+                msg.setCode(404);
+                msg.setMsg("此用户不存在");
+                return msg;
+            }
+
+            Authorization authorization = new Authorization();
+            authorization.setCredential(password);
+            authorization.setUpdateTime(new Date());
+
+            AuthorizationExample example = new AuthorizationExample();
+            example.createCriteria().andIdentifierEqualTo(phone);
+            authMapper.updateByExampleSelective(authorization,example);
+
+            return Msg.success();
+        }
+        msg.setCode(500);
+        msg.setMsg("验证码错误");
+        return msg;
+    }
 }

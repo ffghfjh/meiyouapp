@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -241,5 +238,12 @@ public class UserController {
     @ApiOperation("查询用户资料")
     public Msg selUserInfoById(int uId){
         return userService.selUserInfoById(uId);
+    }
+
+
+    @PostMapping("forgetPassword")
+    @ApiOperation(value = "忘记密码", notes = "500-->验证码错误,404-->找不到此用户")
+    public Msg forgetPassword(String phone, String code, String password){
+        return userService.forgetPassword(phone, code, password);
     }
 }

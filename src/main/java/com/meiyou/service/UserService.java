@@ -215,4 +215,13 @@ public interface UserService {
      * @return
      */
     public Msg selUserInfoById(int uId);
+
+    /**
+     * 忘记密码
+     * @param phone
+     * @param code
+     * @param password
+     * @return
+     */
+    Msg forgetPassword(String phone,String code,String password);
 }

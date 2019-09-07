@@ -19,9 +19,9 @@ public interface OwnService {
 
     Msg changeBackGroudPicture(Integer uid, MultipartFile img, HttpServletRequest req);
 
-    Msg changePassword(Integer uid,String newPassword);
+    Msg changePassword(Integer uid,String oldPassword,String newPassword);
 
-    Msg changePayPassword(Integer uid,String newPassword);
+    Msg changePayPassword(Integer uid,String oldPassword,String newPassword);
 
     Msg selectByUid(Integer uid);
 }

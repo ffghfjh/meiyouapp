@@ -94,7 +94,7 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
     }
 
     @Override
-    public Msg changePassword(Integer uid, String newPassword) {
+    public Msg changePassword(Integer uid,String oldPassword, String newPassword) {
         Msg msg = new Msg();
         User user = getUserByUid(uid);
         if(user == null){
@@ -102,6 +102,17 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
             msg.setMsg("此用户不存在");
             return msg;
         }
+
+        AuthorizationExample example1 = new AuthorizationExample();
+        example1.createCriteria().andUserIdEqualTo(uid).andIdentityTypeEqualTo(1);
+        List<Authorization> authorizations = authorizationMapper.selectByExample(example1);
+        String password = authorizations.get(0).getCredential();
+        if(!password.equals(oldPassword)){
+            msg.setCode(500);
+            msg.setMsg("旧密码错误");
+            return msg;
+        }
+
         Authorization authorization = new Authorization();
         authorization.setCredential(newPassword);
 
@@ -115,7 +126,7 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
     }
 
     @Override
-    public Msg changePayPassword(Integer uid, String newPassword) {
+    public Msg changePayPassword(Integer uid,String oldPassword, String newPassword) {
         Msg msg = new Msg();
         User user = getUserByUid(uid);
         if(user == null){
@@ -123,6 +134,17 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
             msg.setMsg("此用户不存在");
             return msg;
         }
+
+        AuthorizationExample example1 = new AuthorizationExample();
+        example1.createCriteria().andUserIdEqualTo(uid).andIdentityTypeEqualTo(1);
+        List<Authorization> authorizations = authorizationMapper.selectByExample(example1);
+        String password = authorizations.get(0).getCredential();
+        if(!password.equals(oldPassword)){
+            msg.setCode(500);
+            msg.setMsg("旧密码错误");
+            return msg;
+        }
+
         User u = new User();
         u.setId(uid);
         u.setPayWord(newPassword);

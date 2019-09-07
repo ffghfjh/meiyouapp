@@ -318,4 +318,18 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return Msg.success();
     }
 
+    @Override
+    public Msg deleteByClubBuyId(Integer uid, String token, Integer clubBuyId) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Integer state = clubBuyMapper.selectByPrimaryKey(clubBuyId).getState();
+        if(state != StateEnum.COMPLETE.getValue()){
+            return Msg.fail();
+        }
+        clubBuyMapper.deleteByPrimaryKey(clubBuyId);
+
+        return Msg.success();
+    }
 }

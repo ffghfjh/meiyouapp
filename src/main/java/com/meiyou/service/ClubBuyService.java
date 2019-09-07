@@ -58,4 +58,12 @@ public interface ClubBuyService {
      */
     Msg addClubStar(Integer uid,String token,Integer clubBuyId,Integer star);
 
+    /**
+     * 删除购买的club这条记录
+     * @param uid
+     * @param token
+     * @param clubBuyId
+     * @return
+     */
+    Msg deleteByClubBuyId(Integer uid,String token,Integer clubBuyId);
 }

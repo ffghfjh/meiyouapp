@@ -66,4 +66,13 @@ public interface ShopBuyService {
      * @return
      */
     Msg selectBySid(Integer uid,Integer sid,String token);
+
+    /**
+     * 删除购买的shop这条记录
+     * @param uid
+     * @param token
+     * @param shopBuyId
+     * @return
+     */
+    Msg deleteByShopBuyId(Integer uid,String token,Integer shopBuyId);
 }

@@ -1,14 +1,11 @@
 package com.meiyou.controller;
 
-import com.meiyou.pojo.ActivityLike;
 import com.meiyou.service.ActivityLikeService;
 import com.meiyou.utils.Msg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,6 +22,12 @@ public class ActivityLikeController {
 
     @Autowired
     ActivityLikeService activityLikeService;
+
+    @ApiOperation(value = "删除点赞接口", notes = "uid为用户id,而likeId是点赞记录的id", httpMethod = "POST")
+    @RequestMapping(value = "/remove")
+    public Msg remove(String uid, String token, int likeId) {
+        return activityLikeService.remove(uid, token, likeId);
+    }
 
     @ApiOperation(value = "动态点赞接口", notes = "type为0时取消点赞，为1时点赞", httpMethod = "POST")
     @RequestMapping(value = "/like")

@@ -1,6 +1,5 @@
 package com.meiyou.service;
 
-import com.meiyou.pojo.ActivityLike;
 import com.meiyou.utils.Msg;
 
 /**
@@ -11,6 +10,15 @@ import com.meiyou.utils.Msg;
  * @version: 1.0.0
  */
 public interface ActivityLikeService {
+
+    /**
+     * 删除点赞接口，只是屏蔽这条记录
+     * @param likeId
+     * @param token
+     * @return
+     */
+    Msg remove(String uid, String token, int likeId);
+
 
     //获得我所有动态下所有未读的点赞数
     Msg getNotSeenLikeNumForMyActvity(int uid);

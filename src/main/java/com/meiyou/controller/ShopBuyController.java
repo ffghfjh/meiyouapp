@@ -76,4 +76,12 @@ public class ShopBuyController {
                                 @RequestParam("token") String  token){
         return shopBuyService.selectBySid(uid, sid, token);
     }
+
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除",notes = "删除shop的聘请记录")
+    public Msg addClubStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("shopBuyId") Integer shopBuyId){
+        return shopBuyService.deleteByShopBuyId(uid, token, shopBuyId);
+    }
 }

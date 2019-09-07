@@ -73,8 +73,14 @@ public class ClubBuyController {
                           @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid,
                           @RequestParam("star") Integer star){
-        System.out.println("进入会所评星");
-        System.out.println("cid"+cid);
         return clubBuyService.addClubStar(uid,token,cid,star);
+    }
+
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除",notes = "删除club的购买记录")
+    public Msg addClubStar(@RequestParam("uid") Integer uid,
+                           @RequestParam("token") String token,
+                           @RequestParam("clubBuyId") Integer clubBuyId){
+        return clubBuyService.deleteByClubBuyId(uid, token, clubBuyId);
     }
 }

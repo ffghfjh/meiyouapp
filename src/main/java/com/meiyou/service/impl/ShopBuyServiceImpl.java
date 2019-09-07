@@ -307,4 +307,19 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         msg.setCode(100);
         return msg;
     }
+
+    @Override
+    public Msg deleteByShopBuyId(Integer uid, String token, Integer shopBuyId) {
+        if(!RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Integer state = shopBuyMapper.selectByPrimaryKey(shopBuyId).getState();
+        if(state != StateEnum.COMPLETE.getValue()){
+            return Msg.fail();
+        }
+        shopBuyMapper.deleteByPrimaryKey(shopBuyId);
+
+        return Msg.success();
+    }
 }

@@ -8,7 +8,8 @@ package com.meiyou.myEnum;
 public enum StateEnum {
     INIT(0,"发布成功(未有人购买或报名),报名成功,购买成功"),
     COMPLETE(1,"已确定(已有人购买或报名,不能取消),已完成"),
-    INVALID(2,"取消,已失效");
+    INVALID(2,"取消,已失效"),
+    DELETE(3,"已删除");
 
     private int value;
     private String desc;

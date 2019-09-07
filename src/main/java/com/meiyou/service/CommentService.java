@@ -12,6 +12,15 @@ import com.meiyou.utils.Msg;
 public interface CommentService {
 
     /**
+     * 删除评论，实际为屏蔽此条评论
+     * @param uid
+     * @param token
+     * @param cid
+     * @return
+     */
+    Msg remove(String uid, String token, int cid);
+
+    /**
      * 发布评论
      * @param uid
      * @param aid

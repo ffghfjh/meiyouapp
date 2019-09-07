@@ -8,6 +8,7 @@ import com.meiyou.pojo.*;
 import com.meiyou.service.ActivityLikeService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,31 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
 
     @Autowired
     UserService userService;
+
+    /**
+     * 删除点赞接口，只是屏蔽这条记录
+     *
+     * @param likeId 点赞记录id
+     * @param token
+     * @return
+     */
+    @Override
+    public Msg remove(String uid, String token, int likeId) {
+        //验证用户token
+        if (!RedisUtil.authToken(uid, token)) {
+            return Msg.noLogin();
+        }
+        //屏蔽这条记录
+        ActivityLike activityLike = new ActivityLike();
+        activityLike.setId(likeId);
+        activityLike.setUpdateTime(new Date());
+        activityLike.setBoolClose(true);
+        int i = activityLikeMapper.updateByPrimaryKeySelective(activityLike);
+        if (i == 1) {
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
 
     //获得我所有动态下所有未读的点赞数
     @Override
@@ -72,9 +98,14 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
                     //如果用户不存在的话，直接走下一条点赞记录
                     continue;
                 }
-                //判断这条点赞记录是否超过30天
+                //判断这条点赞记录是否超过20天
                 long between = DateUtil.between(activityLike.getCreateTime(), new Date(), DateUnit.DAY);
-                if (between > 30) {
+                if (between > 20) {
+                    activityLikeMapper.deleteByPrimaryKey(activityLike.getId());
+                    continue;
+                }
+                //判断这条点赞记录是否已被屏蔽
+                if (activityLike.getBoolClose() == true) {
                     continue;
                 }
                 count++;
@@ -92,7 +123,8 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
      * @return
      */
     @Override
-    public Msg listUserLikeForMyActivity(int uid) {
+    public Msg
+    listUserLikeForMyActivity(int uid) {
         List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         Msg msg = new Msg();
         //获取我自己的所有动态
@@ -124,13 +156,18 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
                 User user = userService.getUserById(activityLike.getLikeId());
                 boolean boolUser = (user == null || user.getId() == 0 || user.getNickname().equals("找不到任何用户"));
                 if (boolUser) {
-                    //如果用户不存在，直接走下一条点赞记录
+                    //如果点赞的用户不存在，直接走下一条点赞记录
                     continue;
                 }
-                //判断这条点赞记录是否超过30天
+                //判断这条点赞记录是否超过20天
                 long between = DateUtil.between(activityLike.getCreateTime(), new Date(), DateUnit.DAY);
-                if (between > 30) {
-                    //如果超过30天的，直接走下一条点赞记录，因为30天外的点赞不显示
+                if (between > 20) {
+                    //妙法莲华经
+                    activityLikeMapper.deleteByPrimaryKey(activityLike.getId());
+                    continue;
+                }
+                //判断这条记录是否已屏蔽
+                if (activityLike.getBoolClose() == true) {
                     continue;
                 }
                 //更新此条点赞记录为已读状态
@@ -151,6 +188,8 @@ public class ActivityLikeServiceImpl implements ActivityLikeService {
                 //转载动态时间
                 hashMap.put("ActivityTime", DateUtil.formatDateTime(activity.getCreateTime()));
                 hashMap.put("aid", activity.getId());
+                //装载点赞记录id
+                hashMap.put("likeId", activityLike.getId());
                 list.add(hashMap);
             }
         }

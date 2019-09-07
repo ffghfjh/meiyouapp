@@ -52,19 +52,27 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             return Msg.noLogin();
         }
         Msg msg = new Msg();
+
+        //获取会所发布者id，对比购买者id，防止自己买
+        Integer publishId = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getPublishId();
+        if(publishId.equals(clubBuy.getBuyerId())){
+            msg.setCode(501);
+            msg.setMsg("自己不允许购买");
+            return msg;
+        }
+
         clubBuy.setCreateTime(new Date());
         clubBuy.setUpdateTime(new Date());
         clubBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
-        String ask_money = getRootMessage("ask_money");
+        //String ask_money = getRootMessage("ask_money");
 
-        //获取购买者的支付密码,余额及需要支付的费用(报名缴费+会所项目缴费)
+        //获取购买者的支付密码,余额及需要支付的费用(会所项目缴费)
         User result = getUserByUid(clubBuy.getBuyerId());
         String payWord = result.getPayWord();
         Float money = result.getMoney();
-        Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice()
-                +Integer.valueOf(ask_money);
+        Integer price = clubMapper.selectByPrimaryKey(clubBuy.getClubId()).getProjectPrice();
 
         if(payWord == null){
             msg.setMsg("请设置支付密码!");

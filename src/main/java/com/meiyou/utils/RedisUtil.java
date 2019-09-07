@@ -11,8 +11,8 @@ public class RedisUtil {
     
 	 private static JedisPool jedisPool = null;  
      // Redis服务器IP  
-     private static String ADDR = "127.0.0.1";  
-     // Redis的端口号  
+     private static String ADDR = "172.16.213.97";
+     // Redis的端口号
      private static int PORT = 6379;  
      // 访问密码  
      private static String AUTH = "123456";  

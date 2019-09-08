@@ -78,22 +78,24 @@ public class OwnController {
     @ApiOperation(value = "修改登录密码", notes = "修改")
     public Msg updatePassword(@RequestParam("uid") Integer uid,
                               @RequestParam("token") String token,
+                              @RequestParam("oldPassword") String oldPassword,
                               @RequestParam("newPassword") String newPassword){
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }
-        return ownService.changePassword(uid,newPassword);
+        return ownService.changePassword(uid,oldPassword,newPassword);
     }
 
     @PostMapping("/updatePayWord")
     @ApiOperation(value = "修改支付密码", notes = "修改")
     public Msg updatePayWord(@RequestParam("uid") Integer uid,
                              @RequestParam("token") String token,
+                             @RequestParam("oldPassword") String oldPassword,
                              @RequestParam("newPassword") String newPassword){
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }
-        return ownService.changePayPassword(uid,newPassword);
+        return ownService.changePayPassword(uid,oldPassword,newPassword);
 
     }
 

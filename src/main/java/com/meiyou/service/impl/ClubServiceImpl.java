@@ -306,9 +306,10 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 return msg;
             }
 
-            if(uid.equals(clubs.get(0).getPublishId())){
-                continue;
-            }
+            //去除自己发布的
+//            if(uid.equals(clubs.get(0).getPublishId())){
+//                continue;
+//            }
 
 
             //把club的值转换到ClubVO中
@@ -324,6 +325,4 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
         return msg;
     }
-
-
 }

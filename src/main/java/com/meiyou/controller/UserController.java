@@ -245,4 +245,5 @@ public class UserController {
     public Msg selUserInfoById(int uId){
         return userService.selUserInfoById(uId);
     }
+
 }

@@ -55,9 +55,6 @@ public class AlipayServiceImpl implements AlipayService {
             Constants.SIGN_TYPE); // 调用接口之前的初始化
     @Override
     public AlipayTradeAppPayResponse getOrderInfo(String total_amount, String out_trade_no,int uId) {
-
-
-
         Msg msg;
         // TODO Auto-generated method stub
         float ratio = Float.parseFloat(rootMessageService.getMessageByName("charge_ratio"));
@@ -116,7 +113,7 @@ public class AlipayServiceImpl implements AlipayService {
                         float moneyEnd = money*(1-cashRadio);//真实到账的钱
                         String cashNumber = RandomUtil.randomString(11);
                         Cash cash = new Cash();
-                        cash.setCashMoney((int)moneyEnd);
+                        cash.setCashMoney((int)Math.ceil(moneyEnd));
                         cash.setCashType(1);
                         if(money<10000){
                             cash.setState(1);
@@ -264,8 +261,6 @@ public class AlipayServiceImpl implements AlipayService {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     @Override

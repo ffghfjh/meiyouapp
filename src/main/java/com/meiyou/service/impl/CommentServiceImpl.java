@@ -11,6 +11,7 @@ import com.meiyou.service.CommentLikeService;
 import com.meiyou.service.CommentService;
 import com.meiyou.service.UserService;
 import com.meiyou.utils.Msg;
+import com.meiyou.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,30 @@ public class CommentServiceImpl implements CommentService {
     CommentLikeService commentLikeService;
 
 
-
+    /**
+     * 删除评论，实际为屏蔽此条评论
+     *
+     * @param uid
+     * @param token
+     * @param cid
+     * @return
+     */
+    @Override
+    public Msg remove(String uid, String token, int cid) {
+        //验证token
+        if (RedisUtil.authToken(uid, token)) {
+            Comment comment = new Comment();
+            comment.setId(cid);
+            comment.setUpdateTime(new Date());
+            comment.setBoolClose(true);
+            int i = commentMapper.updateByPrimaryKeySelective(comment);
+            if (i == 1) {
+                return Msg.success();
+            }
+            return Msg.fail();
+        }
+        return Msg.noLogin();
+    }
 
     /**
      * 发布评论
@@ -105,6 +129,13 @@ public class CommentServiceImpl implements CommentService {
             return Msg.fail();
         }
         for (Comment comment : comments) {
+            //判读这条评论是否超过20天
+            long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
+            if (between > 20) {
+                //娑婆诃
+                commentMapper.deleteByPrimaryKey(comment.getId());
+                continue;
+            }
             HashMap<String, Object> hashMap = new HashMap<String, Object>();
             //查询这条评论的用户信息
             User user = userService.getUserById(comment.getPersonId());
@@ -175,9 +206,14 @@ public class CommentServiceImpl implements CommentService {
                     //如果这个大哥不存在，就直接走下一个评论
                     continue;
                 }
-                //判读这条评论是否是30天前的，如果是，直接走下一个评论
+                //判断这条评论是否超过20天
                 long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
-                if (between > 30) {
+                if (between > 20) {
+                    commentMapper.deleteByPrimaryKey(comment.getId());
+                    continue;
+                }
+                //判断这条动态是否已屏蔽
+                if (comment.getBoolClose() == true) {
                     continue;
                 }
                 //修改评论为看过的状态
@@ -239,6 +275,7 @@ public class CommentServiceImpl implements CommentService {
             CommentExample.Criteria criteria1 = example1.createCriteria();
             criteria1.andActivityIdEqualTo(activity.getId());
             criteria1.andBoolSeeEqualTo(false);
+            criteria1.andBoolCloseEqualTo(false);
             List<Comment> comments = commentMapper.selectByExample(example1);
             if (comments.isEmpty()) {
                 continue;
@@ -249,9 +286,14 @@ public class CommentServiceImpl implements CommentService {
                 if (boolUser) {
                     continue;
                 }
-                //如果是30天前的评论不要提醒我
+                //判读这条评论是否超过20天
                 long between = DateUtil.between(comment.getCreateTime(), new Date(), DateUnit.DAY);
-                if (between > 30 ) {
+                if (between > 20 ) {
+                    commentMapper.deleteByPrimaryKey(comment.getId());
+                    continue;
+                }
+                //判断这条评论是否被屏蔽
+                if (comment.getBoolClose() == true) {
                     continue;
                 }
                 count++;

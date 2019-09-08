@@ -47,12 +47,22 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             return Msg.noLogin();
         }
 
+        Msg msg = new Msg();
+
+        //获取经典商家发布者id，对比购买者id，防止自己买
+        Integer publishId = shopMapper.selectByPrimaryKey(shopBuy.getGuideId()).getPublishId();
+        if(publishId.equals(shopBuy.getBuyerId())){
+            msg.setCode(501);
+            msg.setMsg("自己不允许聘请");
+            return msg;
+        }
+
         shopBuy.setCreateTime(new Date());
         shopBuy.setUpdateTime(new Date());
         shopBuy.setState(StateEnum.INIT.getValue());
 
         //从系统数据表获取报名费用
-        String ask_money = getRootMessage("ask_money");
+        //String ask_money = getRootMessage("ask_money");
 
         //获取购买者的支付密码和余额
         User result = getUserByUid(shopBuy.getBuyerId());
@@ -64,7 +74,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         Integer charge = shopMapper.selectByPrimaryKey(shopBuy.getGuideId()).getCharge();
         Integer charges = charge * time;
 
-        Msg msg = new Msg();
+
         if(payWord == null){
             msg.setMsg("请设置支付密码!");
             msg.setCode(1000);
@@ -84,7 +94,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
             //计算剩余金额
             User user = new User();
-            money = money - Float.valueOf(charges) - Float.valueOf(ask_money);
+            money = money - Float.valueOf(charges);
             user.setMoney(money);
             user.setUpdateTime(new Date());
 

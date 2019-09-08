@@ -306,9 +306,10 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
                 return msg;
             }
 
-            if(uid.equals(shops.get(0).getPublishId())){
-                continue;
-            }
+            //去除自己发布的
+//            if(uid.equals(shops.get(0).getPublishId())){
+//                continue;
+//            }
 
             //把shop的值转换到ShopVO中
             ShopVO shopVO = setShopToShopVO(shops.get(0));

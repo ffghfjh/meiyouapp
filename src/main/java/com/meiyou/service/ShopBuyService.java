@@ -68,11 +68,11 @@ public interface ShopBuyService {
     Msg selectBySid(Integer uid,Integer sid,String token);
 
     /**
-     * 删除购买的club这条记录
+     * 删除购买的shop这条记录
      * @param uid
      * @param token
-     * @param clubBuyId
+     * @param shopBuyId
      * @return
      */
-    Msg deleteByShopBuyId(Integer uid,String token,Integer clubBuyId);
+    Msg deleteByShopBuyId(Integer uid,String token,Integer shopBuyId);
 }

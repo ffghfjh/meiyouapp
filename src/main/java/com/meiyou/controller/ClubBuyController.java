@@ -24,7 +24,7 @@ public class ClubBuyController {
     ClubBuyService clubBuyService;
 
     @PostMapping("/add")
-    @ApiOperation(value = "购买推拿会所",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
+    @ApiOperation(value = "购买推拿会所",notes = "501-自己不允许聘请,1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
     public Msg addClubBuy(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid,
@@ -73,8 +73,6 @@ public class ClubBuyController {
                           @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid,
                           @RequestParam("star") Integer star){
-        System.out.println("进入会所评星");
-        System.out.println("cid"+cid);
         return clubBuyService.addClubStar(uid,token,cid,star);
     }
 

@@ -53,6 +53,12 @@ public class UserController {
         }
     }
 
+    @PostMapping("forgetPassword")
+    @ApiOperation(value = "忘记密码", notes = "500-->验证码错误,404-->找不到此用户")
+    public Msg forgetPassword(String phone, String code, String password){
+        return userService.forgetPassword(phone, code, password);
+    }
+
     @RequestMapping(value = "getUserInfo",method = RequestMethod.POST)
     @ApiOperation(value = "获取用户资料")
     public Msg getUserInfo(int uId,String token){
@@ -240,10 +246,4 @@ public class UserController {
         return userService.selUserInfoById(uId);
     }
 
-
-    @PostMapping("forgetPassword")
-    @ApiOperation(value = "忘记密码", notes = "500-->验证码错误,404-->找不到此用户")
-    public Msg forgetPassword(String phone, String code, String password){
-        return userService.forgetPassword(phone, code, password);
-    }
 }

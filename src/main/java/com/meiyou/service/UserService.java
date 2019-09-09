@@ -223,5 +223,5 @@ public interface UserService {
      * @param password
      * @return
      */
-    Msg forgetPassword(String phone,String code,String password);
+    public Msg forgetPassword(String phone,String code,String password);
 }

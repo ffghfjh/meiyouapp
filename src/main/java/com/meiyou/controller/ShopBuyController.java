@@ -22,7 +22,7 @@ public class ShopBuyController {
     ShopBuyService shopBuyService;
 
     @PostMapping("/add")
-    @ApiOperation(value = "购买景点商家",notes = "1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
+    @ApiOperation(value = "购买景点商家",notes = "501-自己不允许购买,1000-请设置支付密码!,1001-支付密码错误!,1002-发布失败,账户余额不足!")
     public Msg addShopBuy(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
                           @RequestParam("gid") Integer gid,

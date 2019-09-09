@@ -164,7 +164,6 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
      */
     @Transactional
     @Override
-    //@CachePut(key = "#result.id")
     public Msg updateShop(Integer uid, String token, Integer sid) {
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
@@ -215,6 +214,41 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
         if (i != 1){
             return Msg.fail();
         }
+
+        return Msg.success();
+    }
+
+    /**
+     * 发布者不想看了
+     * @param uid
+     * @param token
+     * @param shopBuyId
+     * @return
+     */
+    @Override
+    public Msg updateShopBuyDelete(Integer uid, String token, Integer shopBuyId) {
+        if(RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Integer state = shopBuyMapper.selectByPrimaryKey(shopBuyId).getState();
+        if(state != StateEnum.COMPLETE.getValue()){
+            return Msg.fail();
+        }
+
+        ShopBuy shopBuy = new ShopBuy();
+        shopBuy.setUpdateTime(new Date());
+
+        //如果当前订单状态为《购买者不想看到》，则修改状态为忽略忽视状态
+        if(state == StateEnum.DELETE.getValue()){
+            shopBuy.setState(StateEnum.IGNORE.getValue());
+        }else {
+            shopBuy.setState(StateEnum.CUT.getValue());
+        }
+
+        shopBuy.setId(shopBuyId);
+
+        shopBuyMapper.updateByPrimaryKeySelective(shopBuy);
 
         return Msg.success();
     }

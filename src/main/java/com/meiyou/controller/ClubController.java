@@ -83,13 +83,20 @@ public class ClubController {
         return clubBuyService.addClubStar(uid,token,cid,star);
     }
 
-
     @PostMapping("/update")
     @ApiOperation(value = "取消发布推拿会所",notes = "取消即更发布状态，实际数据不删除")
     public Msg deleteClub(@RequestParam("uid") Integer uid,
                           @RequestParam("token") String token,
                           @RequestParam("cid") Integer cid){
         return clubService.updateClub(uid, token, cid);
+    }
+
+    @PostMapping("/updateClubBuy")
+    @ApiOperation(value = "发布者不想看了",notes = "更改状态4或者6")
+    public Msg deleteClubBuy(@RequestParam("uid") Integer uid,
+                          @RequestParam("token") String token,
+                          @RequestParam("clubBuyId") Integer clubBuyId){
+        return clubService.updateClubBuyDelete(uid, token, clubBuyId);
     }
 
     @PostMapping("/find")

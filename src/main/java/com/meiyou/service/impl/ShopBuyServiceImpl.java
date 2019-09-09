@@ -319,7 +319,8 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
     }
 
     /**
-     * 修改状态为已删除--》3
+     * 购买者不想看了
+     * 修改状态为已删除--》3 或 6
      * @param uid
      * @param token
      * @param shopBuyId
@@ -338,7 +339,14 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         ShopBuy shopBuy = new ShopBuy();
         shopBuy.setUpdateTime(new Date());
-        shopBuy.setState(StateEnum.DELETE.getValue());
+
+        //如果当前订单状态为《发布者不想看到》，则修改状态为忽略忽视状态
+        if(state == StateEnum.CUT.getValue()){
+            shopBuy.setState(StateEnum.IGNORE.getValue());
+        }else {
+            shopBuy.setState(StateEnum.DELETE.getValue());
+        }
+
         shopBuy.setId(shopBuyId);
 
         shopBuyMapper.updateByPrimaryKeySelective(shopBuy);

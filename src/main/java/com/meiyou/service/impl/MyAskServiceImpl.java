@@ -5,6 +5,7 @@ import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
 import com.meiyou.model.TourVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyAskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,10 +147,10 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         ClubBuyExample clubBuyExample = new ClubBuyExample();
         clubBuyExample.setOrderByClause("create_time desc");
         //购买者id为uid的购买记录
-        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+        clubBuyExample.createCriteria().andBuyerIdEqualTo(uid)
+                .andStateNotEqualTo(StateEnum.DELETE.getValue());
 
         List<ClubBuy> result = clubBuyMapper.selectByExample(clubBuyExample);
-        System.out.println(result);
 
         //对查找出来的ClubBuy进行封装
         List<ClubVO> clubVOS = new ArrayList<>();
@@ -188,7 +189,8 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         //查找购买按摩会所的记录
         ShopBuyExample shopBuyExample = new ShopBuyExample();
         shopBuyExample.setOrderByClause("create_time desc");
-        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
+        shopBuyExample.createCriteria().andBuyerIdEqualTo(uid)
+                .andStateNotEqualTo(StateEnum.DELETE.getValue());
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 
         //对查找出来的ShopBuy进行封装

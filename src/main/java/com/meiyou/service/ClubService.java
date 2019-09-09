@@ -33,7 +33,7 @@ public interface ClubService {
      * @param cid
      * @return
      */
-    Msg updateClubDelete(Integer uid,String token,Integer cid);
+    Msg updateClubBuyDelete(Integer uid,String token,Integer cid);
 
     /**
      * 通过会所id查找会所信息

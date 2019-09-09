@@ -5,6 +5,7 @@ import com.meiyou.model.AppointmentVO;
 import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
 import com.meiyou.model.TourVO;
+import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.MyPublishService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,7 +178,8 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
         clubExample.setOrderByClause("create_time desc");
-        clubExample.createCriteria().andPublishIdEqualTo(uid);
+        clubExample.createCriteria().andPublishIdEqualTo(uid)
+                .andStateNotEqualTo(StateEnum.DELETE.getValue());
         List<Club> result = clubMapper.selectByExample(clubExample);
 
         List<ClubVO> clubVOS = new ArrayList<>();
@@ -203,7 +205,8 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
     public List<ShopVO> selectShopByUid(Integer uid, String token) {
         ShopExample shopExample = new ShopExample();
         shopExample.setOrderByClause("create_time desc");
-        shopExample.createCriteria().andPublishIdEqualTo(uid);
+        shopExample.createCriteria().andPublishIdEqualTo(uid)
+                .andStateNotEqualTo(StateEnum.DELETE.getValue());
         List<Shop> result = shopMapper.selectByExample(shopExample);
 
         //添加人数到VO类中

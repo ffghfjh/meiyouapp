@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value = "AdminActivityController", tags = {"动态举报（管理员）控制层"})
 @RequestMapping("/AdminActivity")
 @RestController
-public class AdminActivityController {
+public class
+AdminActivityController {
 
     @Autowired
     AdminActivityService adminActivityService;

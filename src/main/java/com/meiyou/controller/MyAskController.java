@@ -10,9 +10,6 @@ import com.meiyou.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,18 +32,10 @@ public class MyAskController {
     * @Author: JK
     * @Date: 2019/8/26
     */
-//    @Caching(
-//            cacheable = {
-//                    @Cacheable(value = "myAsk")
-//            },
-//            put = {
-//                    //先执行方法
-//                    @CachePut(value = "myAsk"),
-//            }
-//    )
+
     @ApiOperation(value = "查询我的约会报名", notes = "查询我的约会报名")
-    @PostMapping(value = "/selectMyAppointmentAsk")
-    public Msg selectMyAppointmentAsk(String uid, String token) {
+    @PostMapping(value = "/selectMyAppointmentAskList")
+    public Msg selectMyAppointmentAskList(String uid, String token) {
         if(!RedisUtil.authToken(uid,token)){
             return Msg.noLogin();
         }
@@ -57,29 +46,63 @@ public class MyAskController {
         }else {
             msg.add("appointmentVOS",appointmentVOS);
         }
+        msg.setCode(100);
+        msg.setMsg("成功");
+        System.out.println(msg);
+        return msg;
+    }
 
+    @ApiOperation(value = "查询我的旅游报名", notes = "查询我的旅游报名")
+    @PostMapping(value = "/selectMyTourAskList")
+    public Msg selectMyTourAskList(String uid, String token) {
+        if(!RedisUtil.authToken(uid,token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
         List<TourVO> tourVOS = myAskService.selectMyTourAsk(uid, token);
         if(tourVOS.isEmpty()){
             msg.add("tourVOS",null);
         }else {
             msg.add("tourVOS",tourVOS);
         }
+        msg.setCode(100);
+        msg.setMsg("成功");
+        System.out.println(msg);
+        return msg;
+    }
 
-
+    @ApiOperation(value = "查询我的会所报名", notes = "查询我的会所报名")
+    @PostMapping(value = "/selectMyClubAskList")
+    public Msg selectMyClubAskList(String uid, String token) {
+        if(!RedisUtil.authToken(uid,token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
         List<ClubVO> clubVOS = myAskService.selectMyClubAsk(Integer.valueOf(uid));
         if(clubVOS.isEmpty()){
             msg.add("clubVOS",null);
         }else {
             msg.add("clubVOS",clubVOS);
         }
+        msg.setCode(100);
+        msg.setMsg("成功");
+        System.out.println(msg);
+        return msg;
+    }
 
+    @ApiOperation(value = "查询我的景点商家报名", notes = "查询我的景点商家报名")
+    @PostMapping(value = "/selectMyShopAskList")
+    public Msg selectMyShopAskList(String uid, String token) {
+        if(!RedisUtil.authToken(uid,token)){
+            return Msg.noLogin();
+        }
+        Msg msg = new Msg();
         List<ShopVO> shopVOS = myAskService.selectMyShopAsk(Integer.valueOf(uid));
         if(shopVOS.isEmpty()){
             msg.add("shopVOS",null);
         }else {
             msg.add("shopVOS",shopVOS);
         }
-
         msg.setCode(100);
         msg.setMsg("成功");
         System.out.println(msg);

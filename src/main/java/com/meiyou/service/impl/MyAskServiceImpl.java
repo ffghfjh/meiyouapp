@@ -21,25 +21,21 @@ import java.util.List;
  **/
 @Service
 public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
-    @Autowired
+    @Autowired(required = false)
     private AppointAskMapper appointAskMapper;
-    @Autowired
+    @Autowired(required = false)
     private AppointmentMapper appointmentMapper;
-    @Autowired
+    @Autowired(required = false)
     private TourAskMapper tourAskMapper;
-    @Autowired
+    @Autowired(required = false)
     private TourMapper tourMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ClubMapper clubMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ClubBuyMapper clubBuyMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ShopMapper shopMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ShopBuyMapper shopBuyMapper;
 
     /**
@@ -50,6 +46,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     @Override
     public List<AppointmentVO> selectMyAppointmentAsk(String uid, String token) {
         AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.setOrderByClause("create_time desc");
         appointAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
 
@@ -97,6 +94,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
     @Override
     public List<TourVO> selectMyTourAsk(String uid, String token) {
         TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.setOrderByClause("create_time desc");
         tourAskExample.createCriteria().andAskerIdEqualTo(Integer.parseInt(uid));
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
 
@@ -146,6 +144,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
         //查找购买按摩会所的记录
         ClubBuyExample clubBuyExample = new ClubBuyExample();
+        clubBuyExample.setOrderByClause("create_time desc");
         //购买者id为uid的购买记录
         clubBuyExample.createCriteria().andBuyerIdEqualTo(uid);
 
@@ -188,6 +187,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
 
         //查找购买按摩会所的记录
         ShopBuyExample shopBuyExample = new ShopBuyExample();
+        shopBuyExample.setOrderByClause("create_time desc");
         shopBuyExample.createCriteria().andBuyerIdEqualTo(uid);
         List<ShopBuy> result = shopBuyMapper.selectByExample(shopBuyExample);
 

@@ -1,6 +1,9 @@
 package com.meiyou.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +19,8 @@ public class TourVO implements Serializable {
     private String publishHeader;
     private String publishBirthday;
     private String publishSignature;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date createTime;
 
     private Integer nums;
     private Integer appointId;
@@ -29,6 +34,7 @@ public class TourVO implements Serializable {
                 ", publishHeader='" + publishHeader + '\'' +
                 ", publishBirthday='" + publishBirthday + '\'' +
                 ", publishSignature='" + publishSignature + '\'' +
+                ", createTime=" + createTime +
                 ", nums=" + nums +
                 ", appointId=" + appointId +
                 ", goMessage='" + goMessage + '\'' +
@@ -39,6 +45,14 @@ public class TourVO implements Serializable {
                 ", askState=" + askState +
                 ", askerHeader=" + askerHeader +
                 '}';
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getPublishId() {

@@ -1,5 +1,7 @@
 package com.meiyou.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
  * @create: 2019-08-24 11:09
  **/
 public class ShopVO implements Serializable {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date createTime;
     private Integer id;
     private Integer publishId;
     private Integer shopId;
@@ -40,14 +44,15 @@ public class ShopVO implements Serializable {
     @Override
     public String toString() {
         return "ShopVO{" +
-                "id=" + id +
+                "createTime=" + createTime +
+                ", id=" + id +
                 ", publishId=" + publishId +
+                ", shopId=" + shopId +
                 ", publishIdHeader='" + publishIdHeader + '\'' +
                 ", publishIdNickname='" + publishIdNickname + '\'' +
                 ", publishIdSex=" + publishIdSex +
                 ", publishIdBirthday='" + publishIdBirthday + '\'' +
                 ", publishIdSignature='" + publishIdSignature + '\'' +
-                ", shopId=" + shopId +
                 ", serviceArea='" + serviceArea + '\'' +
                 ", travelTime='" + travelTime + '\'' +
                 ", charge=" + charge +
@@ -60,6 +65,14 @@ public class ShopVO implements Serializable {
                 ", star=" + star +
                 ", header=" + header +
                 '}';
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getId() {

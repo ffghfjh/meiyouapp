@@ -203,6 +203,13 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         if (!authToken) {
             return Msg.noLogin();
         }
+        Tour tour1 = tourMapper.selectByPrimaryKey(id);
+        Integer publishId = tour1.getPublishId();
+        if (publishId == Integer.parseInt(uid)){
+            msg.setCode(501);
+            msg.setMsg("不能报名自己发布的订单");
+            return msg;
+        }
         //根据报名者id查询出他所有信息
         User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
         //获取报名者账户余额

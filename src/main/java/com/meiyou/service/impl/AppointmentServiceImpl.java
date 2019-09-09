@@ -201,6 +201,13 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (!authToken) {
             return Msg.noLogin();
         }
+        Appointment appointment1 = appointmentMapper.selectByPrimaryKey(id);
+        Integer publisherId = appointment1.getPublisherId();
+        if (publisherId == Integer.parseInt(uid)){
+            msg.setCode(501);
+            msg.setMsg("不能报名自己发布的订单");
+            return msg;
+        }
         //根据报名者id查询出他所有信息
         User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
         //获取报名者账户余额

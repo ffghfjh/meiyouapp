@@ -75,6 +75,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 }
                 appointmentVO.setAskerHeader(askerHears);
                 appointmentVO.setNums(appointAsks.size());
+                appointmentVO.setCreateTime(appointment.getCreateTime());
             }
 
             //获取用户id
@@ -140,6 +141,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 tourVO.setAskerHeader(askerHears);
                 //添加报名的总人数
                 tourVO.setNums(tourAsks.size());
+                tourVO.setCreateTime(tour.getCreateTime());
             }
 
             //获取用户id

@@ -47,13 +47,14 @@ public class MyPublishController {
                                    @RequestParam("token") String token){
         HashMap<String, Object> hashMap = new HashMap<>();
         List<MyPublishVo> list = new ArrayList<>();
-        if(!RedisUtil.authToken(uid,token)){
-            hashMap.put("Code",300);
-            hashMap.put("Msg","未登陆");
-            return hashMap;
-        }
+//        if(!RedisUtil.authToken(uid,token)){
+//            hashMap.put("Code",300);
+//            hashMap.put("Msg","未登陆");
+//            return hashMap;
+//        }
         Msg msg = new Msg();
         List<AppointmentVO> appointmentList = myPublishService.selectAppointmentList(uid, token);
+        System.out.println(appointmentList);
         if(appointmentList.isEmpty()){
             hashMap.put("600",null);
         }else {
@@ -61,10 +62,11 @@ public class MyPublishController {
                 try {
                     MyPublishVo myPublishVo = new MyPublishVo();
                     ConvertUtils.register(new DateConverter(null), java.util.Date.class);
-                    System.out.println(appointmentVO.getAppointContext());
-                    System.out.println(appointmentVO.getCreateTime());
+//                    System.out.println(appointmentVO.getAppointContext());
+//                    System.out.println(appointmentVO.getCreateTime());
                     BeanUtils.copyProperties(myPublishVo,appointmentVO);
-                    System.out.println(myPublishVo.getCreateTime().getTime());
+//                    System.out.println("++++++"+myPublishVo);
+//                    System.out.println(myPublishVo.getCreateTime().getTime());
                     myPublishVo.setType(1);
                     list.add(myPublishVo);
                 } catch (IllegalAccessException e) {

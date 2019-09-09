@@ -221,6 +221,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
+    @Override
+    public Msg updateClubDelete(Integer uid, String token, Integer cid) {
+        return null;
+    }
+
     /**
      * 查看指定的按摩会所
      * @param cid

@@ -151,6 +151,7 @@ public class BaseServiceImpl {
         clubVO.setMarketPrice(club.getMarketPrice());
         clubVO.setHeader(list);
         clubVO.setState(club.getState());
+        clubVO.setCreateTime(club.getCreateTime());
 
         //查找此club的星级
         Integer starNums = getStarNumsByClubId(club.getId());
@@ -204,6 +205,7 @@ public class BaseServiceImpl {
         shopVO.setBoolClose(shop.getBoolClose());
         shopVO.setHeader(list);
         shopVO.setState(shop.getState());
+        shopVO.setCreateTime(shop.getCreateTime());
 
         //查找此Shop的星级
         Integer starNums = getStarNumsByGuideId(shop.getId());

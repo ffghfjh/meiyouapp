@@ -328,7 +328,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         if(state != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
-        clubBuyMapper.deleteByPrimaryKey(clubBuyId);
+        //clubBuyMapper.upda(clubBuyId);
 
         return Msg.success();
     }

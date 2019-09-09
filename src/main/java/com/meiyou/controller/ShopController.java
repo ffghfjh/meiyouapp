@@ -81,6 +81,14 @@ public class ShopController {
         return shopService.updateShop(uid,token,sid);
     }
 
+    @PostMapping("/updateDelete")
+    @ApiOperation(value = "发布者不想看了",notes = "shopBuyId 为购买商家的Id,修改状态--->>4或6")
+    public Msg updateShopBuyDelete(@RequestParam("uid") Integer uid,
+                                   @RequestParam("token") String token,
+                                   @RequestParam("shopBuyId") Integer shopBuyId){
+        return shopService.updateShopBuyDelete(uid, token, shopBuyId);
+    }
+
     @PostMapping("/find")
     @ApiOperation(value = "通过同城导游id查找对应的同城导游信息",notes = "返回为ClubVO类,nums为报名人数")
     public Msg findClubByCid(@RequestParam("uid") Integer uid,

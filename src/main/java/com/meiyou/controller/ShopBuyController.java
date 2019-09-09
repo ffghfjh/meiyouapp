@@ -61,6 +61,14 @@ public class ShopBuyController {
         return shopBuyService.updateShopBuyComplete(uid, sid, token);
     }
 
+    @PostMapping("/updateDelete")
+    @ApiOperation(value = "购买者不想看了",notes = "shopBuyId 为购买商家的这条记录的Id，修改状态为--->>3或6")
+    public Msg updateShopBuyDelete(@RequestParam("uid") Integer uid,
+                                   @RequestParam("token") String token,
+                                   @RequestParam("shopBuyId") Integer shopBuyId){
+        return shopBuyService.deleteByShopBuyId(uid, token, shopBuyId);
+    }
+
     @PostMapping("/findBySidAndUid")
     @ApiOperation(value = "通过同城导游记录id(shopBuy_id)查找对应的同城导游信息",notes = "查找")
     public Msg findShopBySidAndUid(@RequestParam("uid") Integer uid,
@@ -77,11 +85,4 @@ public class ShopBuyController {
         return shopBuyService.selectBySid(uid, sid, token);
     }
 
-    @PostMapping("/delete")
-    @ApiOperation(value = "删除",notes = "删除shop的聘请记录")
-    public Msg addClubStar(@RequestParam("uid") Integer uid,
-                           @RequestParam("token") String token,
-                           @RequestParam("shopBuyId") Integer shopBuyId){
-        return shopBuyService.deleteByShopBuyId(uid, token, shopBuyId);
-    }
 }

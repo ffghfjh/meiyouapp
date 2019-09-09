@@ -15,7 +15,7 @@ public interface ShopService {
      * 发布景点商家(同城导游)
      * @param shop
      * @param token
-     * @param time
+     * @param timeType
      * @param password
      * @return
      */
@@ -29,6 +29,15 @@ public interface ShopService {
      * @return
      */
     Msg updateShop(Integer uid,String token,Integer sid);
+
+    /**
+     * 修改发布的景点商家的状态为已删除-->3
+     * @param uid
+     * @param token
+     * @param shopBuyId
+     * @return
+     */
+    Msg updateShopBuyDelete(Integer uid,String token,Integer shopBuyId);
 
     /**
      * 查找景点商家(同城导游)id的详细信息

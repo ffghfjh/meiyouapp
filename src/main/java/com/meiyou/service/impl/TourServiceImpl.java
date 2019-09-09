@@ -5,6 +5,7 @@ import com.meiyou.mapper.TourMapper;
 import com.meiyou.mapper.UserMapper;
 import com.meiyou.model.AskerVO;
 import com.meiyou.model.Coordinate;
+import com.meiyou.model.TourVo1;
 import com.meiyou.pojo.*;
 import com.meiyou.service.RootMessageService;
 import com.meiyou.service.TourService;
@@ -19,7 +20,6 @@ import redis.clients.jedis.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -202,6 +202,13 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         //判断是否登录
         if (!authToken) {
             return Msg.noLogin();
+        }
+        Tour tour1 = tourMapper.selectByPrimaryKey(id);
+        Integer publishId = tour1.getPublishId();
+        if (publishId == Integer.parseInt(uid)){
+            msg.setCode(501);
+            msg.setMsg("不能报名自己发布的订单");
+            return msg;
         }
         //根据报名者id查询出他所有信息
         User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
@@ -754,7 +761,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         if (responseList == null || responseList.size() == 0) {
             return Msg.fail();
         }
-        ArrayList<Object> list = new ArrayList<>();
+        ArrayList<TourVo1> list = new ArrayList<>();
         for (GeoRadiusResponse response : responseList) {
             //获取缓存中的key
             String memberByString = response.getMemberByString();
@@ -766,13 +773,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             //获取用户id
             Integer publisherId = tour.getPublishId();
 
-            //如果发布者等于报名者，则跳出本次循环
-            if (publisherId == Integer.parseInt(uid)){
-                continue;
-            }
             User user = userMapper.selectByPrimaryKey(publisherId);
-            HashMap<String, Object> map = new HashMap<>();
-
             if (state == 1 || state == 2){
                 String nickname = user.getNickname();
                 String header = user.getHeader();
@@ -789,31 +790,50 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
                 Integer confirmId = tour.getConfirmId();
                 Integer state1 = tour.getState();
                 Integer id = tour.getId();
+                Date createTime = tour.getCreateTime();
+
+                TourVo1 tourVo1 = new TourVo1();
+                tourVo1.setUid(userId);
+                tourVo1.setNickname(nickname);
+                tourVo1.setHeader(header);
+                tourVo1.setBirthday(birthday);
+                tourVo1.setSex(sex);
+                tourVo1.setTid(id);
+                tourVo1.setGoMessage(goMessage);
+                tourVo1.setStartAddress(startAddress);
+                tourVo1.setEndAddress(endAddress);
+                tourVo1.setGoTime(goTime);
+                tourVo1.setNeedNumber(needNum);
+                tourVo1.setReward(reward);
+                tourVo1.setPayType(payType);
+                tourVo1.setConfirmId(confirmId);
+                tourVo1.setState(state1);
+                tourVo1.setCreateTime(createTime);
+
                 if (tour.getPayType() == 1){
                     //获取诚意金
                     String sincerityMoneyName = "sincerity_money";
                     int sincerityMoneyValue = rootMessageUtil.getRootMessage(sincerityMoneyName);
-                    map.put("sincerityMoneyValue",sincerityMoneyValue);
+                    tourVo1.setSincerityMoneyValue(sincerityMoneyValue);
                 }
-                map.put("publishId",userId);
-                map.put("nickname",nickname);
-                map.put("header",header);
-                map.put("birthday",birthday);
-                map.put("sex",sex);
-                map.put("goMessage",goMessage);
-                map.put("startAddress",startAddress);
-                map.put("endAddress",endAddress);
-                map.put("goTime",goTime);
-                map.put("needNum",needNum);
-                map.put("reward",reward);
-                map.put("payType",payType);
-                map.put("confirmId",confirmId);
-                map.put("state1",state1);
-                map.put("id",id);
-                list.add(map);
+                list.add(tourVo1);
 
             }
         }
+
+        for (int i = 0; i < list .size(); i++)    {
+            for (int j = list .size()-1; j > i; j--)  {
+                Long time= list .get(j).getCreateTime().getTime();
+                Long time1= list .get(j-1).getCreateTime().getTime();
+                if (time.compareTo(time1)>0)    {
+                    //互换位置
+                    TourVo1 tourVo1 = list.get(j);
+                    list.set(j, list.get(j-1));
+                    list.set(j-1, tourVo1 );
+                }
+            }
+        }
+
         msg.setCode(100);
         msg.setMsg("获取附近热门旅游成功");
         return msg.add("list",list);

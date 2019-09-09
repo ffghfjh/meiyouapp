@@ -21,21 +21,17 @@ import java.util.List;
  **/
 @Service
 public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishService {
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
+    @Autowired(required = false)
     private AppointmentMapper appointmentMapper;
-    @Autowired
+    @Autowired(required = false)
     private AppointAskMapper appointAskMapper;
-    @Autowired
+    @Autowired(required = false)
     private TourMapper tourMapper;
-    @Autowired
+    @Autowired(required = false)
     private TourAskMapper tourAskMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ClubMapper clubMapper;
-
-    @Autowired
+    @Autowired(required = false)
     ShopMapper shopMapper;
 
     /**
@@ -47,6 +43,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
     public List<AppointmentVO> selectAppointmentList(String uid, String token) {
         List<AppointmentVO> appointmentVOS = new ArrayList<>();
         AppointmentExample example = new AppointmentExample();
+        example.setOrderByClause("create_time desc");
         example.createCriteria().andPublisherIdEqualTo(Integer.parseInt(uid));
         List<Appointment> appointments = appointmentMapper.selectByExample(example);
 
@@ -75,6 +72,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 }
                 appointmentVO.setAskerHeader(askerHears);
                 appointmentVO.setNums(appointAsks.size());
+                appointmentVO.setCreateTime(appointment.getCreateTime());
             }
 
             //获取用户id
@@ -109,6 +107,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
     public List<TourVO> selectTourList(String uid, String token) {
         List<TourVO> tourVOS = new ArrayList<>();
         TourExample tourExample = new TourExample();
+        tourExample.setOrderByClause("create_time desc");
         tourExample.createCriteria().andPublishIdEqualTo(Integer.parseInt(uid));
         List<Tour> tours = tourMapper.selectByExample(tourExample);
 
@@ -140,6 +139,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
                 tourVO.setAskerHeader(askerHears);
                 //添加报名的总人数
                 tourVO.setNums(tourAsks.size());
+                tourVO.setCreateTime(tour.getCreateTime());
             }
 
             //获取用户id
@@ -176,6 +176,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
     public List<ClubVO> selectClubByUid(Integer uid,String token) {
         //查找发布出去的有效按摩会所
         ClubExample clubExample = new ClubExample();
+        clubExample.setOrderByClause("create_time desc");
         clubExample.createCriteria().andPublishIdEqualTo(uid);
         List<Club> result = clubMapper.selectByExample(clubExample);
 
@@ -201,6 +202,7 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
     @Override
     public List<ShopVO> selectShopByUid(Integer uid, String token) {
         ShopExample shopExample = new ShopExample();
+        shopExample.setOrderByClause("create_time desc");
         shopExample.createCriteria().andPublishIdEqualTo(uid);
         List<Shop> result = shopMapper.selectByExample(shopExample);
 

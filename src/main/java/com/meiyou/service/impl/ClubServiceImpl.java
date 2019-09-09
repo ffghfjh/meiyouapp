@@ -221,6 +221,11 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
+    @Override
+    public Msg updateClubDelete(Integer uid, String token, Integer cid) {
+        return null;
+    }
+
     /**
      * 查看指定的按摩会所
      * @param cid
@@ -279,8 +284,8 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         //查找附近的key
         List<GeoRadiusResponse> geoRadiusResponses = getClubGeoRadiusResponse(uid,longitude,latitude);
 
-           if( geoRadiusResponses.isEmpty() && geoRadiusResponses == null){
-            return Msg.fail();
+        if( geoRadiusResponses.isEmpty() && geoRadiusResponses == null){
+        return Msg.fail();
         }
 
         List<ClubVO> clubVOS = new ArrayList<>();
@@ -305,12 +310,6 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
                 msg.setMsg("附近没有找到按摩会所");
                 return msg;
             }
-
-            //去除自己发布的
-//            if(uid.equals(clubs.get(0).getPublishId())){
-//                continue;
-//            }
-
 
             //把club的值转换到ClubVO中
             ClubVO clubVO = setClubToClubVO(clubs.get(0));

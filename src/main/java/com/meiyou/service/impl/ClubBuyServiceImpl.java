@@ -318,6 +318,13 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         return Msg.success();
     }
 
+    /**
+     * 修改订单状态为已删除(假删除)
+     * @param uid
+     * @param token
+     * @param clubBuyId
+     * @return
+     */
     @Override
     public Msg deleteByClubBuyId(Integer uid, String token, Integer clubBuyId) {
         if(!RedisUtil.authToken(uid.toString(),token)){
@@ -328,7 +335,12 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
         if(state != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
-        clubBuyMapper.deleteByPrimaryKey(clubBuyId);
+
+        ClubBuy clubBuy = new ClubBuy();
+        clubBuy.setId(clubBuyId);
+        clubBuy.setState(StateEnum.DELETE.getValue());
+        clubBuy.setUpdateTime(new Date());
+        clubBuyMapper.updateByPrimaryKeySelective(clubBuy);
 
         return Msg.success();
     }

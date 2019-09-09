@@ -318,6 +318,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         return msg;
     }
 
+    /**
+     * 修改状态为已删除--》3
+     * @param uid
+     * @param token
+     * @param shopBuyId
+     * @return
+     */
     @Override
     public Msg deleteByShopBuyId(Integer uid, String token, Integer shopBuyId) {
         if(!RedisUtil.authToken(uid.toString(),token)){
@@ -328,7 +335,13 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
         if(state != StateEnum.COMPLETE.getValue()){
             return Msg.fail();
         }
-        shopBuyMapper.deleteByPrimaryKey(shopBuyId);
+
+        ShopBuy shopBuy = new ShopBuy();
+        shopBuy.setUpdateTime(new Date());
+        shopBuy.setState(StateEnum.DELETE.getValue());
+        shopBuy.setId(shopBuyId);
+
+        shopBuyMapper.updateByPrimaryKeySelective(shopBuy);
 
         return Msg.success();
     }

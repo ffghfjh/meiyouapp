@@ -1,6 +1,9 @@
 package com.meiyou.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -9,7 +12,8 @@ import java.util.List;
  * @create: 2019-08-24 10:35
  **/
 public class ClubVO implements Serializable {
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date createTime;
     //nums 为查询报名了这个club的人数
     private Integer id;
     private Integer publishId;
@@ -38,7 +42,8 @@ public class ClubVO implements Serializable {
     @Override
     public String toString() {
         return "ClubVO{" +
-                "id=" + id +
+                "createTime=" + createTime +
+                ", id=" + id +
                 ", publishId=" + publishId +
                 ", publishHeader='" + publishHeader + '\'' +
                 ", clubId=" + clubId +
@@ -55,6 +60,14 @@ public class ClubVO implements Serializable {
                 ", star=" + star +
                 ", header=" + header +
                 '}';
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getId() {

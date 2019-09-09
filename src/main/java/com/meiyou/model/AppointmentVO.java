@@ -1,6 +1,9 @@
 package com.meiyou.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,6 +19,8 @@ public class AppointmentVO implements Serializable {
     private String publishBirthday;
     private String publishSignature;
     private Integer publishId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date createTime;
 
     @Override
     public String toString() {
@@ -26,6 +31,7 @@ public class AppointmentVO implements Serializable {
                 ", publishBirthday='" + publishBirthday + '\'' +
                 ", publishSignature='" + publishSignature + '\'' +
                 ", publishId=" + publishId +
+                ", createTime=" + createTime +
                 ", nums=" + nums +
                 ", appointId=" + appointId +
                 ", appointContext='" + appointContext + '\'' +
@@ -35,6 +41,14 @@ public class AppointmentVO implements Serializable {
                 ", askState=" + askState +
                 ", askerHeader=" + askerHeader +
                 '}';
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getPublishId() {

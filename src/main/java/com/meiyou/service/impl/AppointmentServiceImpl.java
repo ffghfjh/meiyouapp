@@ -916,6 +916,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (appointAsks.size() == 1){
             //约会报名者删除记录，则将数据库中的数据删除
             appointAskMapper.deleteByExample(appointAskExample);
+            appointmentMapper.deleteByPrimaryKey(id);
         }
         if (i == 1){
             return Msg.success();
@@ -946,6 +947,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         if (appointments.size() == 1){
             //约会报名者删除记录，则将数据库中的数据删除
             appointmentMapper.deleteByExample(appointmentExample);
+            appointAskMapper.deleteByPrimaryKey(id);
         }
         if (i == 1){
             return Msg.success();

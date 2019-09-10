@@ -50,7 +50,7 @@ spring:
   cache:
     cache-names: MeiyouCache
   rabbitmq:
-    addresses: 47.103.24.19
+    addresses: 114.55.242.196
     username: guest
     password: guest
 

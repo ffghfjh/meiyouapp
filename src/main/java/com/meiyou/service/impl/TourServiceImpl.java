@@ -903,7 +903,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     @Override
     public Msg delectMyPublishTourRecord(Integer uid, String token, Integer id) {
         TourExample tourExample = new TourExample();
-        tourExample.createCriteria().andIdEqualTo(id).andStateEqualTo(5);
+        tourExample.createCriteria().andIdEqualTo(id);
         Tour tour = new Tour();
         tour.setState(7);
         int i = tourMapper.updateByExampleSelective(tour,tourExample);

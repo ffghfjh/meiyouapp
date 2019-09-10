@@ -903,7 +903,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     @Override
     public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
         AppointmentExample appointmentExample = new AppointmentExample();
-        appointmentExample.createCriteria().andIdEqualTo(id).andStateEqualTo(5);
+        appointmentExample.createCriteria().andIdEqualTo(id);
         Appointment appointment = new Appointment();
         appointment.setState(7);
         int i = appointmentMapper.updateByExampleSelective(appointment,appointmentExample);

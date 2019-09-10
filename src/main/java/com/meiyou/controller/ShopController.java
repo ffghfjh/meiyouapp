@@ -81,6 +81,14 @@ public class ShopController {
         return shopService.updateShop(uid,token,sid);
     }
 
+    @PostMapping("/updateShopIgnore")
+    @ApiOperation(value = "发布者不想看自己发布的商家了",notes = "更改状态为5")
+    public Msg updateShopIgnore(@RequestParam("uid") Integer uid,
+                                @RequestParam("token") String token,
+                                @RequestParam("shopId") Integer shopId){
+        return shopService.updateShopIgnore(uid, token, shopId);
+    }
+
     @PostMapping("/updateDelete")
     @ApiOperation(value = "发布者不想看了",notes = "shopBuyId 为购买商家的Id,修改状态--->>4或6")
     public Msg updateShopBuyDelete(@RequestParam("uid") Integer uid,

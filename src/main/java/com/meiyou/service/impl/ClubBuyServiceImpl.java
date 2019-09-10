@@ -228,9 +228,9 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg selectByCid(Integer uid, Integer cid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者
@@ -267,7 +267,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             askerVO.setSex(buyer.getSex());
             askerVO.setSignature(buyer.getSignature());
             askerVO.setAskState(c.getState());
-            askerVO.setAskId(c.getClubId());
+            askerVO.setAskId(c.getId());
 
             askerVOS.add(askerVO);
         }

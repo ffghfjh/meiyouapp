@@ -222,6 +222,32 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
     }
 
     /**
+     * 发布者不想看这个发布的了
+     * @param uid
+     * @param token
+     * @param clubId
+     * @return
+     */
+    @Override
+    public Msg updateClubIgnore(Integer uid, String token, Integer clubId) {
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+
+        Integer state = clubMapper.selectByPrimaryKey(clubId).getState();
+        if(state == StateEnum.INVALID.getValue() || state == StateEnum.EXPIRE.getValue()){
+            Club club = new Club();
+            club.setId(clubId);
+            club.setUpdateTime(new Date());
+            club.setState(StateEnum.IGNORE.getValue());
+
+            clubMapper.updateByPrimaryKeySelective(club);
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+
+    /**
      * 发布者不想看了
      * @param uid
      * @param token

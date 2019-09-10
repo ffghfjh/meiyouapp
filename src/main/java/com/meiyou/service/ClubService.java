@@ -36,6 +36,15 @@ public interface ClubService {
     Msg updateClubBuyDelete(Integer uid,String token,Integer cid);
 
     /**
+     * 发布者不想看这个发布的了
+     * @param uid
+     * @param token
+     * @param clubId
+     * @return
+     */
+    Msg updateClubIgnore(Integer uid,String token,Integer clubId);
+
+    /**
      * 通过会所id查找会所信息
      * @param cid
      * @return

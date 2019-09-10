@@ -902,11 +902,22 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     */
     @Override
     public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
+        //约会发布者删除发布的记录
         AppointmentExample appointmentExample = new AppointmentExample();
         appointmentExample.createCriteria().andIdEqualTo(id);
         Appointment appointment = new Appointment();
         appointment.setState(7);
         int i = appointmentMapper.updateByExampleSelective(appointment,appointmentExample);
+
+        //判断约会报名表中报名者是否删除记录
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(7);
+        List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
+        if (appointAsks.size() == 1){
+            //约会报名者删除记录，则将数据库中的数据删除
+            appointAskMapper.deleteByExample(appointAskExample);
+            appointmentMapper.deleteByPrimaryKey(id);
+        }
         if (i == 1){
             return Msg.success();
         }
@@ -925,6 +936,19 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         AppointAsk appointAsk = new AppointAsk();
         appointAsk.setAskState(8);
         int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+
+        //查询约会发布表中的主键id
+        AppointAsk appointAsk1 = appointAskMapper.selectByPrimaryKey(id);
+        Integer appointId = appointAsk1.getAppointId();
+        //判断约会发布表中发布者是否删除记录
+        AppointmentExample appointmentExample = new AppointmentExample();
+        appointmentExample.createCriteria().andIdEqualTo(appointId).andStateEqualTo(5);
+        List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
+        if (appointments.size() == 1){
+            //约会报名者删除记录，则将数据库中的数据删除
+            appointmentMapper.deleteByExample(appointmentExample);
+            appointAskMapper.deleteByPrimaryKey(id);
+        }
         if (i == 1){
             return Msg.success();
         }

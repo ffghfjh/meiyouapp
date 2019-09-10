@@ -894,5 +894,41 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
             msg.setCode(100);
             return msg;
         }
+
+    /**
+    * @Description: 删除我的发布中旅游已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @Override
+    public Msg delectMyPublishTourRecord(Integer uid, String token, Integer id) {
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(id);
+        Tour tour = new Tour();
+        tour.setState(7);
+        int i = tourMapper.updateByExampleSelective(tour,tourExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
+
+    /**
+    * @Description: 删除我的报名中旅游已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @Override
+    public Msg delectMyAskTourRecord(Integer uid, String token, Integer id) {
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andIdEqualTo(id).andAskState0EqualTo(7);
+        TourAsk tourAsk = new TourAsk();
+        tourAsk.setAskState0(8);
+        int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+}
 

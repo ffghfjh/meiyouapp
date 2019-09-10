@@ -197,10 +197,10 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     public Msg appointmentAsk(String uid, String password, Integer id, String token) {
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(uid, token);
-        //判断是否登录
+       /* //判断是否登录
         if (!authToken) {
             return Msg.noLogin();
-        }
+        }*/
         Appointment appointment1 = appointmentMapper.selectByPrimaryKey(id);
         Integer publisherId = appointment1.getPublisherId();
         if (publisherId == Integer.parseInt(uid)){
@@ -893,5 +893,41 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;
+    }
+
+    /**
+    * @Description: 删除我的发布中约会已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/9
+    */
+    @Override
+    public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
+        AppointmentExample appointmentExample = new AppointmentExample();
+        appointmentExample.createCriteria().andIdEqualTo(id);
+        Appointment appointment = new Appointment();
+        appointment.setState(7);
+        int i = appointmentMapper.updateByExampleSelective(appointment,appointmentExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+
+    /**
+    * @Description: 删除我的报名中约会已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/9
+    */
+    @Override
+    public Msg delectMyAskAppointmentRecord(Integer uid, String token, Integer id) {
+        AppointAskExample appointAskExample = new AppointAskExample();
+        appointAskExample.createCriteria().andIdEqualTo(id).andAskStateEqualTo(7);
+        AppointAsk appointAsk = new AppointAsk();
+        appointAsk.setAskState(8);
+        int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
+        if (i == 1){
+            return Msg.success();
+        }
+        return Msg.fail();
     }
 }

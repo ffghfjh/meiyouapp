@@ -70,4 +70,14 @@ public interface TourService {
      * 查询报名旅游的全部人员
      */
     Msg selectAllTourById(Integer uid,String token,Integer id);
+
+    /**
+     * 删除我的发布中旅游已完成和已取消的记录
+     */
+    Msg delectMyPublishTourRecord(Integer uid,String token,Integer id);
+
+    /**
+     * 删除我的报名中旅游已完成和已取消的记录
+     */
+    Msg delectMyAskTourRecord(Integer uid,String token,Integer id);
 }

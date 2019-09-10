@@ -319,7 +319,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
     }
 
     /**
-     * 修改订单状态为已删除(假删除)
+     * 购买者不想看了
      * @param uid
      * @param token
      * @param clubBuyId
@@ -338,7 +338,14 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
 
         ClubBuy clubBuy = new ClubBuy();
         clubBuy.setId(clubBuyId);
-        clubBuy.setState(StateEnum.DELETE.getValue());
+
+        //如果当前订单状态为《发布者不想看到》，则修改状态为忽略忽视状态
+        if(state == StateEnum.CUT.getValue()){
+            clubBuy.setState(StateEnum.IGNORE.getValue());
+        }else {
+            clubBuy.setState(StateEnum.DELETE.getValue());
+        }
+
         clubBuy.setUpdateTime(new Date());
         clubBuyMapper.updateByPrimaryKeySelective(clubBuy);
 

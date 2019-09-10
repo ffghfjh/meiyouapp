@@ -221,9 +221,38 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
         return Msg.success();
     }
 
+    /**
+     * 发布者不想看了
+     * @param uid
+     * @param token
+     * @param clubBuyId
+     * @return
+     */
     @Override
-    public Msg updateClubDelete(Integer uid, String token, Integer cid) {
-        return null;
+    public Msg updateClubBuyDelete(Integer uid, String token, Integer clubBuyId) {
+        if(RedisUtil.authToken(uid.toString(),token)){
+            return Msg.noLogin();
+        }
+
+        Integer state = clubBuyMapper.selectByPrimaryKey(clubBuyId).getState();
+        if(state != StateEnum.COMPLETE.getValue()){
+            return Msg.fail();
+        }
+
+        ClubBuy clubBuy = new ClubBuy();
+        clubBuy.setId(clubBuyId);
+
+        //如果当前订单状态为《购买者不想看到》，则修改状态为忽略忽视状态
+        if(state == StateEnum.DELETE.getValue()){
+            clubBuy.setState(StateEnum.IGNORE.getValue());
+        }else {
+            clubBuy.setState(StateEnum.CUT.getValue());
+        }
+
+        clubBuy.setUpdateTime(new Date());
+        clubBuyMapper.updateByPrimaryKeySelective(clubBuy);
+
+        return Msg.success();
     }
 
     /**

@@ -9,8 +9,11 @@ public enum StateEnum {
     INIT(0,"发布成功(未有人购买或报名),报名成功,购买成功"),
     COMPLETE(1,"已确定(已有人购买或报名,不能取消的),已完成"),
     INVALID(2,"取消,已失效"),
-    DELETE(3,"已删除"),
-    EXPIRE(4,"已过期");
+    DELETE(3,"购买者删除,购买者看不到状态"),
+    CUT(4,"发布者删除,发布者看不到状态"),
+    IGNORE(5,"忽略状态"),
+    EXPIRE(6,"已过期");
+
 
     private int value;
     private String desc;

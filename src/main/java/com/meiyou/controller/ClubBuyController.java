@@ -51,6 +51,14 @@ public class ClubBuyController {
         return clubBuyService.updateClubBuyComplete(uid, cid, token);
     }
 
+    @PostMapping("/updateDelete")
+    @ApiOperation(value = "购买者不想看了",notes = "clubBuyId 为购买会所的这条记录的Id,修改状态为--->>3或6")
+    public Msg updateClubBuyDelete(@RequestParam("uid") Integer uid,
+                             @RequestParam("token") String token,
+                             @RequestParam("clubBuyId") Integer clubBuyId){
+        return clubBuyService.deleteByClubBuyId(uid, token, clubBuyId);
+    }
+
     @PostMapping("/findByCidAndUid")
     @ApiOperation(value = "通过会所id和用户id查找对应购买的会所记录",notes = "查找")
     public Msg findClubBuyByCidAndUid(@RequestParam("uid") Integer uid,
@@ -76,11 +84,4 @@ public class ClubBuyController {
         return clubBuyService.addClubStar(uid,token,cid,star);
     }
 
-    @PostMapping("/delete")
-    @ApiOperation(value = "删除",notes = "删除club的购买记录")
-    public Msg addClubStar(@RequestParam("uid") Integer uid,
-                           @RequestParam("token") String token,
-                           @RequestParam("clubBuyId") Integer clubBuyId){
-        return clubBuyService.deleteByClubBuyId(uid, token, clubBuyId);
-    }
 }

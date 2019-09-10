@@ -219,6 +219,32 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
     }
 
     /**
+     * 发布者不想看这个发布的了
+     * @param uid
+     * @param token
+     * @param shopId
+     * @return
+     */
+    @Override
+    public Msg updateShopIgnore(Integer uid, String token, Integer shopId) {
+//        if(RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
+
+        Integer state = shopMapper.selectByPrimaryKey(shopId).getState();
+        if(state == StateEnum.INVALID.getValue() || state == StateEnum.EXPIRE.getValue()){
+            Shop shop = new Shop();
+            shop.setId(shopId);
+            shop.setUpdateTime(new Date());
+            shop.setState(StateEnum.IGNORE.getValue());
+
+            shopMapper.updateByPrimaryKeySelective(shop);
+            return Msg.success();
+        }
+        return Msg.fail();
+    }
+
+    /**
      * 发布者不想看了
      * @param uid
      * @param token

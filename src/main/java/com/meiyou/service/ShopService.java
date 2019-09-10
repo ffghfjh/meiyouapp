@@ -31,6 +31,15 @@ public interface ShopService {
     Msg updateShop(Integer uid,String token,Integer sid);
 
     /**
+     * 发布者不想看这个发布的了
+     * @param uid
+     * @param token
+     * @param shopId
+     * @return
+     */
+    Msg updateShopIgnore(Integer uid,String token,Integer shopId);
+
+    /**
      * 修改发布的景点商家的状态为已删除-->3
      * @param uid
      * @param token

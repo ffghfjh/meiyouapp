@@ -91,6 +91,14 @@ public class ClubController {
         return clubService.updateClub(uid, token, cid);
     }
 
+    @PostMapping("/updateClubIgnore")
+    @ApiOperation(value = "发布者不想看自己发布的会所了",notes = "更改状态为5")
+    public Msg updateClubIgnore(@RequestParam("uid") Integer uid,
+                          @RequestParam("token") String token,
+                          @RequestParam("clubId") Integer clubId){
+        return clubService.updateClubIgnore(uid, token, clubId);
+    }
+
     @PostMapping("/updateClubBuy")
     @ApiOperation(value = "发布者不想看了",notes = "更改状态4或者6")
     public Msg deleteClubBuy(@RequestParam("uid") Integer uid,

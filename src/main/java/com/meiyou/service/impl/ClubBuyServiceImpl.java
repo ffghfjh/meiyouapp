@@ -267,6 +267,7 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             askerVO.setSex(buyer.getSex());
             askerVO.setSignature(buyer.getSignature());
             askerVO.setAskState(c.getState());
+            askerVO.setAskId(c.getClubId());
 
             askerVOS.add(askerVO);
         }

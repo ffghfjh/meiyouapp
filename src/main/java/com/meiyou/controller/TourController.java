@@ -187,4 +187,26 @@ public class TourController {
         return tourService.selectAllTourById(uid, token,id);
     }
 
+    /**
+    * @Description: 删除我的发布中旅游已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @ApiOperation(value = "删除我的发布中旅游已完成和已取消的记录", notes = "删除我的发布中旅游已完成和已取消的记录", httpMethod = "POST")
+    @PostMapping(value = "/delectMyPublishTourRecord")
+    public Msg delectMyPublishTourRecord(Integer uid, String token, Integer id) {
+        return tourService.delectMyPublishTourRecord(uid, token,id);
+    }
+
+    /**
+    * @Description: 删除我的报名中旅游已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @ApiOperation(value = "删除我的报名中旅游已完成和已取消的记录", notes = "删除我的报名中旅游已完成和已取消的记录", httpMethod = "POST")
+    @PostMapping(value = "/delectMyAskTourRecord")
+    public Msg delectMyAskTourRecord(Integer uid, String token, Integer id) {
+        return tourService.delectMyAskTourRecord(uid, token,id);
+    }
+
 }

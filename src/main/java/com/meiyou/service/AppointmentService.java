@@ -70,4 +70,15 @@ public interface AppointmentService {
      * 查询报名约会的全部人员
      */
     Msg selectAllAppointmentById(Integer uid,String token,Integer id);
+
+    /**
+     * 删除我的发布中约会已完成和已取消的记录
+     */
+    Msg delectMyPublishAppointmentRecord(Integer uid,String token,Integer id);
+
+    /**
+     * 删除我的报名中约会已完成和已取消的记录
+     */
+    Msg delectMyAskAppointmentRecord(Integer uid,String token,Integer id);
+
 }

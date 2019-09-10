@@ -212,7 +212,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         }
         //根据报名者id查询出他所有信息
         User user = userMapper.selectByPrimaryKey(Integer.parseInt(uid));
-        //获取报名者账户余额
+        //获取报名者账户                       余额
         Float money = user.getMoney();
 
         //获取报名金的金额

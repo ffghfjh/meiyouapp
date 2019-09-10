@@ -327,26 +327,37 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
      */
     @Override
     public Msg deleteByClubBuyId(Integer uid, String token, Integer clubBuyId) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-
-        Integer state = clubBuyMapper.selectByPrimaryKey(clubBuyId).getState();
-        if(state != StateEnum.COMPLETE.getValue()){
-            return Msg.fail();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         ClubBuy clubBuy = new ClubBuy();
+        clubBuy.setUpdateTime(new Date());
         clubBuy.setId(clubBuyId);
 
-        //如果当前订单状态为《发布者不想看到》，则修改状态为忽略忽视状态
-        if(state == StateEnum.CUT.getValue()){
-            clubBuy.setState(StateEnum.IGNORE.getValue());
-        }else {
-            clubBuy.setState(StateEnum.DELETE.getValue());
+        Integer state = clubBuyMapper.selectByPrimaryKey(clubBuyId).getState();
+
+        Msg msg = new Msg();
+        //只有状态是已完成、已取消、报名者已删除才可以进行删除操作
+        switch (state){
+            case 1:
+                clubBuy.setState(StateEnum.DUMP.getValue());
+                break;
+            case 2:
+                clubBuy.setState(StateEnum.DELETE.getValue());
+                break;
+            case 4:
+                clubBuy.setState(StateEnum.IGNORE.getValue());
+                break;
+            case 8:
+                clubBuy.setState(StateEnum.IGNORE.getValue());
+                break;
+            default:
+                msg.setMsg("此状态不能修改");
+                msg.setCode(100);
+                return msg;
         }
 
-        clubBuy.setUpdateTime(new Date());
         clubBuyMapper.updateByPrimaryKeySelective(clubBuy);
 
         return Msg.success();

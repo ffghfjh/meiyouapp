@@ -9,6 +9,7 @@ import com.meiyou.model.ProcessReceiver;
 import com.meiyou.myEnum.StateEnum;
 import com.meiyou.pojo.*;
 import com.meiyou.service.impl.BaseServiceImpl;
+import com.meiyou.utils.Msg;
 import io.swagger.annotations.ApiOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,12 +36,14 @@ public class MeiyouApplicationTests extends BaseServiceImpl {
     RabbitTemplate rabbitTemplate;
     @Test
     public void contextLoads() {
-//        int clubBuyId = 1;
-//        ClubBuy clubBuy = new ClubBuy();
-//        clubBuy.setId(clubBuyId);
-//        clubBuy.setState(StateEnum.DELETE.getValue());
-//        clubBuy.setUpdateTime(new Date());
-//        clubBuyMapper.updateByPrimaryKeySelective(clubBuy);
+
+        int state = 2;
+        if(!(state == StateEnum.COMPLETE.getValue() || state == StateEnum.INVALID.getValue())){
+            System.out.println("ok");
+        }else {
+            System.out.println("不允许操作");
+        }
+
     }
 
 

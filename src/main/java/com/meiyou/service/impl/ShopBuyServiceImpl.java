@@ -328,26 +328,36 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg deleteByShopBuyId(Integer uid, String token, Integer shopBuyId) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
-
-        Integer state = shopBuyMapper.selectByPrimaryKey(shopBuyId).getState();
-        if(state != StateEnum.COMPLETE.getValue()){
-            return Msg.fail();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         ShopBuy shopBuy = new ShopBuy();
         shopBuy.setUpdateTime(new Date());
-
-        //如果当前订单状态为《发布者不想看到》，则修改状态为忽略忽视状态
-        if(state == StateEnum.CUT.getValue()){
-            shopBuy.setState(StateEnum.IGNORE.getValue());
-        }else {
-            shopBuy.setState(StateEnum.DELETE.getValue());
-        }
-
         shopBuy.setId(shopBuyId);
+
+        Integer state = shopBuyMapper.selectByPrimaryKey(shopBuyId).getState();
+
+        Msg msg = new Msg();
+        //只有状态是已完成、已取消、报名者已删除才可以进行删除操作
+        switch (state){
+            case 1:
+                shopBuy.setState(StateEnum.DUMP.getValue());
+                break;
+            case 2:
+                shopBuy.setState(StateEnum.DELETE.getValue());
+                break;
+            case 4:
+                shopBuy.setState(StateEnum.IGNORE.getValue());
+                break;
+            case 8:
+                shopBuy.setState(StateEnum.IGNORE.getValue());
+                break;
+            default:
+                msg.setMsg("此状态不能修改");
+                msg.setCode(100);
+                return msg;
+        }
 
         shopBuyMapper.updateByPrimaryKeySelective(shopBuy);
 

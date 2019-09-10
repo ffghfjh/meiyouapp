@@ -266,9 +266,9 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
      */
     @Override
     public Msg selectBySid(Integer uid, Integer sid, String token) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
 
         Msg msg = new Msg();
         //判断访问者是否为发布者
@@ -314,6 +314,7 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
 
         //返回一个封装好的askerVO类
         msg.add("askerVOS",askerVOS);
+        System.out.println(askerVOS);
         msg.setMsg("成功");
         msg.setCode(100);
         return msg;

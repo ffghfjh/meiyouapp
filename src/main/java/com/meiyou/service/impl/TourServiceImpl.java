@@ -915,6 +915,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         if (tourAsks.size() == 1){
             //旅游报名者删除记录，则将数据库中的数据删除
             tourAskMapper.deleteByExample(tourAskExample);
+            tourMapper.deleteByPrimaryKey(id);
         }
         if (i == 1){
             return Msg.success();
@@ -945,6 +946,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         if (tours.size() == 1){
             //旅游报名者删除记录，则将数据库中的数据删除
             tourMapper.deleteByExample(tourExample);
+            tourAskMapper.deleteByPrimaryKey(id);
         }
         if (i == 1){
             return Msg.success();

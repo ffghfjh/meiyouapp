@@ -27,7 +27,7 @@ public interface ClubService {
     Msg updateClub(Integer uid,String token,Integer cid);
 
     /**
-     * 通过会所id修改club状态为已删除-->4
+     * 通过会所id修改clubBuy状态
      * @param uid
      * @param token
      * @param cid

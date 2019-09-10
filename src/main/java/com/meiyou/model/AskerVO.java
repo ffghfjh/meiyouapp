@@ -15,6 +15,7 @@ public class AskerVO implements Serializable {
     private String birthday;
     private String signature;
     private Integer askState;
+    private Integer askId;
 
     @Override
     public String toString() {
@@ -26,7 +27,16 @@ public class AskerVO implements Serializable {
                 ", birthday='" + birthday + '\'' +
                 ", signature='" + signature + '\'' +
                 ", askState=" + askState +
+                ", askId=" + askId +
                 '}';
+    }
+
+    public Integer getAskId() {
+        return askId;
+    }
+
+    public void setAskId(Integer askId) {
+        this.askId = askId;
     }
 
     public Integer getId() {

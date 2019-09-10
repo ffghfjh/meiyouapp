@@ -41,6 +41,8 @@ public interface ShopService {
 
     /**
      * 查找景点商家(同城导游)id的详细信息
+     * @param uid
+     * @param token
      * @param sid
      * @return
      */

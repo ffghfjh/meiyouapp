@@ -208,4 +208,26 @@ public class AppointmentController {
     public Msg selectAllAppointmentById(Integer uid, String token, Integer id) {
         return appointmentService.selectAllAppointmentById(uid, token, id);
     }
+
+    /**
+    * @Description: 删除我的发布中约会已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @ApiOperation(value = "删除我的发布中约会已完成和已取消的记录", notes = "删除我的发布中约会已完成和已取消的记录", httpMethod = "POST")
+    @PostMapping(value = "/delectMyPublishAppointmentRecord")
+    public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
+        return appointmentService.delectMyPublishAppointmentRecord(uid, token, id);
+    }
+
+    /**
+    * @Description: 删除我的报名中约会已完成和已取消的记录
+    * @Author: JK
+    * @Date: 2019/9/10
+    */
+    @ApiOperation(value = "删除我的报名中约会已完成和已取消的记录", notes = "删除我的报名中约会已完成和已取消的记录", httpMethod = "POST")
+    @PostMapping(value = "/delectMyAskAppointmentRecord")
+    public Msg delectMyAskAppointmentRecord(Integer uid, String token, Integer id) {
+        return appointmentService.delectMyAskAppointmentRecord(uid, token, id);
+    }
 }

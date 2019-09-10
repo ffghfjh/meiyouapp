@@ -907,6 +907,15 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         Tour tour = new Tour();
         tour.setState(7);
         int i = tourMapper.updateByExampleSelective(tour,tourExample);
+
+        //判断旅游报名表中报名者是否删除记录
+        TourAskExample tourAskExample = new TourAskExample();
+        tourAskExample.createCriteria().andAppointIdEqualTo(id).andAskState0EqualTo(7);
+        List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
+        if (tourAsks.size() == 1){
+            //旅游报名者删除记录，则将数据库中的数据删除
+            tourAskMapper.deleteByExample(tourAskExample);
+        }
         if (i == 1){
             return Msg.success();
         }
@@ -925,6 +934,18 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskState0(8);
         int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
+
+        //查询旅游发布表中的主键id
+        TourAsk tourAsk1 = tourAskMapper.selectByPrimaryKey(id);
+        Integer appointId = tourAsk1.getAppointId();
+        //判断旅游发布表中发布者是否删除记录
+        TourExample tourExample = new TourExample();
+        tourExample.createCriteria().andIdEqualTo(appointId).andStateEqualTo(5);
+        List<Tour> tours = tourMapper.selectByExample(tourExample);
+        if (tours.size() == 1){
+            //旅游报名者删除记录，则将数据库中的数据删除
+            tourMapper.deleteByExample(tourExample);
+        }
         if (i == 1){
             return Msg.success();
         }

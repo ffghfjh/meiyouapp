@@ -1,5 +1,6 @@
 package com.meiyou.service.impl;
 
+import com.alibaba.druid.support.spring.stat.annotation.Stat;
 import com.meiyou.mapper.ClubBuyMapper;
 import com.meiyou.mapper.ClubMapper;
 import com.meiyou.mapper.ClubStarMapper;
@@ -266,8 +267,32 @@ public class ClubBuyServiceImpl extends BaseServiceImpl implements ClubBuyServic
             askerVO.setBirthday(buyer.getBirthday());
             askerVO.setSex(buyer.getSex());
             askerVO.setSignature(buyer.getSignature());
-            askerVO.setAskState(c.getState());
             askerVO.setAskId(c.getId());
+
+            //清除发布者不想看到的
+            if(c.getState() == StateEnum.CUT.getValue()
+                    || c.getState() == StateEnum.RESET.getValue()
+                    || c.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
+
+            switch (c.getState()){
+            case 0:
+                askerVO.setAskState(StateEnum.INIT.getValue());
+                break;
+            case 1:
+                askerVO.setAskState(StateEnum.COMPLETE.getValue());
+                break;
+            case 2:
+                askerVO.setAskState(StateEnum.INVALID.getValue());
+                break;
+            case 3:
+                askerVO.setAskState(StateEnum.INVALID.getValue());
+                break;
+            case 7:
+                askerVO.setAskState(StateEnum.COMPLETE.getValue());
+                break;
+            }
 
             askerVOS.add(askerVO);
         }

@@ -164,7 +164,31 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             ClubVO clubVO = setClubToClubVO(club);
             //设置购买者状态
             clubVO.setId(c.getId());
-            clubVO.setAskState(c.getState());
+
+            //清除报名者不想看到的
+            if(c.getState() == StateEnum.DELETE.getValue()
+                    || c.getState() == StateEnum.DUMP.getValue()
+                    || c.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
+
+            switch (c.getState()){
+                case 0:
+                    clubVO.setAskState(StateEnum.INIT.getValue());
+                    break;
+                case 1:
+                    clubVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+                case 2:
+                    clubVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 4:
+                    clubVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 8:
+                    clubVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+            }
 
             //设置按摩会所id
             clubVO.setPublishId(c.getClubId());
@@ -204,7 +228,31 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             ShopVO shopVO = setShopToShopVO(shop);
             //设置购买者状态
             shopVO.setId(shopBuy.getId());
-            shopVO.setAskState(shopBuy.getState());
+
+            //清除报名者不想看到的
+            if(shopBuy.getState() == StateEnum.DELETE.getValue()
+                    || shopBuy.getState() == StateEnum.DUMP.getValue()
+                    || shopBuy.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
+
+            switch (shopBuy.getState()){
+                case 0:
+                    shopVO.setAskState(StateEnum.INIT.getValue());
+                    break;
+                case 1:
+                    shopVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+                case 2:
+                    shopVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 4:
+                    shopVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 8:
+                    shopVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+            }
 
             //设置经典商家id
             shopVO.setPublishId(shopBuy.getGuideId());

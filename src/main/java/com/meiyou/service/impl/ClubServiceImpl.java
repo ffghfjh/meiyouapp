@@ -25,6 +25,7 @@ import redis.clients.jedis.GeoRadiusResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description: 按摩会所业务层接口实现类
@@ -367,12 +368,13 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
 
             //通过id查找club
             ClubExample example = new ClubExample();
-            example.createCriteria().andIdEqualTo(id).andOutTimeGreaterThan(new Date());
+            example.createCriteria()
+                    .andIdEqualTo(id)
+                    .andOutTimeGreaterThan(new Date())
+                    .andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue());
             List<Club> clubs = clubMapper.selectByExample(example);
             if(clubs.isEmpty()){
-                msg.setCode(404);
-                msg.setMsg("附近没有找到按摩会所");
-                return msg;
+                continue;
             }
 
             //把club的值转换到ClubVO中
@@ -380,6 +382,19 @@ public class ClubServiceImpl extends BaseServiceImpl implements ClubService {
             clubVO.setDistance(dis);
 
             clubVOS.add(clubVO);
+        }
+
+        for (int i = 0; i < clubVOS .size(); i++)    {
+            for (int j = clubVOS .size()-1; j > i; j--)  {
+                Long time= clubVOS .get(j).getCreateTime().getTime();
+                Long time1= clubVOS .get(j-1).getCreateTime().getTime();
+                if (time.compareTo(time1)>0)    {
+                    //互换位置
+                    ClubVO clubVO = clubVOS.get(j);
+                    clubVOS.set(j, clubVOS.get(j-1));
+                    clubVOS.set(j-1, clubVO );
+                }
+            }
         }
 
         msg.add("clubVOS",clubVOS);

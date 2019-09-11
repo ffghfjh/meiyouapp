@@ -124,7 +124,7 @@ public class BaseServiceImpl {
 
         //查找报名每个会所的人数
         ClubBuyExample example = new ClubBuyExample();
-        example.createCriteria().andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue()).andClubIdEqualTo(club.getId());
+        example.createCriteria().andClubIdEqualTo(club.getId());
         List<ClubBuy> clubBuys = clubBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 
@@ -175,7 +175,7 @@ public class BaseServiceImpl {
 
         //查找报名每个会所的人数
         ShopBuyExample example = new ShopBuyExample();
-        example.createCriteria().andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue()).andGuideIdEqualTo(shop.getId());
+        example.createCriteria().andGuideIdEqualTo(shop.getId());
         List<ShopBuy> shopBuys = shopBuyMapper.selectByExample(example);
         List<String> list = new ArrayList<>();
 

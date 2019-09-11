@@ -188,6 +188,9 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         }
 
         for(Club club : result){
+            if(club.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
             //把每一个重新赋值的clubVO类加到新的集合中
             clubVOS.add(setClubToClubVO(club));
         }
@@ -216,6 +219,9 @@ public class MyPublishServiceImpl extends BaseServiceImpl implements MyPublishSe
         }
 
         for(Shop shop : result){
+            if(shop.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
             //把每一个重新赋值的shopVOS类加到新的集合中
             shopVOS.add(setShopToShopVO(shop));
         }

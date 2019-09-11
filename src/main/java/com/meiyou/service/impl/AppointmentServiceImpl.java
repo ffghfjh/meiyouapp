@@ -46,7 +46,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/21
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg insert(Appointment appointment, String password, String token, double latitude, double longitude) {
         Msg msg = new Msg();
@@ -106,10 +106,14 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
 
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(appointment.getPublisherId());
-        //更新用户账户余额
-        userMapper.updateByExample(user, userExample);
-
-        int i = appointmentMapper.insertSelective(appointment);
+        int i = 0;
+        try {
+            //更新用户账户余额
+            userMapper.updateByExample(user, userExample);
+            i = appointmentMapper.insertSelective(appointment);
+        } catch (RuntimeException e) {
+            throw new RuntimeException();
+        }
         if (i == 1) {
             //获取发布时定位
             Coordinate coordinate = new Coordinate();
@@ -129,7 +133,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg deleteAppointmentPublish(Integer id, String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
@@ -165,15 +169,21 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
 
             UserExample userExample = new UserExample();
             userExample.createCriteria().andIdEqualTo(appointment.getPublisherId());
-            //更新用户账户余额
-            int i1 = userMapper.updateByExample(user, userExample);
 
             AppointmentExample example = new AppointmentExample();
             example.createCriteria().andIdEqualTo(id)
                     .andPublisherIdEqualTo(appointment.getPublisherId());
             appointment.setState(0);
             appointment.setUpdateTime(new Date());
-            int i2 = appointmentMapper.updateByExample(appointment, example);
+            int i1 = 0;
+            int i2 = 0;
+            try {
+                //更新用户账户余额
+                i1 = userMapper.updateByExample(user, userExample);
+                i2 = appointmentMapper.updateByExample(appointment, example);
+            } catch (RuntimeException e) {
+                throw new RuntimeException();
+            }
 
             int i = i1 + i2;
 
@@ -192,7 +202,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg appointmentAsk(String uid, String password, Integer id, String token) {
         Msg msg = new Msg();
@@ -284,7 +294,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/23
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg endAppointmentAsk(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -378,7 +388,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/22
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg confirmAppointmentUserId(String uid, Integer askerId, Integer appointId, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -461,7 +471,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/23
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg endAppointment(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -501,7 +511,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/23
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg againReleaseAppointment(String uid, Integer id, String token) {
         Appointment appointment = appointmentMapper.selectByPrimaryKey(id);
@@ -661,7 +671,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/23
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg confirmAppointment(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -698,7 +708,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
      * @Author: JK
      * @Date: 2019/8/23
      */
-    @Transactional
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg confirmAppointmentArrive(String uid, Integer id, String token) {
         boolean authToken = RedisUtil.authToken(uid, token);
@@ -901,7 +911,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
+    public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id){
         //约会发布者删除发布的记录
         AppointmentExample appointmentExample = new AppointmentExample();
         appointmentExample.createCriteria().andIdEqualTo(id);
@@ -911,16 +921,12 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
 
        /* //判断约会报名表中报名者是否删除记录
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(8);
+        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(9);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
         if (appointAsks.size() == 1){
             //约会报名者删除记录，则将数据库中的数据删除
-            try {
                 appointAskMapper.deleteByExample(appointAskExample);
-                appointmentMapper.deleteByPrimaryKey(id);
-            } catch (RuntimeException e) {
-                throw new RuntimeException();
-            }
+                appointmentMapper.deleteByPrimaryKey(null);
         }*/
         if (i == 1){
             return Msg.success();
@@ -937,7 +943,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     @Override
     public Msg delectMyAskAppointmentRecord(Integer uid, String token, Integer id) {
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andIdEqualTo(id).andAskStateEqualTo(7);
+        appointAskExample.createCriteria().andIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();
         appointAsk.setAskState(9);
         int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
@@ -953,7 +959,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
             //约会报名者删除记录，则将数据库中的数据删除
             try {
                 appointmentMapper.deleteByExample(appointmentExample);
-                appointAskMapper.deleteByPrimaryKey(id);
+                appointAskMapper.deleteByPrimaryKey(null);
             } catch (RuntimeException e) {
                 throw new RuntimeException();
             }

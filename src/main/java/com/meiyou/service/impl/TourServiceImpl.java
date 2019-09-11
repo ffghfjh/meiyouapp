@@ -905,16 +905,16 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
 
        /* //判断旅游报名表中报名者是否删除记录
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andAppointIdEqualTo(id).andAskState0EqualTo(8);
+        tourAskExample.createCriteria().andAppointIdEqualTo(id).andAskState0EqualTo(9);
         List<TourAsk> tourAsks = tourAskMapper.selectByExample(tourAskExample);
         if (tourAsks.size() == 1){
-            try {
-            //旅游报名者删除记录，则将数据库中的数据删除
-                tourAskMapper.deleteByExample(tourAskExample);
-                tourMapper.deleteByPrimaryKey(80);
-            } catch (RuntimeException e) {
-                throw new RuntimeException();
-            }
+                //旅游报名者删除记录，则将数据库中的数据删除
+                int i1 = tourAskMapper.deleteByExample(tourAskExample);
+                int i2 = tourMapper.deleteByPrimaryKey(null);
+            int i3 = i1 + i2;
+            if(i3==1){
+               throw new RuntimeException();
+           }
         }*/
         if (i == 1){
             return Msg.success();
@@ -931,7 +931,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     @Override
     public Msg delectMyAskTourRecord(Integer uid, String token, Integer id) {
         TourAskExample tourAskExample = new TourAskExample();
-        tourAskExample.createCriteria().andIdEqualTo(id).andAskState0EqualTo(7);
+        tourAskExample.createCriteria().andIdEqualTo(id);
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskState0(9);
         int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);

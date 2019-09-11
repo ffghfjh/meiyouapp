@@ -939,7 +939,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         AppointAskExample appointAskExample = new AppointAskExample();
         appointAskExample.createCriteria().andIdEqualTo(id).andAskStateEqualTo(7);
         AppointAsk appointAsk = new AppointAsk();
-        appointAsk.setAskState(8);
+        appointAsk.setAskState(9);
         int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
        /* //查询约会发布表中的主键id

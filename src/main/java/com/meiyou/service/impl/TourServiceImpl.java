@@ -933,7 +933,7 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         TourAskExample tourAskExample = new TourAskExample();
         tourAskExample.createCriteria().andIdEqualTo(id).andAskState0EqualTo(7);
         TourAsk tourAsk = new TourAsk();
-        tourAsk.setAskState0(8);
+        tourAsk.setAskState0(9);
         int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 
        /* //查询旅游发布表中的主键id

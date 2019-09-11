@@ -22,7 +22,7 @@ public class TourVo1 {
     private String endAddress;
     private String goTime;
     private String goMessage;
-    private Integer needNumber;
+    private Integer needNum;
     private Integer payType;
     private Integer reward;
     private Integer state;
@@ -46,7 +46,7 @@ public class TourVo1 {
                 ", endAddress='" + endAddress + '\'' +
                 ", goTime='" + goTime + '\'' +
                 ", goMessage='" + goMessage + '\'' +
-                ", needNumber=" + needNumber +
+                ", needNum=" + needNum +
                 ", payType=" + payType +
                 ", reward=" + reward +
                 ", state=" + state +
@@ -54,6 +54,14 @@ public class TourVo1 {
                 ", createTime=" + createTime +
                 ", sincerityMoneyValue=" + sincerityMoneyValue +
                 '}';
+    }
+
+    public Integer getNeedNum() {
+        return needNum;
+    }
+
+    public void setNeedNum(Integer needNum) {
+        this.needNum = needNum;
     }
 
     public Integer getUid() {
@@ -142,14 +150,6 @@ public class TourVo1 {
 
     public void setGoMessage(String goMessage) {
         this.goMessage = goMessage;
-    }
-
-    public Integer getNeedNumber() {
-        return needNumber;
-    }
-
-    public void setNeedNumber(Integer needNumber) {
-        this.needNumber = needNumber;
     }
 
     public Integer getPayType() {

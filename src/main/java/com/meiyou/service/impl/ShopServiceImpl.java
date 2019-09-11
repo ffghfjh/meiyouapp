@@ -2,6 +2,7 @@ package com.meiyou.service.impl;
 
 import com.meiyou.mapper.ShopBuyMapper;
 import com.meiyou.mapper.ShopMapper;
+import com.meiyou.model.ClubVO;
 import com.meiyou.model.ShopVO;
 import com.meiyou.myEnum.StateEnum;
 import com.meiyou.myEnum.TimeTypeEnum;
@@ -22,6 +23,7 @@ import redis.clients.jedis.GeoRadiusResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description: 景点商家(同城导游)业务层实现类
@@ -338,9 +340,9 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
             }
     )
     public Msg selectShopByPosition(Integer uid, String token, Double longitude, Double latitude) {
-        if(!RedisUtil.authToken(uid.toString(),token)){
-            return Msg.noLogin();
-        }
+//        if(!RedisUtil.authToken(uid.toString(),token)){
+//            return Msg.noLogin();
+//        }
         Msg msg = new Msg();
 
         //查找附近的key
@@ -365,24 +367,33 @@ public class ShopServiceImpl extends BaseServiceImpl implements ShopService{
 
             //通过id查找shop
             ShopExample example = new ShopExample();
-            example.createCriteria().andIdEqualTo(id).andOutTimeGreaterThan(new Date());
+            example.createCriteria()
+                    .andIdEqualTo(id)
+                    .andOutTimeGreaterThan(new Date())
+                    .andStateBetween(StateEnum.INIT.getValue(),StateEnum.COMPLETE.getValue());
             List<Shop> shops = shopMapper.selectByExample(example);
             if(shops.isEmpty()){
-                msg.setCode(404);
-                msg.setMsg("附近没有找到景点商家");
-                return msg;
+                continue;
             }
-
-            //去除自己发布的
-//            if(uid.equals(shops.get(0).getPublishId())){
-//                continue;
-//            }
 
             //把shop的值转换到ShopVO中
             ShopVO shopVO = setShopToShopVO(shops.get(0));
             shopVO.setDistance(dis);
 
             shopVOS.add(shopVO);
+        }
+
+        for (int i = 0; i < shopVOS .size(); i++)    {
+            for (int j = shopVOS .size()-1; j > i; j--)  {
+                Long time= shopVOS .get(j).getCreateTime().getTime();
+                Long time1= shopVOS .get(j-1).getCreateTime().getTime();
+                if (time.compareTo(time1)>0)    {
+                    //互换位置
+                    ShopVO shopVO = shopVOS.get(j);
+                    shopVOS.set(j, shopVOS.get(j-1));
+                    shopVOS.set(j-1, shopVO );
+                }
+            }
         }
 
         msg.add("shopVOS",shopVOS);

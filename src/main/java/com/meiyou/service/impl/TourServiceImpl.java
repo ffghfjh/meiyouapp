@@ -302,7 +302,6 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
         TourAsk tourAsk = new TourAsk();
         tourAsk.setAskState0(4);
         tourAsk.setUpdateTime(new Date());
-
         //将报名人员从报名态改为未报名态
         int i = tourAskMapper.updateByExampleSelective(tourAsk, tourAskExample);
 

@@ -120,7 +120,7 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             tourVO.setPublishBirthday(publish.getBirthday());
 
             //添加旅游信息
-            tourVO.setId(ask.getAppointId());
+            tourVO.setId(ask.getId());
             tourVO.setAppointId(ask.getAppointId());
             tourVO.setStartAddress(tour.getStartAddress());
             tourVO.setEndAddress(tour.getEndAddress());

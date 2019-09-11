@@ -52,9 +52,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         Msg msg = new Msg();
         boolean authToken = RedisUtil.authToken(appointment.getPublisherId().toString(), token);
         //判断是否登录
-       /* if (!authToken) {
+        if (!authToken) {
             return Msg.noLogin();
-        }*/
+        }
 
         //根据发布者id查询出他所有信息
         User user = userMapper.selectByPrimaryKey(appointment.getPublisherId());
@@ -515,7 +515,6 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         //如果是有人报名等待选中状态，则退还所有报名者的报名金
         int i1 = 0;
         int i2 = 0;
-        System.out.println(state);
         if (state == 2) {
             AppointAskExample appointAskExample = new AppointAskExample();
             appointAskExample.createCriteria().andAskStateEqualTo(1)
@@ -900,6 +899,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     * @Author: JK
     * @Date: 2019/9/9
     */
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id) {
         //约会发布者删除发布的记录
@@ -909,15 +909,19 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointment.setState(7);
         int i = appointmentMapper.updateByExampleSelective(appointment,appointmentExample);
 
-        //判断约会报名表中报名者是否删除记录
+       /* //判断约会报名表中报名者是否删除记录
         AppointAskExample appointAskExample = new AppointAskExample();
-        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(7);
+        appointAskExample.createCriteria().andAppointIdEqualTo(id).andAskStateEqualTo(8);
         List<AppointAsk> appointAsks = appointAskMapper.selectByExample(appointAskExample);
         if (appointAsks.size() == 1){
             //约会报名者删除记录，则将数据库中的数据删除
-            appointAskMapper.deleteByExample(appointAskExample);
-            appointmentMapper.deleteByPrimaryKey(id);
-        }
+            try {
+                appointAskMapper.deleteByExample(appointAskExample);
+                appointmentMapper.deleteByPrimaryKey(id);
+            } catch (RuntimeException e) {
+                throw new RuntimeException();
+            }
+        }*/
         if (i == 1){
             return Msg.success();
         }
@@ -929,6 +933,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     * @Author: JK
     * @Date: 2019/9/9
     */
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyAskAppointmentRecord(Integer uid, String token, Integer id) {
         AppointAskExample appointAskExample = new AppointAskExample();
@@ -937,18 +942,22 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
         appointAsk.setAskState(8);
         int i = appointAskMapper.updateByExampleSelective(appointAsk, appointAskExample);
 
-        //查询约会发布表中的主键id
+       /* //查询约会发布表中的主键id
         AppointAsk appointAsk1 = appointAskMapper.selectByPrimaryKey(id);
         Integer appointId = appointAsk1.getAppointId();
         //判断约会发布表中发布者是否删除记录
         AppointmentExample appointmentExample = new AppointmentExample();
-        appointmentExample.createCriteria().andIdEqualTo(appointId).andStateEqualTo(5);
+        appointmentExample.createCriteria().andIdEqualTo(appointId).andStateEqualTo(7);
         List<Appointment> appointments = appointmentMapper.selectByExample(appointmentExample);
         if (appointments.size() == 1){
             //约会报名者删除记录，则将数据库中的数据删除
-            appointmentMapper.deleteByExample(appointmentExample);
-            appointAskMapper.deleteByPrimaryKey(id);
-        }
+            try {
+                appointmentMapper.deleteByExample(appointmentExample);
+                appointAskMapper.deleteByPrimaryKey(id);
+            } catch (RuntimeException e) {
+                throw new RuntimeException();
+            }
+        }*/
         if (i == 1){
             return Msg.success();
         }

@@ -52,10 +52,7 @@ public class TourController {
         tour.setReward(reward);
         tour.setPayType(payType);
         return tourService.insert(tour,password,token,latitude,longitude);
-
     }
-
-
 
     /**
      * @Description: 取消发布旅游订单

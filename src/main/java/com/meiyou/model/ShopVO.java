@@ -226,4 +226,5 @@ public class ShopVO implements Serializable {
     public void setHeader(List<String> header) {
         this.header = header;
     }
+
 }

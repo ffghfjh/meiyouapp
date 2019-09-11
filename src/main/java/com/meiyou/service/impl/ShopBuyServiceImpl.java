@@ -307,7 +307,30 @@ public class ShopBuyServiceImpl extends BaseServiceImpl implements ShopBuyServic
             askerVO.setSignature(buyer.getSignature());
             askerVO.setAskId(shopBuy.getId());
 
-            askerVO.setAskState(shopBuy.getState());
+            //清除发布者不想看到的
+            if(shopBuy.getState() == StateEnum.CUT.getValue()
+                    || shopBuy.getState() == StateEnum.RESET.getValue()
+                    || shopBuy.getState() == StateEnum.IGNORE.getValue()){
+                continue;
+            }
+
+            switch (shopBuy.getState()){
+                case 0:
+                    askerVO.setAskState(StateEnum.INIT.getValue());
+                    break;
+                case 1:
+                    askerVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+                case 2:
+                    askerVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 3:
+                    askerVO.setAskState(StateEnum.INVALID.getValue());
+                    break;
+                case 7:
+                    askerVO.setAskState(StateEnum.COMPLETE.getValue());
+                    break;
+            }
 
             askerVOS.add(askerVO);
         }

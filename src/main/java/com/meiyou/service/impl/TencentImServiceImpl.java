@@ -140,6 +140,67 @@ public class TencentImServiceImpl implements TencentImService {
         }
     }
 
+    @Override
+    public boolean setUserInfo(User user) {
+        Random rand = new Random();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 1; i <= 32; i++) {
+            int randNum = rand.nextInt(9) + 1;
+            String num = randNum + "";
+            sb = sb.append(num);
+        }
+        String random = String.valueOf(sb); // 32未随机数
+        String usersig = tls_sigature.genSig(Constants.SDKAPPID, Constants.IDENTIFIER, Constants.PRIKEY).urlSig;
+        String URL = "https://console.tim.qq.com/v4/profile/portrait_set?sdkappid=" + Constants.SDKAPPID + "&identifier="+ Constants.IDENTIFIER +"&usersig=" + usersig + "&random=" + random + "&contenttype=json";
+
+        Map<String,Object> map = new HashMap<String,Object>();
+        List<Object> list = new ArrayList<Object>();
+        if(user.getNickname()!=null){
+            //昵称
+            Map<String,Object> nickname = new HashMap<String,Object>();
+            nickname.put("Tag", "Tag_Profile_IM_Nick");
+            nickname.put("Value", user.getNickname());
+            list.add(nickname);
+        }
+
+        if(user.getSex()!=null){
+            //性别
+            Map<String,Object> sex = new HashMap<String,Object>();
+
+            sex.put("Tag", "Tag_Profile_IM_Gender");
+            if(user.getSex()) {
+                sex.put("Value", "Gender_Type_Female");
+            }else {
+                sex.put("Value", "Gender_Type_Male");
+            }
+            list.add(sex);
+        }
+        if(user.getSignature()!=null){
+            //签名
+            Map<String,Object> qianming = new HashMap<String,Object>();
+            qianming.put("Tag", "Tag_Profile_IM_SelfSignature");
+            qianming.put("Value", user.getSignature());
+            list.add(qianming);
+        }
+
+        if(user.getHeader()!=null) {
+            //头像
+            Map<String,Object> img = new HashMap<String,Object>();
+            img.put("Tag", "Tag_Profile_IM_Image");
+            img.put("Value", user.getHeader());
+            list.add(img);
+        }
+        map.put("From_Account", user.getAccount());
+        map.put("ProfileItem", list);
+        JSONObject json = HttpUtil.postToJSONObject(URL, map);
+        System.out.println(json.toString());
+        if(json.getString("ActionStatus").equals("OK")) {
+          return true;
+        }else {
+           return false;
+        }
+    }
+
     public boolean userSendMsg(String fromUser, String toUser, String context, Integer syncOtherMachine) {
         // TODO Auto-generated method stub
 

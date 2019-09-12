@@ -19,4 +19,11 @@ public interface TencentImService {
       */
      int getUserState(String account);
 
+     /**
+      * 更新用户信息
+      * @param user
+      * @return
+      */
+     boolean setUserInfo(User user);
+
 }

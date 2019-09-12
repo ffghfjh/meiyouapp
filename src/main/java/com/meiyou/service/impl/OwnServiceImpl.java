@@ -7,6 +7,7 @@ import com.meiyou.pojo.AuthorizationExample;
 import com.meiyou.pojo.User;
 import com.meiyou.pojo.UserExample;
 import com.meiyou.service.OwnService;
+import com.meiyou.service.TencentImService;
 import com.meiyou.utils.FileUploadUtil;
 import com.meiyou.utils.Msg;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
     @Autowired
     AuthorizationMapper authorizationMapper;
 
+    @Autowired
+    TencentImService tencentImService;
+
     @Override
     public Msg changeInfo(User user) {
         Msg msg = new Msg();
@@ -38,12 +42,14 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(user.getId());
         Integer rows = userMapper.updateByExampleSelective(user, userExample);
-        if(rows == 0){
-            Msg.fail();
+        String account = userMapper.selectByPrimaryKey(user.getId()).getAccount();
+        user.setAccount(account);
+        if(tencentImService.setUserInfo(user)&&rows==1){
+            msg.setCode(100);
+            msg.setMsg("成功");
+            return msg;
         }
-        msg.setCode(100);
-        msg.setMsg("成功");
-        return msg;
+        return Msg.fail();
     }
 
     @Override
@@ -59,14 +65,23 @@ public class OwnServiceImpl extends BaseServiceImpl implements OwnService {
         user.setHeader(fileMsg.getExtend().get("path").toString());
         user.setUpdateTime(new Date());
         Integer rows = userMapper.updateByPrimaryKey(user);
+
+
+
         if(rows != 1){
             msg.setMsg("更新用户头像失败");
             msg.setCode(501);
             return msg;
         }
-        msg.setCode(100);
-        msg.setMsg("更新头像成功");
-        return msg;
+        if(tencentImService.setUserInfo(user)){
+            msg.setCode(100);
+            msg.setMsg("更新头像成功");
+            return msg;
+        }else {
+            msg.setMsg("更新腾讯用户头像失败");
+            msg.setCode(501);
+            return msg;
+        }
     }
 
     @Override

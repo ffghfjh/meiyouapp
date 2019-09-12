@@ -897,6 +897,9 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyPublishTourRecord(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
         TourExample tourExample = new TourExample();
         tourExample.createCriteria().andIdEqualTo(id);
         Tour tour = new Tour();
@@ -930,6 +933,9 @@ public class TourServiceImpl extends BaseServiceImpl implements TourService {
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyAskTourRecord(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
         TourAskExample tourAskExample = new TourAskExample();
         tourAskExample.createCriteria().andIdEqualTo(id);
         TourAsk tourAsk = new TourAsk();

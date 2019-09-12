@@ -912,6 +912,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyPublishAppointmentRecord(Integer uid, String token, Integer id){
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
         //约会发布者删除发布的记录
         AppointmentExample appointmentExample = new AppointmentExample();
         appointmentExample.createCriteria().andIdEqualTo(id);
@@ -942,6 +945,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Msg delectMyAskAppointmentRecord(Integer uid, String token, Integer id) {
+        if (!RedisUtil.authToken(uid.toString(), token)) {
+            return Msg.noLogin();
+        }
         AppointAskExample appointAskExample = new AppointAskExample();
         appointAskExample.createCriteria().andIdEqualTo(id);
         AppointAsk appointAsk = new AppointAsk();

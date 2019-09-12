@@ -199,6 +199,20 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
         }
 
         //返回一个封装好的ClubVO类
+
+        for (int i = 0; i < clubVOS .size(); i++)    {
+            for (int j = clubVOS .size()-1; j > i; j--)  {
+                Long time= clubVOS .get(j).getCreateTime().getTime();
+                Long time1= clubVOS .get(j-1).getCreateTime().getTime();
+                if (time.compareTo(time1)>0)    {
+                    //互换位置
+                    ClubVO clubVO = clubVOS.get(j);
+                    clubVOS.set(j, clubVOS.get(j-1));
+                    clubVOS.set(j-1, clubVO );
+                }
+            }
+        }
+
         return clubVOS;
     }
 
@@ -262,6 +276,20 @@ public class MyAskServiceImpl extends BaseServiceImpl implements MyAskService {
             shopVOS.add(shopVO);
         }
         //返回一个封装好的ShopVO类
+
+        for (int i = 0; i < shopVOS .size(); i++)    {
+            for (int j = shopVOS .size()-1; j > i; j--)  {
+                Long time= shopVOS .get(j).getCreateTime().getTime();
+                Long time1= shopVOS .get(j-1).getCreateTime().getTime();
+                if (time.compareTo(time1)>0)    {
+                    //互换位置
+                    ShopVO shopVO = shopVOS.get(j);
+                    shopVOS.set(j, shopVOS.get(j-1));
+                    shopVOS.set(j-1, shopVO );
+                }
+            }
+        }
+
         return shopVOS;
     }
 }

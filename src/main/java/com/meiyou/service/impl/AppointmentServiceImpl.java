@@ -777,7 +777,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl implements Appointme
                 return Msg.fail();
             }
             Appointment appointment = appointmentMapper.selectByPrimaryKey(Integer.parseInt(memberByString));
-            Integer state = appointment.getState();
+                Integer state = appointment.getState();
             //获取用户id
             Integer publisherId = appointment.getPublisherId();
             User user = userMapper.selectByPrimaryKey(publisherId);

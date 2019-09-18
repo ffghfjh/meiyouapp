@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserReportMapper userReportMapper;
-
     @Autowired
     UserMapper userMapper;
     @Autowired
@@ -1280,6 +1279,11 @@ public class UserServiceImpl implements UserService {
                         return Msg.success();
                     }
             }
+        }
+        else if(redPacket.getState()==2){
+            Msg msg = Msg.success();
+            msg.setCode(1000);
+            return msg;
         }
         return Msg.fail();
     }

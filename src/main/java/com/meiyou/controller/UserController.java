@@ -167,6 +167,7 @@ public class UserController {
     @RequestMapping(value="sendMoney",method = RequestMethod.POST)
     @ApiOperation("发红包")
     public Msg sendMoney(int id,String token,String text,String toAccount,int money) {
+        System.out.println("发送红包");
         if (RedisUtil.authToken(String.valueOf(id), token)) {
             return userService.sendMoney(id,text,money,toAccount);
         }

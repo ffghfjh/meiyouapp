@@ -247,4 +247,10 @@ public class UserController {
         return userService.selUserInfoById(uId);
     }
 
+    @RequestMapping(value = "selUserInfoByAccount",method = RequestMethod.POST)
+    @ApiOperation("查询用户资料")
+    public Msg selUserInfoById(String account){
+        return userService.selUserInfoByAccount(account);
+    }
+
 }

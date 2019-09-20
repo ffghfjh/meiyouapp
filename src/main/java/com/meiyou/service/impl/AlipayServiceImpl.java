@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,7 +72,7 @@ public class AlipayServiceImpl implements AlipayService {
         recharge.setUpdateTime(date);
         recharge.setChargeType(1);
         if(rechargeMapper.insertSelective(recharge)==1){
-             AlipayClient alipayClient = new DefaultAlipayClient(Constants.ALIURL, Constants.APP_ID, Constants.APP_PRIVATE_KEY, "json", Constants.CHARSET, Constants.ALIPAY_PUBLIC_KEY, "RSA2"); // 获得初始化的AlipayClient
+            AlipayClient alipayClient = new DefaultAlipayClient(Constants.ALIURL, Constants.APP_ID, Constants.APP_PRIVATE_KEY, "json", Constants.CHARSET, Constants.ALIPAY_PUBLIC_KEY, "RSA2"); // 获得初始化的AlipayClient
             AlipayTradeAppPayRequest alipayRequest = new AlipayTradeAppPayRequest();//app支付请求
             //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
             AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
@@ -217,7 +218,7 @@ public class AlipayServiceImpl implements AlipayService {
     }
 
     @Override
-    public void payCallback(Map requestParams) {
+    public void payCallback(Map<String,String[]> requestParams) {
         //获取支付宝POST过来反馈信息
         Map<String, String> params = new HashMap<String, String>();
         for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
@@ -225,18 +226,25 @@ public class AlipayServiceImpl implements AlipayService {
             String[] values = (String[]) requestParams.get(name);
             String valueStr = "";
             for (int i = 0; i < values.length; i++) {
-                valueStr = (i == values.length - 1) ? valueStr + values[i]
-                        : valueStr + values[i] + ",";
+                valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
             //乱码解决，这段代码在出现乱码时使用。
-            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+//            try {
+//                valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
             params.put(name, valueStr);
+        }
             //切记alipaypublickey是支付宝的公钥，请去open.alipay.com对应应用下查看。
             //boolean AlipaySignature.rsaCheckV1(Map<String, String> params, String publicKey, String charset, String sign_type)
-            boolean flag;
-            try {
-                flag = AlipaySignature.rsaCheckV1(params, Constants.ALIPAY_PUBLIC_KEY, Constants.CHARSET, "RSA2");
-                if (flag) {
+        boolean flag = false;
+        try {
+            flag = AlipaySignature.rsaCheckV1(params, Constants.ALIPAY_PUBLIC_KEY, Constants.CHARSET, "RSA2");
+         } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+           if (flag) {
                     // 商户订单号
                     String out_trade_no = params.get("out_trade_no");
                     // 修改叮当状态，改为 支付成功，已付款; 同时新增支付流水
@@ -256,12 +264,9 @@ public class AlipayServiceImpl implements AlipayService {
                 } else {
                     System.out.println("验证失败");
                 }
-            } catch (AlipayApiException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
         }
-    }
+
 
     @Override
     public Msg getChargeRadio() {

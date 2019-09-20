@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -32,7 +29,7 @@ public class AlipayController {
      *
      * @return
      */
-    @RequestMapping(value = "alipayOrder", method = RequestMethod.GET)
+    @RequestMapping(value = "alipayOrder",produces = "application/json; charset=utf-8", method = RequestMethod.GET)
     @ApiOperation(value = "支付宝获取支付订单信息接口")
     public Msg alipay(String total_amount,int uId,String token) {
         System.out.println("获取支付订单");
@@ -85,9 +82,9 @@ public class AlipayController {
      * 支付结果回调
      * @param request
      */
-    @RequestMapping(value="payCallback",method = RequestMethod.POST)
+    @RequestMapping(value="payCallback",produces = "application/json; charset=utf-8",method = RequestMethod.POST)
     public void payCallback(HttpServletRequest request){
-        Map requestParams = request.getParameterMap();
+        Map<String,String[]> requestParams = request.getParameterMap();
         alipayService.payCallback(requestParams);
     }
 

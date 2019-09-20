@@ -1220,6 +1220,36 @@ public class UserServiceImpl implements UserService {
         return msg;
     }
 
+    @Override
+    public Msg selUserInfoByAccount(String account) {
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andAccountEqualTo(account);
+        User user = userMapper.selectByExample(example).get(0);
+        Msg msg = Msg.success();
+        msg.add("uId",user.getId());
+        msg.add("account",user.getAccount());
+        msg.add("nickName",user.getNickname());
+        msg.add("header",user.getHeader());
+        msg.add("bgImg",user.getBgPicture());
+        msg.add("signature",user.getSignature());
+        if(user.getSex()){
+            msg.add("sex","女");
+        }else {
+            msg.add("sex","男");
+        }
+        int i = tencentImService.getUserState(user.getAccount());
+        if(i==1){
+            msg.add("state","在线");
+        }
+        else{
+            msg.add("state","离线");
+        }
+        msg.add("age",user.getBirthday());
+
+        return msg;
+    }
+
     /**
      * 用户举报
      * @param reporter_id [举报人]

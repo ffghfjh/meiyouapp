@@ -216,6 +216,12 @@ public interface UserService {
      */
     public Msg selUserInfoById(int uId);
 
+
+    /**
+     * 通过用户账号显示资料
+     */
+    public Msg selUserInfoByAccount(String account);
+
     /**
      * 忘记密码
      * @param phone

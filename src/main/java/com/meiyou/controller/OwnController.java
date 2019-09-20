@@ -36,6 +36,7 @@ public class OwnController {
                           @RequestParam("birthday") String birthday,
                           @RequestParam("signature") String signature
                           ){
+        System.out.println("修改资料");
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }
@@ -44,6 +45,31 @@ public class OwnController {
         user.setNickname(nickname);
         user.setSex(sex);
         user.setBirthday(birthday);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         user.setSignature(signature);
 
         return ownService.changeInfo(user);
@@ -55,6 +81,7 @@ public class OwnController {
                             @RequestParam("token") String token,
                             @RequestParam("img") MultipartFile img,
                             HttpServletRequest req){
+        System.out.println("修改头像");
         if(!RedisUtil.authToken(uid.toString(),token)){
             return Msg.noLogin();
         }

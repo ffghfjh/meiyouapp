@@ -44,7 +44,7 @@ public interface AlipayService {
     /**
      * 支付结果回调
      */
-    public void payCallback(Map requestParams);
+    public void payCallback(Map<String,String[]> requestParams);
 
     /**
      * 获取充值比例
